@@ -8,7 +8,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-import TextField from '@material-ui/core/TextField';
+//import TextField from '@material-ui/core/TextField';
+import { TextValidator } from 'react-material-ui-form-validator';
 
 /*
 This code is part of the CGIMP distribution
@@ -77,6 +78,7 @@ function OptsTable(props) {
 		    <TableRow key={row.id}>
 		    <TableCell key="1" align="right">{row.values[0]}</TableCell>
 		    <TableCell key="2" align="right">
+		    {/*
 		    <TextField
 		value={getState(row.values[3])}
 		onChange={handleChange(row.values[3])}
@@ -85,6 +87,15 @@ function OptsTable(props) {
 		//inputProps={{type: "number"}}
 		required={true}
 		{...( isError(getState(row.values[3]), row.values[4]) & {error: true, helperText: 'Input must be a ' + row.values[4] + '.'} ) }
+		    />
+		     */}
+		    <TextValidator
+		value={getState(row.values[3])}
+                onChange={handleChange(row.values[3])}
+                margin="dense"
+                id={row.values[3]}
+		validators={['required', 'isFloat']}
+		errorMessages={['This field is required!','Input must be a number!']}
 		    />
 		    </TableCell>
 		    <TableCell key="3" align="left">{row.values[2]}</TableCell>

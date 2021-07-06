@@ -306,7 +306,7 @@ router.post('/processData', (req, res) => {
     cmdArgs.push('-o');
     cmdArgs.push(outPath);
     
-    //console.log(cmdArgs.join(' '));
+    console.log(cmdArgs.join(' '));
 
     let pipelineOptions = {
 	mode: 'text',

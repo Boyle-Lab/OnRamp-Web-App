@@ -5,6 +5,8 @@ import FileUploader from './FileUploader';
 import OptsTable from './OptsTable';
 import SharedOptsTable from './SharedOptsTable';
 
+import { ValidatorForm } from 'react-material-ui-form-validator';
+
 /*
 This code is part of the CGIMP distribution
 (https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
@@ -154,6 +156,9 @@ class IntersectUserData extends Component {
 	    }
 	});
         this.updateStateSettings(dest, files);
+	if (!files.length) {
+            this.updateStateSettings(dest + 'Loaded', false);
+	}
     }
 
     handleChange = name => event => {
@@ -264,6 +269,11 @@ class IntersectUserData extends Component {
 	            allowedTypes={['fa', 'fasta']}
                     updateParentState={this.updateStateSettings}
                 />
+		<ValidatorForm
+            ref="form"
+            onSubmit={this.processData}
+            onError={errors => console.log(errors)}
+		>
 		<SharedOpts
                     medakaModels = {this.state.medakaModels}
                     selectedModel = {this.state.medakaSelectedModel}
@@ -272,23 +282,18 @@ class IntersectUserData extends Component {
 	            selectedMode = {this.state.mode}
         	    getState = {this.getState}
 		/>
-		<div>	
                 {
 		    this.state.mode === "medaka" ?
 			(<div></div>)
 			:
 			<BinningOpts handleChange={this.handleChange} getState={this.getState}/>
 		}
-	        </div>
-		<div>		
 		{
 		    this.state.nanofilt ?
 			<NanofiltOpts handleChange = {this.handleChange} getState={this.getState}/> :
 		    (<span></span>)
 		}
-	        </div>
-		<div>
-	        <form onSubmit={this.processData}>
+	        {/*<form onSubmit={this.processData}>*/}
 		<input type="submit" value="Submit" disabled={!(this.state.readFiles.length &&
 								this.state.refFiles.length &&
 								this.props.dataIsLoaded &&
@@ -296,8 +301,7 @@ class IntersectUserData extends Component {
 								this.state.readFilesLoaded
 							       )}
 		/>
-	        </form>
-		</div>
+	        </ValidatorForm>
 	    </div>
         );
     }

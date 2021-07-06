@@ -78,6 +78,7 @@ class App extends Component {
 		/>
 		<LoadAlertDialog
 	            open={!this.state.dataIsLoaded}
+	            message={'Please be patient; this may take several minutes!'}
 		/>
 		</div>
 	);
