@@ -1,8 +1,7 @@
 // /client/App.js
 
 import React, { Component } from "react";
-import IgvBrowser from './IgvBrowser';
-import Downloader from './Downloader';
+import LoadAlertDialog from './LoadAlert';
 
 import browser from './browser_config';
 import axios from "axios";
@@ -26,38 +25,40 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
 
-class ResultsDisplay extends Component {
-    // initialize our state
+class Downloader extends Component {
     constructor(props) {
-	super(props);
+        super(props);
 	this.state = {
+	    working: false
 	};
     }
-
-    componentDidMount() {
+    
+    downloadResults = () => {
+	this.setState({ working: true });
+	axios.post(browser.apiAddr + '/prepareResults',
+		   { serverId: this.props.serverId }
+		  )
+	    .then( response => {
+		this.setState({ working: false });
+		const downloadURL = browser.apiAddr + '/downloadResults' +
+		      '?serverId=' + response.data.data.serverId +
+		      '&fileName=' + response.data.data.fileName
+		window.location.href = downloadURL;
+	    });
     }
     
-    componentWillUnmount() {
-	// Clean up our area.
-    }
-
-
-    // Render the UI.
     render() {
 	return (
 		<div>
-		<IgvBrowser
-	            refFile={this.props.refFile}
-	            refServerId={this.props.refServerId}
-	            algnFile={this.props.algnFile}
-	            resServerId={this.props.resServerId}
-		/>
-		<Downloader
-	            serverId={this.props.resServerId}
-		/>
+		<LoadAlertDialog
+                    open={this.state.working}
+                    title={"Preparing Files..."}
+	            message={"This may take several minutes; please be patient!"}
+                />
+		<button onClick={this.downloadResults}>Download Results</button>
 		</div>
 	);
     }
 }
 
-export default ResultsDisplay;
+export default Downloader;

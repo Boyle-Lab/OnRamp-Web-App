@@ -1,9 +1,6 @@
 // /client/App.js
 
 import React, { Component } from "react";
-import IgvBrowser from './IgvBrowser';
-import Downloader from './Downloader';
-
 import browser from './browser_config';
 import axios from "axios";
 
@@ -26,7 +23,7 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
 
-class ResultsDisplay extends Component {
+class IgvBrowser extends Component {
     // initialize our state
     constructor(props) {
 	super(props);
@@ -35,6 +32,29 @@ class ResultsDisplay extends Component {
     }
 
     componentDidMount() {
+	const igvDiv = document.getElementById("igv-div");
+	let options =
+	    {
+		reference: {
+		    name: this.props.refFile,
+		    fastaURL: browser.apiAddr + '/getResult?serverId=' + this.props.refServerId + "&fileName=" + this.props.refFile + '&contentType=text/plain&encodingType=utf8',
+		    indexed: false
+		},
+		tracks: [
+		    {
+			name: "Alignment",
+			type: "alignment",
+			format: "bam",
+			sourceType: "file",
+			url: browser.apiAddr + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.algnFile + '&contentType=application/octet-stream',
+			indexURL: browser.apiAddr + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.algnFile + '.bai' + '&contentType=application/octet-stream'
+		    }
+		]
+	    };
+	igv.createBrowser(igvDiv, options)
+	.then(function (browser) {
+            console.log("Created IGV browser");
+	});
     }
     
     componentWillUnmount() {
@@ -45,19 +65,9 @@ class ResultsDisplay extends Component {
     // Render the UI.
     render() {
 	return (
-		<div>
-		<IgvBrowser
-	            refFile={this.props.refFile}
-	            refServerId={this.props.refServerId}
-	            algnFile={this.props.algnFile}
-	            resServerId={this.props.resServerId}
-		/>
-		<Downloader
-	            serverId={this.props.resServerId}
-		/>
-		</div>
-	);
+		<div id="igv-div">
+		</div>	);
     }
 }
 
-export default ResultsDisplay;
+export default IgvBrowser;
