@@ -21,3 +21,11 @@ conda init
 conda create -q -y -n medaka -c conda-forge -c bioconda medaka nanofilt
 conda activate medaka
 git clone https://github.com/crmumm/bulkPlasmidSeq.git
+
+# Install and compile EMBOSS
+cd /usr/local && wget ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-6.6.0.tar.gz
+tar -xvf EMBOSS-6.6.0.tar.gz
+cd EMBOSS-6.6.0
+./configure
+make
+ln -s $(pwd)/emboss/needle /usr/local/bin/
