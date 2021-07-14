@@ -89,7 +89,7 @@ if __name__ == "__main__":
         
         sys.stderr.write("%s\n" % fasta_file)
         fasta_fname = os.path.basename(fasta_file)
-        fasta_fname_root = fasta_fname.split('.')[0]
+        fasta_fname_root = os.path.splitext(fasta_fname)[0]
 
         # Retrieve the fasta filename and squence.
         f = open(fasta_file, 'r')
@@ -110,7 +110,14 @@ if __name__ == "__main__":
 
         # Process the pairwise alignment. We need the summary stats and the alignment string.
         pw_algn_seq_fname = glob(args.consensus_path + '/' + fasta_fname_root + '*.txt')[0] # SHOULD only return one file!
+        res["pairwise_algn_name"] = os.path.basename(pw_algn_seq_fname)
         #sys.stderr.write("%s\n" % pw_algn_seq_fname)
+
+        # Since sequence names are truncated at 13 characters, creating possible ambiguity,
+        # we will replace sequence line labels with "Seq 1" or "Seq 2", which are identified
+        # in the header as to which sequence they correspond to. We need a way to track which
+        # sequence line we're appending.
+        whichSeq = 1
         with open(pw_algn_seq_fname, 'r') as f:
             for line in f:
                 line.strip('\n')
@@ -118,9 +125,11 @@ if __name__ == "__main__":
                     continue
                 if re.search('^# 1:', line):
                     res["pairwise_algn_stats"]["seq1_name"] = line.split()[-1]
+                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 1:' + line.split()[-1] + '\n'
                     #sys.stderr.write("%s\n" % (res["pairwise_algn_stats"]["seq1_name"]))
                 elif re.search('^# 2:', line):
                     res["pairwise_algn_stats"]["seq2_name"] = line.split()[-1]
+                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 2:' + line.split()[-1] + '\n\n'
                     #sys.stderr.write("%s\n" % (res["pairwise_algn_stats"]["seq2_name"]))
                 elif re.search('^# Length', line):
                     res["pairwise_algn_stats"]["length"] = line.split()[-1]
@@ -143,6 +152,15 @@ if __name__ == "__main__":
                 elif re.search('^#', line):
                     continue
                 else:
+                    if re.search('^\s+', line):  # Sequence match/mismatch/gap line
+                        whichSeq = 2
+                    else:
+                        label = "Seq " + str(whichSeq) + '        '
+                        replPat = line.split()[0]
+                        line = re.sub(replPat, label, line)
+                        if whichSeq == 2:
+                            line = line + '\n'
+                            whichSeq = 1
                     res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + line
             #sys.stderr.write("%s" % res["pairwise_algn_seq"])
 
@@ -151,4 +169,4 @@ if __name__ == "__main__":
         
     # Convert results to a json string and print to stdout
     ret_str = json.dumps(ret)
-    sys.stdout.write("{}\n".format(ret_str))   
+    sys.stdout.write("{}\n".format(ret_str))
