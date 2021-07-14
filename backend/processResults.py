@@ -174,4 +174,4 @@ if __name__ == "__main__":
         
     # Convert results to a json string and print to stdout
     ret_str = json.dumps(ret)
-    #sys.stdout.write("{}\n".format(ret_str))
+    sys.stdout.write("{}\n".format(ret_str))
