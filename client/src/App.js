@@ -37,7 +37,8 @@ class App extends Component {
 	    refServerId: null,
 	    resServerId: null,
 	    refFile: null,
-	    algnFile: null
+	    algnFile: null,
+	    resData: null
 	};
     }
 
@@ -67,7 +68,8 @@ class App extends Component {
 			            resServerId={this.state.resServerId}
 			            refFile={this.state.refFile}
 			            algnFile={this.state.algnFile}
-			        />
+			            resData={this.state.resData}
+			    />
 		                :
 		                <IntersectUserData
 	                            dataIsLoaded={this.state.dataIsLoaded}

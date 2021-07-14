@@ -51,7 +51,7 @@ function SharedOptsTable(props) {
 	    {names.map( (name, index) => (
 		    <TableCell key={index.toString()} align="left">{name}</TableCell>
 	    ))}
-	</TableRow>
+	    </TableRow>
             </TableHead>
             <TableBody>
             {rows.map(row => (

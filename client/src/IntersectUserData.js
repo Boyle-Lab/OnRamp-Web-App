@@ -229,6 +229,7 @@ class IntersectUserData extends Component {
 		this.props.updateParentState("refFile", res.data.data.refFile);
 		this.props.updateParentState("algnFile", res.data.data.algnFile);
 		this.props.updateParentState("dataIsLoaded", true);
+		this.props.updateParentState("resData", res.data.stats);
 		this.props.updateParentState("showResults", true);
             })
             .catch(error => {
@@ -250,7 +251,7 @@ class IntersectUserData extends Component {
     render () {
 	console.log("Render IntersectUserData");
         return (
-            <div>
+	    <div>
                 Upload Read Data (fastq):
                 <FileUploader
 	            onFilesChange={this.handleFilesChange}

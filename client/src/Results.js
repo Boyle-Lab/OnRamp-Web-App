@@ -3,6 +3,8 @@
 import React, { Component } from "react";
 import IgvBrowser from './IgvBrowser';
 import Downloader from './Downloader';
+import ResultsTable from './ResultsTable';
+import InfoDialog from './InfoDialog';
 
 import browser from './browser_config';
 import axios from "axios";
@@ -31,21 +33,45 @@ class ResultsDisplay extends Component {
     constructor(props) {
 	super(props);
 	this.state = {
+	    showInfoDialog: false,
+	    infoDialogContent: null,
+	    infoDialogName: null
 	};
     }
 
     componentDidMount() {
     }
-    
+
     componentWillUnmount() {
 	// Clean up our area.
     }
 
+    showInfo = (event) => {
+	this.setState({ "infoDialogName": event.target[0].value,
+			"infoDialogContent": event.target[1].value,
+			"showInfoDialog": true });
+	event.preventDefault();
+    }
+
+    hideInfo = () => {
+	this.setState({ "showInfoDialog": false });
+    }
 
     // Render the UI.
     render() {
 	return (
 		<div>
+		<ResultsTable
+	            names={["Plasmid Reference Fasta", "Quality Metrics", "Consensus Sequence", "Pairwise Alignment", "IGV"]}
+	            rows={this.props.resData}
+	            handleInfoClick={this.showInfo}
+		/>
+		<InfoDialog
+	    open={this.state.showInfoDialog}
+	    onClose={this.hideInfo}
+	    name={this.state.infoDialogName}
+	    content={this.state.infoDialogContent}
+		/>
 		<IgvBrowser
 	            refFile={this.props.refFile}
 	            refServerId={this.props.refServerId}

@@ -39,3 +39,13 @@ a:hover {
     align-items: center;
     text-align: center;
 }
+
+.infoDialog {
+    display: block;
+    justify-content: left;
+    align-items: left;
+    text-align: left;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
