@@ -82,6 +82,7 @@ if __name__ == "__main__":
                 "similarity_pct": 0,
                 "gaps_str": "",
                 "gaps_pct": 0,
+                "mismatch_count": 0,
                 "score": 0
             },
             "quality_metrics": {}
@@ -125,11 +126,11 @@ if __name__ == "__main__":
                     continue
                 if re.search('^# 1:', line):
                     res["pairwise_algn_stats"]["seq1_name"] = line.split()[-1]
-                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 1:' + line.split()[-1] + '\n'
+                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 1: ' + line.split()[-1] + ' (reference)\n'
                     #sys.stderr.write("%s\n" % (res["pairwise_algn_stats"]["seq1_name"]))
                 elif re.search('^# 2:', line):
                     res["pairwise_algn_stats"]["seq2_name"] = line.split()[-1]
-                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 2:' + line.split()[-1] + '\n\n'
+                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 2: ' + line.split()[-1] + ' (consensus)\n\n'
                     #sys.stderr.write("%s\n" % (res["pairwise_algn_stats"]["seq2_name"]))
                 elif re.search('^# Length', line):
                     res["pairwise_algn_stats"]["length"] = line.split()[-1]
@@ -154,6 +155,9 @@ if __name__ == "__main__":
                 else:
                     if re.search('^\s+', line):  # Sequence match/mismatch/gap line
                         whichSeq = 2
+                        matches = re.match('\.', line)
+                        if matches:
+                            res["pairwise_algn_stats"]["mismatch_count"] += len(matches)
                     else:
                         label = "Seq " + str(whichSeq) + '        '
                         replPat = line.split()[0]
