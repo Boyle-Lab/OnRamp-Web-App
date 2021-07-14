@@ -63,7 +63,10 @@ function ResultsTable(props) {
 		        </form>
 		    </TableCell>
 		    <TableCell key="2" align="left">
-		        {""}
+		    Length: {row.pairwise_algn_stats.length}<br/>
+		    Gaps: {row.pairwise_algn_stats.gaps_str}<br/>
+		    Mismatches: {row.pairwise_algn_stats.mismatch_count}/{row.pairwise_algn_stats.length}<br/>
+		    Sequencing Depth: {""}
 		    </TableCell>
 		    <TableCell key="3" align="left">
 		        {row.consensus_name}

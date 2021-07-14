@@ -35,7 +35,8 @@ class ResultsDisplay extends Component {
 	this.state = {
 	    showInfoDialog: false,
 	    infoDialogContent: null,
-	    infoDialogName: null
+	    infoDialogName: null,
+	    showIgv: false
 	};
     }
 
@@ -57,6 +58,11 @@ class ResultsDisplay extends Component {
 	this.setState({ "showInfoDialog": false });
     }
 
+    handleClick = (event) => {
+	this.setState({ showIgv: true });
+	event.preventDefault();
+    }
+
     // Render the UI.
     render() {
 	return (
@@ -67,17 +73,22 @@ class ResultsDisplay extends Component {
 	            handleInfoClick={this.showInfo}
 		/>
 		<InfoDialog
-	    open={this.state.showInfoDialog}
-	    onClose={this.hideInfo}
-	    name={this.state.infoDialogName}
-	    content={this.state.infoDialogContent}
+	            open={this.state.showInfoDialog}
+	            onClose={this.hideInfo}
+	            name={this.state.infoDialogName}
+	            content={this.state.infoDialogContent}
 		/>
+		{this.state.showIgv ?
 		<IgvBrowser
 	            refFile={this.props.refFile}
 	            refServerId={this.props.refServerId}
 	            algnFile={this.props.algnFile}
 	            resServerId={this.props.resServerId}
-		/>
+		 />
+		 :
+		 <div></div>
+		}
+	        <button onClick={this.handleClick}>Show Results in IGV</button>
 		<Downloader
 	            serverId={this.props.resServerId}
 		/>

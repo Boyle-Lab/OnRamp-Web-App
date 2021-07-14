@@ -112,7 +112,7 @@ if __name__ == "__main__":
         # Process the pairwise alignment. We need the summary stats and the alignment string.
         pw_algn_seq_fname = glob(args.consensus_path + '/' + fasta_fname_root + '*.txt')[0] # SHOULD only return one file!
         res["pairwise_algn_name"] = os.path.basename(pw_algn_seq_fname)
-        #sys.stderr.write("%s\n" % pw_algn_seq_fname)
+        sys.stderr.write("%s\n" % pw_algn_seq_fname)
 
         # Since sequence names are truncated at 13 characters, creating possible ambiguity,
         # we will replace sequence line labels with "Seq 1" or "Seq 2", which are identified
@@ -155,7 +155,7 @@ if __name__ == "__main__":
                 else:
                     if re.search('^\s+', line):  # Sequence match/mismatch/gap line
                         whichSeq = 2
-                        matches = re.match('\.', line)
+                        matches = re.findall('\.', line)
                         if matches:
                             res["pairwise_algn_stats"]["mismatch_count"] += len(matches)
                     else:
@@ -167,10 +167,11 @@ if __name__ == "__main__":
                             whichSeq = 1
                     res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + line
             #sys.stderr.write("%s" % res["pairwise_algn_seq"])
+            #sys.stderr.write("%s\n" % res["pairwise_algn_stats"]["mismatch_count"])
 
         # Push the data to the return array
         ret.append(res)
         
     # Convert results to a json string and print to stdout
     ret_str = json.dumps(ret)
-    sys.stdout.write("{}\n".format(ret_str))
+    #sys.stdout.write("{}\n".format(ret_str))
