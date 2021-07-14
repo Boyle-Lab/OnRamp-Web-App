@@ -217,7 +217,8 @@ router.post('/processData', (req, res) => {
     // Container for results locations.
     const resData = { algnFile: "filtered_alignment.bam",
                       refServerId: refServerId,
-                      resServerId: serverId };
+                      resServerId: serverId,
+		      origRefFiles: refFiles };
 
     // Process the options.
     //const cmdArgs = ['/usr/local/bin/bulkPlasmidSeq/bulkPlasmidSeq.py'];
@@ -315,7 +316,7 @@ router.post('/processData', (req, res) => {
 	args: cmdArgs
     }
     
-    PythonShell.run('/usr/local/bulkPlasmidSeq/bulkPlasmidSeq.py', pipelineOptions, function (err) {
+    PythonShell.run('/usr/local/bulkPlasmidSeq/bulkPlasmidSeq.py', pipelineOptions, function (err, resStats) {
 	if (err) {
 	    console.log(err)
 	    res.status(400).send('Runtime error:' + err);
@@ -330,7 +331,22 @@ router.post('/processData', (req, res) => {
 	    });
 	    */
 	    //console.log("done")
-	    return res.json({ success: true, data: resData });
+
+	    // Gather up stats on the results.
+	    pipelineOptions = {
+		mode: 'text',
+		pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
+		pythonOptions: ['-u'],
+		args: [refPath, outPath + '/consensus_sequences']
+	    }
+	    PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
+		if (err) {
+		    console.log(err)
+		    res.status(400).send('Runtime error:' + err);
+		} else {
+		    return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+		}
+	    });
 	}
     });
 });
