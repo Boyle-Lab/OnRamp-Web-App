@@ -124,31 +124,32 @@ if __name__ == "__main__":
                 line.strip('\n')
                 if len(line) == 1:
                     continue
+                fields = line.split()
                 if re.search('^# 1:', line):
-                    res["pairwise_algn_stats"]["seq1_name"] = line.split()[-1]
-                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 1: ' + line.split()[-1] + ' (reference)\n'
+                    res["pairwise_algn_stats"]["seq1_name"] = fields[-1]
+                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 1: ' + fields[-1] + ' (reference)\n'
                     #sys.stderr.write("%s\n" % (res["pairwise_algn_stats"]["seq1_name"]))
                 elif re.search('^# 2:', line):
-                    res["pairwise_algn_stats"]["seq2_name"] = line.split()[-1]
-                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 2: ' + line.split()[-1] + ' (consensus)\n\n'
+                    res["pairwise_algn_stats"]["seq2_name"] = fields[-1]
+                    res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 2: ' + fields[-1] + ' (consensus)\n\n'
                     #sys.stderr.write("%s\n" % (res["pairwise_algn_stats"]["seq2_name"]))
                 elif re.search('^# Length', line):
-                    res["pairwise_algn_stats"]["length"] = line.split()[-1]
+                    res["pairwise_algn_stats"]["length"] = fields[-1]
                     #sys.stderr.write("%s\n" % (res["pairwise_algn_stats"]["length"])) 
                 elif re.search('^# Identity', line):
-                    res["pairwise_algn_stats"]["identity_str"] = line.split()[-2]
-                    res["pairwise_algn_stats"]["identity_pct"] = float(re.sub('[()%]', '', line.split()[-1]))
+                    res["pairwise_algn_stats"]["identity_str"] = fields[-2].split('/')[0]
+                    res["pairwise_algn_stats"]["identity_pct"] = float(re.sub('[()%]', '', fields[-1]))
                     #sys.stderr.write("%s, %.1f\n" % (res["pairwise_algn_stats"]["identity_str"], res["pairwise_algn_stats"]["identity_pct"]))
                 elif re.search('^# Similarity', line):
-                    res["pairwise_algn_stats"]["similarity_str"] = line.split()[-2]
-                    res["pairwise_algn_stats"]["similarity_pct"] = float(re.sub('[()%]', '', line.split()[-1]))
+                    res["pairwise_algn_stats"]["similarity_str"] = fields[-2].split('/')[0]
+                    res["pairwise_algn_stats"]["similarity_pct"] = float(re.sub('[()%]', '', fields[-1]))
                     #sys.stderr.write("%s, %.1f\n" % (res["pairwise_algn_stats"]["similarity_str"], res["pairwise_algn_stats"]["similarity_pct"]))
                 elif re.search('^# Gaps', line):
-                    res["pairwise_algn_stats"]["gaps_str"] = line.split()[-3]  # The gaps line includes a space after the opening paren in the pct field. This will break if this is ever not true!
-                    res["pairwise_algn_stats"]["gaps_pct"] = float(re.sub('[()%]', '', line.split()[-1]))
+                    res["pairwise_algn_stats"]["gaps_str"] = fields[-3]  # The gaps line includes a space after the opening paren in the pct field. This will break if this is ever not true!
+                    res["pairwise_algn_stats"]["gaps_pct"] = float(re.sub('[()%]', '', fields[-1]))
                     #sys.stderr.write("%s, %.1f\n" % (res["pairwise_algn_stats"]["gaps_str"], res["pairwise_algn_stats"]["gaps_pct"]))
                 elif re.search('^# Score', line):
-                    res["pairwise_algn_stats"]["score"] = line.split()[-1]
+                    res["pairwise_algn_stats"]["score"] = fields[-1]
                     #sys.stderr.write("%s\n" % (res["pairwise_algn_stats"]["score"]))
                 elif re.search('^#', line):
                     continue
@@ -160,7 +161,7 @@ if __name__ == "__main__":
                             res["pairwise_algn_stats"]["mismatch_count"] += len(matches)
                     else:
                         label = "Seq " + str(whichSeq) + '        '
-                        replPat = line.split()[0]
+                        replPat = fields[0]
                         line = re.sub(replPat, label, line)
                         if whichSeq == 2:
                             line = line + '\n'
