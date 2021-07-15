@@ -54,10 +54,11 @@ function ResultsTable(props) {
 
     return (
 	    <div>
-	    <p class='leftAligned'>
-	    <span class='good'>Good Quality</span>&nbsp;&nbsp;&nbsp;
-	    <span class='fair'>Fair Quality</span>&nbsp;&nbsp;&nbsp;
-	    <span class='poor'>Poor Quality</span>
+	    <p class='leftAlignedBold'>
+	    Quality Key:&nbsp;&nbsp;&nbsp;
+	    <span class='good'>Good</span>&nbsp;&nbsp;&nbsp;
+	    <span class='fair'>Fair</span>&nbsp;&nbsp;&nbsp;
+	    <span class='poor'>Poor</span>
 	    </p>
 	    <Paper className={classes.root}>
 	    <Table className={classes.table}>

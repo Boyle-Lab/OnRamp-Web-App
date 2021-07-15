@@ -68,6 +68,7 @@ a:hover {
     font-weight: bold;
 }
 
-.leftAligned {
+.leftAlignedBold {
     text-align: left;
+    font-weight: bold;
 }
