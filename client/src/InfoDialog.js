@@ -25,13 +25,6 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
-/*
-const useStyles = makeStyles(theme => ({
-    scrollPaper: {
-	alignItems: 'flex-start',
-    }
-}));
-*/
 
 class InfoDialog extends React.Component {
     constructor(props) {
@@ -42,7 +35,7 @@ class InfoDialog extends React.Component {
 
     render () {
 	return (
-	    <div class='infoDialog'>
+	    <div>
 		<Dialog
                     open={this.props.open}
 	            onClose={this.props.onClose}
@@ -72,4 +65,3 @@ InfoDialog.defaultProps = {
 };
 
 export default InfoDialog
-//export default withStyles(useStyles)(InfoDialog);

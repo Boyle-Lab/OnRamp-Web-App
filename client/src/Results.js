@@ -59,7 +59,7 @@ class ResultsDisplay extends Component {
     }
 
     handleClick = (event) => {
-	this.setState({ showIgv: true });
+	this.setState({ showIgv: !this.state.showIgv });
 	event.preventDefault();
     }
 
@@ -68,7 +68,7 @@ class ResultsDisplay extends Component {
 	return (
 		<div>
 		<ResultsTable
-	            names={["Plasmid Reference Fasta", "Quality Metrics", "Consensus Sequence", "Pairwise Alignment", "IGV"]}
+	            names={["Plasmid Reference Fasta", "Quality Metrics", "Consensus Sequence", "Pairwise Alignment"]}
 	            rows={this.props.resData}
 	            handleInfoClick={this.showInfo}
 		/>
@@ -79,16 +79,18 @@ class ResultsDisplay extends Component {
 	            content={this.state.infoDialogContent}
 		/>
 		{this.state.showIgv ?
+		<div>
 		<IgvBrowser
 	            refFile={this.props.refFile}
 	            refServerId={this.props.refServerId}
 	            algnFile={this.props.algnFile}
 	            resServerId={this.props.resServerId}
 		 />
+		 <button onClick={this.handleClick}>Hide IGV Browser</button>
+		 </div>
 		 :
-		 <div></div>
+		 <button onClick={this.handleClick}>Show Results in IGV Browser</button>
 		}
-	        <button onClick={this.handleClick}>Show Results in IGV</button>
 		<Downloader
 	            serverId={this.props.resServerId}
 		/>
