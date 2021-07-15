@@ -117,7 +117,7 @@ function ResultsTable(props) {
 		        <form onSubmit={handleInfoClick}>
                         <input type="hidden" name="input_fasta_name" value={row.pairwise_algn_name}/>
                         <input type="hidden" name="input_fasta_seq" value={row.pairwise_algn_seq}/>
-                        <input type="submit" value="Show Sequence"/>
+                        <input type="submit" value="Show Alignment"/>
                         </form>
 		        </span>
 		    </TableCell>
