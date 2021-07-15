@@ -83,6 +83,7 @@ if __name__ == "__main__":
                 "gaps_str": "",
                 "gaps_pct": 0,
                 "mismatch_count": 0,
+                "mismatch_pct": 0,
                 "score": 0
             },
             "quality_metrics": {}
@@ -169,6 +170,7 @@ if __name__ == "__main__":
                     res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + line
             #sys.stderr.write("%s" % res["pairwise_algn_seq"])
             #sys.stderr.write("%s\n" % res["pairwise_algn_stats"]["mismatch_count"])
+            res["pairwise_algn_stats"]["mismatch_pct"] = (res["pairwise_algn_stats"]["mismatch_count"] / res["pairwise_algn_stats"]["length"]) * 100
 
         # Push the data to the return array
         ret.append(res)
