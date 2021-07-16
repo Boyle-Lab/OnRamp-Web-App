@@ -1,7 +1,7 @@
 // /client/App.js
 
 import React, { Component } from "react";
-import IgvBrowser from './IgvBrowser';
+import IgvDialog from './IgvDialog';
 import Downloader from './Downloader';
 import ResultsTable from './ResultsTable';
 import InfoDialog from './InfoDialog';
@@ -78,16 +78,16 @@ class ResultsDisplay extends Component {
 	            name={this.state.infoDialogName}
 	            content={this.state.infoDialogContent}
 		/>
-		{this.state.showIgv ?
-		<div>
-		<IgvBrowser
+		<IgvDialog
+	            open={this.state.showIgv}
+	            onClose={this.handleClick}
 	            refFile={this.props.refFile}
 	            refServerId={this.props.refServerId}
 	            algnFile={this.props.algnFile}
 	            resServerId={this.props.resServerId}
 		 />
+		{this.state.showIgv ?
 		 <button onClick={this.handleClick}>Hide IGV Browser</button>
-		 </div>
 		 :
 		 <button onClick={this.handleClick}>Show Results in IGV Browser</button>
 		}
