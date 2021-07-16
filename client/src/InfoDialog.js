@@ -47,10 +47,8 @@ class InfoDialog extends React.Component {
                 <DialogTitle id="alert-dialog-title">
 		    {this.props.name}
 	        </DialogTitle>
-                <DialogContent>
-		    <span class='infoDialog'>
-		    {this.props.content}
-	            </span>
+                <DialogContent>		    
+	 	<span class='infoDialog' dangerouslySetInnerHTML={{ __html: this.props.content, }}></span>
                 </DialogContent>
 	        </Dialog>
 	    </div>

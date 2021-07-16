@@ -25,25 +25,22 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 """
 
-def parseOutput(output):
-    # Parse out the models and default model from medaka output.
-    for line in output.split('\n'):
-        if re.search('Available', line):
-            models = re.split(',\s+', line)[1:]
-            #sys.stderr.write("%s\n" % models)
-        elif re.search('consensus', line):
-            default_model = re.split('\s+', line)[-1]
-            #sys.stderr.write("%s\n" % default_model)
-    return models, default_model
+nucs = ['a', 'c', 'g', 't', 'A', 'C', 'G', 'T']
 
-
-def resultsToJson(models, default_model):
-    # Convert results to a json string.
-    dat = {}
-    dat["models"] = models
-    dat["default_model"] = default_model
-    return json.dumps(dat)
-
+nucColors = {
+    'a': '<span class="aNuc">a</span>',
+    'c': '<span class="cNuc">c</span>',
+    'g': '<span class="gNuc">g</span>',
+    't': '<span class="tNuc">t</span>',
+    'A': '<span class="aNuc">A</span>',
+    'C': '<span class="cNuc">C</span>',
+    'G': '<span class="gNuc">G</span>',
+    'T': '<span class="tNuc">T</span>',
+    '.': '<span class="subst">.</span>',
+    '-': '-',
+    'N': 'N',
+    'n': 'n'
+}
 
 if __name__ == "__main__":
     # Intersect two sets of input intervals and return the result.
@@ -179,13 +176,28 @@ if __name__ == "__main__":
                         matches = re.findall('\.', line)
                         if matches:
                             res["pairwise_algn_stats"]["mismatch_count"] += len(matches)
+                        line = re.sub('\.', nucColors['.'], line)
                     else:
-                        label = "Seq " + str(whichSeq) + '        '
+                        lineLen = len(line)
+                        label = "Seq " + str(whichSeq)
                         replPat = fields[0]
                         line = re.sub(replPat, label, line)
+                        lineLenDiff = lineLen - len(line)
+                        if lineLenDiff > 0:
+                            # Handle cases that change the line length
+                            replPat = label
+                            label = label + ' ' * lineLenDiff
+                            line = re.sub(replPat, label, line)
+                        # Add color codes to sequence string
+                        _line = ""
+                        for nuc in fields[2]:                            
+                            _line = _line + nucColors[nuc]
+                        replPat = fields[2]
+                        line = re.sub(replPat, _line, line)
                         if whichSeq == 2:
                             line = line + '\n'
                             whichSeq = 1
+                        line = re.sub('\n', '<br/>', line)
                     res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + line
             #sys.stderr.write("%s" % res["pairwise_algn_seq"])
             #sys.stderr.write("%s\n" % res["pairwise_algn_stats"]["mismatch_count"])

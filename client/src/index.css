@@ -72,3 +72,33 @@ a:hover {
     text-align: left;
     font-weight: bold;
 }
+
+.aNuc {
+    color: #00ff00;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.cNuc {
+    color: #ffcc00;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.gNuc {
+    color: #ff0000;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.tNuc {
+    color: #0000ff;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.subst {
+    color: #ff0000;
+    font-family: monospace;
+    font-weight: bold;
+}
