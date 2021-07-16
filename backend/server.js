@@ -337,7 +337,7 @@ router.post('/processData', (req, res) => {
 		mode: 'text',
 		pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
 		pythonOptions: ['-u'],
-		args: [refPath, outPath + '/consensus_sequences']
+		args: [refPath, outPath + '/consensus_sequences', outPath + '/filtered_alignment.bam']
 	    }
 	    PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
 		if (err) {

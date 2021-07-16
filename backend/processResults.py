@@ -4,6 +4,7 @@ import json
 import argparse
 import subprocess
 from glob import glob
+from pysam import AlignmentFile
 
 """
 This code is part of the bulkPlasmidSeq distribution
@@ -56,9 +57,23 @@ if __name__ == "__main__":
         "consensus_path", type=str,	
         help="Path to consensus fasta files. (Pairwise alignments are also in this directory.)"
     )
+    parser.add_argument(
+        "filtered_bam_file", type=str,
+        help="Path to filtered alignment bam file."
+    )
     
     args = parser.parse_args()
 
+
+    # First process filtered bam file to get the sequencing coverage for each plasmid.
+    seq_coverages = {}
+    bam_f = AlignmentFile(args.filtered_bam_file, "rb")
+    for read in bam_f.fetch():
+        if read.reference_name in seq_coverages.keys():
+            seq_coverages[read.reference_name] += 1
+        else:
+            seq_coverages[read.reference_name] = 1
+            
     # Data will be stored in a dictionary that will be returned as a json string.
     ret = []
     
@@ -68,6 +83,7 @@ if __name__ == "__main__":
         res = {
             "input_fasta_name": "",
             "input_fasta_seq": "",
+            "sequencing_cov": 0,
             "consensus_name": "",
             "consensus_seq": "",
             "pairwise_algn_name": "",
@@ -99,6 +115,9 @@ if __name__ == "__main__":
         res["input_fasta_seq"] = f.read()
         f.close()
         #sys.stderr.write("%s\n" % res["input_fasta_seq"])
+
+        # Store the precomputed sequencing coverage.
+        res["sequencing_cov"] = seq_coverages[fasta_fname_root]
 
         # Get the consensus sequence filename and sequence.
         consensus_seq_fname = glob(args.consensus_path + '/' + fasta_fname_root + '*.fasta')[0] # SHOULD only return one file!

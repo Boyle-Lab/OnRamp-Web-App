@@ -75,7 +75,7 @@ function ResultsTable(props) {
 		    <TableCell key="1" align="left">
 		        <span class={checkQuality(row.pairwise_algn_stats.gaps_str,
 						  row.pairwise_algn_stats.mismatch_count,
-						  100)}>
+						  row.sequencing_cov)}>
 		        {row.input_fasta_name}<br/>
 		        <form onSubmit={handleInfoClick}>
 		        <input type="hidden" name="input_fasta_name" value={row.input_fasta_name}/>
@@ -91,7 +91,7 @@ function ResultsTable(props) {
 		        Length: {row.pairwise_algn_stats.length}<br/>
 		        Gaps: {row.pairwise_algn_stats.gaps_str} ({row.pairwise_algn_stats.gaps_pct.toPrecision(1)}%)<br/>
 		        Mismatches: {row.pairwise_algn_stats.mismatch_count} ({row.pairwise_algn_stats.mismatch_pct.toPrecision(1)}%)<br/>
-		        Sequencing Depth: {""}
+		        Sequencing Depth: {row.sequencing_cov}
 		        </span>
 		    </TableCell>
 		    <TableCell key="3" align="left">
