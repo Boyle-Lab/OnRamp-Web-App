@@ -1,6 +1,6 @@
 import React from 'react';
 import Dialog from '@material-ui/core/Dialog';
-import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { withStyles } from '@material-ui/core/styles';
@@ -47,11 +47,11 @@ class InfoDialog extends React.Component {
                 <DialogTitle id="alert-dialog-title">
 		    {this.props.name}
 	        </DialogTitle>
-                <DialogContentText>
+                <DialogContent>
 		    <span class='infoDialog'>
 		    {this.props.content}
 	            </span>
-                </DialogContentText>
+                </DialogContent>
 	        </Dialog>
 	    </div>
 	);
