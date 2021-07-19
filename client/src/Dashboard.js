@@ -102,7 +102,7 @@ const styles = theme => ({
     overflow: 'auto',
   },
   chartContainer: {
-    marginLeft: -22,
+      marginLeft: 5,
   },
   tableContainer: {
     height: 320,
@@ -139,7 +139,8 @@ class Dashboard extends React.Component {
           position="absolute"
           className={classNames(classes.appBar, this.state.open && classes.appBarShift)}
         >
-          <Toolbar disableGutters={!this.state.open} className={classes.toolbar}>
+            <Toolbar disableGutters={!this.state.open} className={classes.toolbar}>
+	    {/*
             <IconButton
               color="inherit"
               aria-label="Open drawer"
@@ -151,6 +152,7 @@ class Dashboard extends React.Component {
             >
               <MenuIcon />
             </IconButton>
+	     */}
             <Typography
               component="h1"
               variant="h6"
@@ -166,7 +168,8 @@ class Dashboard extends React.Component {
 		//</IconButton>
 	    }
           </Toolbar>
-        </AppBar>
+            </AppBar>
+	    {/*
         <Drawer
           variant="permanent"
           classes={{
@@ -182,7 +185,8 @@ class Dashboard extends React.Component {
           <Divider />
           <List>{this.props.controls}</List>
           <Divider />
-        </Drawer>
+		    </Drawer>
+	    */}
         <main className={classes.content}>
             <div className={classes.appBarSpacer} />
             <Typography component="div" className={classes.chartContainer}>
