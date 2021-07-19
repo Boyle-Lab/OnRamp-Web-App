@@ -50,17 +50,17 @@ a:hover {
 }
 
 .good {
-    color: #008000;
+    color: #009e73;
     font-weight: bold;
 }
 
 .fair {
-    color: #e6b800;
+    color: #e69f00;
     font-weight: bold;
 }
 
 .poor {
-    color: #cc0000;
+    color: #d41159;
     font-weight: bold;
 }
 
@@ -74,31 +74,31 @@ a:hover {
 }
 
 .aNuc {
-    color: #00ff00;
+    color: #009e73;
     font-family: monospace;
     font-weight: bold;
 }
 
 .cNuc {
-    color: #ffcc00;
+    color: #e69f00;
     font-family: monospace;
     font-weight: bold;
 }
 
 .gNuc {
-    color: #ff0000;
+    color: #d55e00;
     font-family: monospace;
     font-weight: bold;
 }
 
 .tNuc {
-    color: #0000ff;
+    color: #0072b2;
     font-family: monospace;
     font-weight: bold;
 }
 
 .subst {
-    color: #ff0000;
+    color: #cc79a7;
     font-family: monospace;
     font-weight: bold;
 }
