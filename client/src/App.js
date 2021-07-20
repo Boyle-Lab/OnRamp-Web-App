@@ -7,6 +7,8 @@ import LoadAlertDialog from './LoadAlert';
 import IntersectUserData from './IntersectUserData';
 import ResultsDisplay from './Results';
 import Cookies from 'universal-cookie';
+import CachedSessionDialog from './CachedSessionDialog';
+import AcceptCookiesDialog from './AcceptCookiesDialog';
 
 import browser from './browser_config';
 import axios from "axios";
@@ -45,15 +47,16 @@ class App extends Component {
 	    algnFile: null,
 	    resData: null,
 	    useCookies: true,
+	    useCached: false,
+	    showCachedDialog: false,
+	    showAcceptCookiesDialog: true
 	};
     }
 
     componentDidMount() {
 	const cookies =  _cookies.getAll();
-	console.log(cookies);
 	if ('resServerId' in cookies && 'refServerId' in cookies && 'refFile' in cookies) {
-	    // Display existing results from server.
-	    this.getCachedResults(cookies.resServerId, cookies.refServerId, cookies.refFile);
+	    this.setState({ 'showCachedDialog': true });
 	}
     }
 
@@ -68,7 +71,9 @@ class App extends Component {
 
     _updateStateSettings = (data) => {
 	Object.keys(data).forEach( (key) => {
-	    this.setState({ [key]: data[key] });
+	    this.setState({ [key]: data[key] }, () => {
+		console.log(key, this.state[key]);
+	    });
 	});
     }
 
@@ -80,6 +85,31 @@ class App extends Component {
 	    });
 	    const cookies =  _cookies.getAll();
 	    //console.log(cookies);
+	}
+    }
+
+    // Reset cookies.
+    resetCookies = () => {
+	const cookies =  _cookies.getAll();
+	Object.keys(cookies).forEach( (key) => {
+            _cookies.remove(key);
+        });
+    }
+
+    // Handle responses regarding cached data.
+    handleCookiesClick = (data) => {
+        this._updateStateSettings(data);
+        this.resetCookies();
+    }
+
+    // Handle responses regarding cached data.
+    handleCachedClick = (data) => {
+	this._updateStateSettings(data);
+	if (data.useCached) {
+	    const cookies =  _cookies.getAll();
+	    this.getCachedResults(cookies.resServerId, cookies.refServerId, cookies.refFile);
+	} else {
+	    //this.resetCookies();
 	}
     }
 
@@ -102,13 +132,6 @@ class App extends Component {
 		    "resData": res.data.stats,
 		    "showResults": true
 		});
-                // Set session cookies. (might want to renew the cookie expiry)
-                /*this.props.setCookie({
-                    "refServerId": res.data.data.refServerId,
-                    "resServerId": res.data.data.resServerId,
-                    "refFile": res.data.data.refFile,
-                });*/
-
             })
             .catch(error => {
                 console.log(error);
@@ -144,6 +167,14 @@ class App extends Component {
 	            open={!this.state.dataIsLoaded}
 	            message={'Please be patient; this may take several minutes!'}
 		/>
+		<CachedSessionDialog
+                    open={this.state.showCachedDialog}
+	            handleResponse={this.handleCachedClick}
+                />
+		<AcceptCookiesDialog
+                    open={this.state.showAcceptCookiesDialog}
+                    handleResponse={this.handleCookiesClick}
+                />
 		</div>
 	);
     }
