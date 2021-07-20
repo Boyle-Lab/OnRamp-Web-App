@@ -49,14 +49,19 @@ class App extends Component {
 	    useCookies: true,
 	    useCached: false,
 	    showCachedDialog: false,
-	    showAcceptCookiesDialog: true
+	    showAcceptCookiesDialog: false
 	};
     }
 
     componentDidMount() {
 	const cookies =  _cookies.getAll();
-	if ('resServerId' in cookies && 'refServerId' in cookies && 'refFile' in cookies) {
-	    this.setState({ 'showCachedDialog': true });
+	console.log(cookies);
+	if (Object.keys(cookies).length == 0) {
+	    this.setState({ 'showAcceptCookiesDialog': true });
+	} else {
+	    if ('resServerId' in cookies && 'refServerId' in cookies && 'refFile' in cookies) {
+		this.setState({ 'showCachedDialog': true });
+	    }
 	}
     }
 
@@ -161,8 +166,12 @@ class App extends Component {
 			            setCookie={this.setCookie}
 			        />
 			   }
-	            onSettingsClick={this.handleSettingsClick}
+	            handleChange={this._updateStateSettings}
 		/>
+		<AcceptCookiesDialog
+                    open={this.state.showAcceptCookiesDialog}
+                    handleResponse={this.handleCookiesClick}
+                />
 		<LoadAlertDialog
 	            open={!this.state.dataIsLoaded}
 	            message={'Please be patient; this may take several minutes!'}
@@ -170,10 +179,6 @@ class App extends Component {
 		<CachedSessionDialog
                     open={this.state.showCachedDialog}
 	            handleResponse={this.handleCachedClick}
-                />
-		<AcceptCookiesDialog
-                    open={this.state.showAcceptCookiesDialog}
-                    handleResponse={this.handleCookiesClick}
                 />
 		</div>
 	);

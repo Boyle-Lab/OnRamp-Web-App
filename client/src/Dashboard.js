@@ -10,8 +10,9 @@ import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+//import MenuIcon from '@material-ui/icons/Menu';
+//import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import HomeIcon from '@material-ui/icons/Home';
 //import SettingsIcon from '@material-ui/icons/Settings';
 
 /*
@@ -125,8 +126,10 @@ class Dashboard extends React.Component {
     this.setState({ open: false });
   };
 
-    handleSettingsClick = () => {
-	this.props.onSettingsClick();
+    handleHomeClick = () => {
+	this.props.handleChange({
+	    'showResults': false
+	});
     }
 
   render() {
@@ -140,19 +143,12 @@ class Dashboard extends React.Component {
           className={classNames(classes.appBar, this.state.open && classes.appBarShift)}
         >
             <Toolbar disableGutters={!this.state.open} className={classes.toolbar}>
-	    {/*
             <IconButton
               color="inherit"
-              aria-label="Open drawer"
-              onClick={this.handleDrawerOpen}
-              className={classNames(
-                classes.menuButton,
-                this.state.open && classes.menuButtonHidden,
-              )}
+              onClick={this.handleHomeClick}
             >
-              <MenuIcon />
+              <HomeIcon />
             </IconButton>
-	     */}
             <Typography
               component="h1"
               variant="h6"
@@ -199,7 +195,8 @@ class Dashboard extends React.Component {
 }
 
 Dashboard.propTypes = {
-  classes: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
+    handleChange: null
 };
 
 export default withStyles(styles)(Dashboard);
