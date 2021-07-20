@@ -82,7 +82,6 @@ class ResultsDisplay extends Component {
 	            open={this.state.showIgv}
 	            onClose={this.handleClick}
 	            refFile={this.props.refFile}
-	            refServerId={this.props.refServerId}
 	            algnFile={this.props.algnFile}
 	            resServerId={this.props.resServerId}
 		 />

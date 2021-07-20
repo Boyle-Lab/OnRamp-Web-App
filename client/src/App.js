@@ -6,6 +6,10 @@ import Dashboard from './Dashboard';
 import LoadAlertDialog from './LoadAlert';
 import IntersectUserData from './IntersectUserData';
 import ResultsDisplay from './Results';
+import Cookies from 'universal-cookie';
+
+import browser from './browser_config';
+import axios from "axios";
 
 /*
 This code is part of the bulk_plasmid_seq_web distribution
@@ -25,6 +29,7 @@ GNU General Public License for more details.
 
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
+const _cookies = new Cookies();
 
 class App extends Component {
     // initialize our state
@@ -38,11 +43,18 @@ class App extends Component {
 	    resServerId: null,
 	    refFile: null,
 	    algnFile: null,
-	    resData: null
+	    resData: null,
+	    useCookies: true,
 	};
     }
 
     componentDidMount() {
+	const cookies =  _cookies.getAll();
+	console.log(cookies);
+	if ('resServerId' in cookies && 'refServerId' in cookies && 'refFile' in cookies) {
+	    // Display existing results from server.
+	    this.getCachedResults(cookies.resServerId, cookies.refServerId, cookies.refFile);
+	}
     }
 
     componentWillUnmount() {
@@ -52,6 +64,56 @@ class App extends Component {
     // Handle state change requests from the settings dialog.
     updateStateSettings = (name, value) => {
         this.setState({ [name]: value });
+    }
+
+    _updateStateSettings = (data) => {
+	Object.keys(data).forEach( (key) => {
+	    this.setState({ [key]: data[key] });
+	});
+    }
+
+    // Set cookies.
+    setCookie = (data) => {
+	if (this.state.useCookies) {
+	    Object.keys(data).forEach( (key) => {
+		_cookies.set(key, data[key], { 'maxAge': 86400 });
+	    });
+	    const cookies =  _cookies.getAll();
+	    //console.log(cookies);
+	}
+    }
+
+    // Get a cached result set from the server.
+    getCachedResults = (resServerId, refServerId, refFile) => {
+	axios.post(browser.apiAddr + "/processCachedData",
+                   {resServerId: resServerId,
+		    refServerId: refServerId,
+		    refFile: refFile
+                   }
+                  )
+            .then(res => {
+                // Display the results in the parent component.           
+                this._updateStateSettings({
+		    "refServerId": res.data.data.refServerId,
+		    "resServerId": res.data.data.resServerId,
+		    "refFile": res.data.data.refFile,
+		    "algnFile": res.data.data.algnFile,
+		    "dataIsLoaded": true,
+		    "resData": res.data.stats,
+		    "showResults": true
+		});
+                // Set session cookies. (might want to renew the cookie expiry)
+                /*this.props.setCookie({
+                    "refServerId": res.data.data.refServerId,
+                    "resServerId": res.data.data.resServerId,
+                    "refFile": res.data.data.refFile,
+                });*/
+
+            })
+            .catch(error => {
+                console.log(error);
+                // Handle the error
+            });
     }
 
     // Render the UI.
@@ -64,7 +126,6 @@ class App extends Component {
 	           content={this.state.showResults ?
 		                <ResultsDisplay
                                     updateParentState={this.updateStateSettings}
-			            refServerId={this.state.refServerId}
 			            resServerId={this.state.resServerId}
 			            refFile={this.state.refFile}
 			            algnFile={this.state.algnFile}
@@ -74,6 +135,7 @@ class App extends Component {
 		                <IntersectUserData
 	                            dataIsLoaded={this.state.dataIsLoaded}
 	                            updateParentState={this.updateStateSettings}
+			            setCookie={this.setCookie}
 			        />
 			   }
 	            onSettingsClick={this.handleSettingsClick}

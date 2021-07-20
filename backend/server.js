@@ -235,11 +235,11 @@ router.post('/processData', (req, res) => {
 
     // Ref file/directory is next
     cmdArgs.push('-r');
-    if (_refFiles.length > 1) {
+    if (_refFiles.length > 0) {
         cmdArgs.push(refPath)
-	// Need to cmbine ref files into a single fasta for display when there are multiples.
+	// Need to combine ref files into a single fasta for display when there are multiples.
 	const filesToCat = ["cat"];
-	// Append the reafPath to all files.
+	// Append the refPath to all files.
 	_refFiles.map(function (filename) {
 	    filesToCat.push(refPath + filename);
 	});
@@ -255,7 +255,7 @@ router.post('/processData', (req, res) => {
 	    }
 	    //console.log("Ref files combined.");
 	});
-	resData["refServerId"] = serverId;
+	//resData["refServerId"] = serverId;
 	resData["refFile"] = 'combined_ref_seqs.fasta';
     } else {
 	cmdArgs.push(refPath + _refFiles[0]);
@@ -337,7 +337,7 @@ router.post('/processData', (req, res) => {
 		mode: 'text',
 		pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
 		pythonOptions: ['-u'],
-		args: [refPath, outPath + '/consensus_sequences', outPath + '/filtered_alignment.bam']
+		args: [refPath, outPath + 'consensus_sequences', outPath + 'filtered_alignment.bam']
 	    }
 	    PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
 		if (err) {
@@ -349,6 +349,40 @@ router.post('/processData', (req, res) => {
 	    });
 	}
     });
+});
+
+// This method retrieves existing data from the server for a session run
+// within the last 24 hours. (session data stored in a cookie)
+router.post('/processCachedData', (req, res) => {
+    const { resServerId, refServerId, refFile } = req.body;
+
+    // Container for results locations.
+    const resData = { algnFile: "filtered_alignment.bam",
+                      refServerId: refServerId,
+                      resServerId: resServerId,
+		      refFile: refFile
+		    };
+
+    // Get locations of data on the server.
+    const refPath = '/tmp/' + refServerId + '/';
+    const resPath = '/tmp/' + resServerId + '/';    
+
+    let pipelineOptions = {
+        mode: 'text',
+        pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
+        pythonOptions: ['-u'],
+        args: [refPath, resPath + 'consensus_sequences', resPath + 'filtered_alignment.bam']
+    }
+    
+    PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
+        if (err) {
+            console.log(err)
+            res.status(400).send('Runtime error:' + err);
+        } else {
+            return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+        }
+    });
+    
 });
 
 // append /api for our http requests

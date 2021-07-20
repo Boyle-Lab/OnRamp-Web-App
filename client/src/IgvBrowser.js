@@ -37,7 +37,7 @@ class IgvBrowser extends Component {
 	    {
 		reference: {
 		    name: this.props.refFile,
-		    fastaURL: browser.apiAddr + '/getResult?serverId=' + this.props.refServerId + "&fileName=" + this.props.refFile + '&contentType=text/plain&encodingType=utf8',
+		    fastaURL: browser.apiAddr + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.refFile + '&contentType=text/plain&encodingType=utf8',
 		    indexed: false
 		},
 		tracks: [

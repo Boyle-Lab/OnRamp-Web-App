@@ -52,7 +52,6 @@ class IgvDialog extends React.Component {
                 <DialogContent>
 		<IgvBrowser
                     refFile={this.props.refFile}
-                    refServerId={this.props.refServerId}
                     algnFile={this.props.algnFile}
                     resServerId={this.props.resServerId}
                  />

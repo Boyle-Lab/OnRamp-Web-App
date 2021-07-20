@@ -223,7 +223,7 @@ class IntersectUserData extends Component {
                    }
                   )
             .then(res => {
-		// Process the results for display
+		// Display the results in the parent component.
 		this.props.updateParentState("refServerId", res.data.data.refServerId);
 		this.props.updateParentState("resServerId", res.data.data.resServerId);
 		this.props.updateParentState("refFile", res.data.data.refFile);
@@ -231,6 +231,13 @@ class IntersectUserData extends Component {
 		this.props.updateParentState("dataIsLoaded", true);
 		this.props.updateParentState("resData", res.data.stats);
 		this.props.updateParentState("showResults", true);
+		// Set session cookies.
+		this.props.setCookie({
+		    "refServerId": res.data.data.refServerId,
+		    "resServerId": res.data.data.resServerId,
+		    "refFile": res.data.data.refFile,
+		});
+		
             })
             .catch(error => {
                 console.log(error);
