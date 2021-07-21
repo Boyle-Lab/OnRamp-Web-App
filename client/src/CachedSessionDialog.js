@@ -46,6 +46,7 @@ class CachedSessionDialog extends React.Component {
 
     handleNewAnalClick = (event) => {
 	this.props.handleResponse({
+	    'showResults': false,
             'showCachedDialog':	false,
             'useCached': false
         });

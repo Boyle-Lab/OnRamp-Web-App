@@ -13,7 +13,9 @@ import IconButton from '@material-ui/core/IconButton';
 //import MenuIcon from '@material-ui/icons/Menu';
 //import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import HomeIcon from '@material-ui/icons/Home';
-//import SettingsIcon from '@material-ui/icons/Settings';
+import SettingsIcon from '@material-ui/icons/Settings';
+import StorageIcon from '@material-ui/icons/Storage';
+
 
 /*
 This code is part of the CGIMP distribution
@@ -132,6 +134,12 @@ class Dashboard extends React.Component {
 	});
     }
 
+    handleSessionsClick = () => {
+	this.props.handleChange({
+	    'showCachedDialog': true
+	});
+    }
+
   render() {
     const { classes } = this.props;
 
@@ -149,6 +157,13 @@ class Dashboard extends React.Component {
             >
               <HomeIcon />
             </IconButton>
+	    <IconButton
+              color="inherit"
+              onClick={this.handleSessionsClick}
+	      disabled={!this.props.enableSessionsIcon}
+            >
+	    <StorageIcon />
+	    </IconButton>
             <Typography
               component="h1"
               variant="h6"

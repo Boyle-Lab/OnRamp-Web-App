@@ -49,7 +49,8 @@ class App extends Component {
 	    useCookies: true,
 	    useCached: false,
 	    showCachedDialog: false,
-	    showAcceptCookiesDialog: false
+	    showAcceptCookiesDialog: false,
+	    enableSessionsButton: false
 	};
     }
 
@@ -60,7 +61,7 @@ class App extends Component {
 	    this.setState({ 'showAcceptCookiesDialog': true });
 	} else {
 	    if ('resServerId' in cookies && 'refServerId' in cookies && 'refFile' in cookies) {
-		this.setState({ 'showCachedDialog': true });
+		this.setState({ 'enableSessionsButton': true });
 	    }
 	}
     }
@@ -166,7 +167,8 @@ class App extends Component {
 			            setCookie={this.setCookie}
 			        />
 			   }
-	            handleChange={this._updateStateSettings}
+	    handleChange={this._updateStateSettings}
+	    enableSessionsIcon={this.state.enableSessionsButton}
 		/>
 		<AcceptCookiesDialog
                     open={this.state.showAcceptCookiesDialog}
