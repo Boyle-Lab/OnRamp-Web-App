@@ -211,7 +211,6 @@ class Dashboard extends React.Component {
 
 Dashboard.propTypes = {
     classes: PropTypes.object.isRequired,
-    handleChange: null
 };
 
 export default withStyles(styles)(Dashboard);

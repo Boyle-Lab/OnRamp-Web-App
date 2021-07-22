@@ -1,93 +1,67 @@
 import React from 'react';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { withStyles } from '@material-ui/core/styles';
-import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
-
-/*
-This code is part of the bulkPlasmidSeq distribution
-(https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
-Please see the LICENSE file that should have been included as part of this
-package. If not, see <https://www.gnu.org/licenses/>.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-CONTACT: Adam Diehl, adadiehl@umich.edu
-*/
-
+import Avatar from '@material-ui/core/Avatar';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import CollectionsIcon from '@material-ui/icons/Collections';
 
 class CachedSessionDialog extends React.Component {
     constructor(props) {
-	super(props);
-        this.state = {
-	};
+      super(props);
+	this.state = {
+	    cookies: null
+	}
     }
 
-    hnadleShowResClick = (event) => {
-	this.props.handleResponse({
-	    'showCachedDialog': false,
-	    'useCached': true
-	});
-	event.preventDefault();
+    componentDidMount() {
+        /*const cookies =  this.props._cookies.getAll();
+        this.setState({ cookies: cookies }, () => {
+            console.log(this.state.cookies);
+        });*/
     }
 
-    handleNewAnalClick = (event) => {
-	this.props.handleResponse({
-	    'showResults': false,
-            'showCachedDialog':	false,
-            'useCached': false
+    handleShowResClick = (sessionId) => {
+        this.props.handleResponse({
+            'showCachedDialog': false,
+            'useCached': sessionId
         });
-	event.preventDefault();
+    }
+    
+    handleClose = () => {
+        this.props.handleResponse({
+            'showCachedDialog': false
+        });
     }
 
+    
     render () {
-	return (
-	    <div>
-		<Dialog
-                    open={this.props.open}
-	            onClose={this.props.onClose}
-	            scroll='paper'
-	            maxWidth='xl'
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-	        >
-                  <DialogTitle id="alert-dialog-title">
-		        {'Cached Session Found'}
-	          </DialogTitle>
-                  <DialogContent>
-		    <DialogContentText>
-		        {'We found results from a previous run. Do you want to view them or start a new analysis?'}
-	            </DialogContentText>
-                  </DialogContent>
-		  <DialogActions>
-                    <Button onClick={this.hnadleShowResClick} color="primary">
-                        View Results
-                    </Button>
-                    <Button onClick={this.handleNewAnalClick} color="primary" autoFocus>
-                        Start New Analysis 
-                    </Button>
-                  </DialogActions>
-	        </Dialog>
-	    </div>
+	return (  
+		<Dialog onClose={this.handleClose} aria-labelledby="cached-dialog-title" open={this.props.open}>
+		<DialogTitle id="cached-dialog-title">Select a Cached Session</DialogTitle>
+		<List>
+		{this.props.cookies ?
+		 (
+		     Object.keys(this.props.cookies).map((key, index) => (
+			     <ListItem button onClick={() => this.handleShowResClick(key)} key={index}>
+			     <ListItemAvatar>
+			     <Avatar>
+			     <CollectionsIcon />
+			     </Avatar>
+			     </ListItemAvatar>
+			     <ListItemText primary={this.props.cookies[key].name} secondary={this.props.cookies[key].date} />
+			     </ListItem>
+		     ))
+		 ) : (<div/>)
+		}
+		</List>
+		</Dialog>
 	);
     }
 }
 
-CachedSessionDialog.defaultProps = {
-    open: false,
-};
-
-export default CachedSessionDialog
+export default CachedSessionDialog;

@@ -59,6 +59,13 @@ function SharedOptsTable(props) {
 		    <TableCell key="1" align="right">{row.values[0]}</TableCell>
 		    <TableCell key="2" align="right">
 		    {row.id === 1 ?
+		     (<TextField
+                         id="name"
+		         onChange={handleChange('mode')}
+		         value={getState(row.values[3])}
+                         margin="normal">
+                      </TextField>)
+		     : row.id === 2 ?
 			(<TextField
 			 id="mode"
 			 select
@@ -78,7 +85,7 @@ function SharedOptsTable(props) {
 			     </option>
 			 ))}
 			 </TextField>)
-		     : row.id === 2 ?
+		     : row.id === 3 ?
 			(<TextField
 			 id="medakaModel"
 			 select

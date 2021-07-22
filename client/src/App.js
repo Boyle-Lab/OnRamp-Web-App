@@ -47,22 +47,19 @@ class App extends Component {
 	    algnFile: null,
 	    resData: null,
 	    useCookies: true,
-	    useCached: false,
+	    useCached: 0,
 	    showCachedDialog: false,
 	    showAcceptCookiesDialog: false,
-	    enableSessionsButton: false
+	    enableSessionsButton: false,
 	};
     }
 
     componentDidMount() {
 	const cookies =  _cookies.getAll();
-	console.log(cookies);
 	if (Object.keys(cookies).length == 0) {
 	    this.setState({ 'showAcceptCookiesDialog': true });
 	} else {
-	    if ('resServerId' in cookies && 'refServerId' in cookies && 'refFile' in cookies) {
-		this.setState({ 'enableSessionsButton': true });
-	    }
+	    this.setState({ 'enableSessionsButton': true });
 	}
     }
 
@@ -86,11 +83,19 @@ class App extends Component {
     // Set cookies.
     setCookie = (data) => {
 	if (this.state.useCookies) {
-	    Object.keys(data).forEach( (key) => {
-		_cookies.set(key, data[key], { 'maxAge': 86400 });
+	    const session_key = Math.floor(1000000000 + Math.random() * 9000000000);
+	    let cookie_str = "{";
+	    Object.keys(data).forEach( (key, index) => {
+		cookie_str = cookie_str + '"' +  key + '":"' + data[key] + '"';
+		if (index !== Object.keys(data).length-1) {
+		    cookie_str = cookie_str + ',';
+		}
 	    });
-	    const cookies =  _cookies.getAll();
+	    cookie_str = cookie_str + '}';
+	     _cookies.set(session_key, cookie_str, { 'maxAge': 86400 });
+	    //const cookies = _cookies.getAll();
 	    //console.log(cookies);
+	    this.setState({ enableSessionsButton: true });
 	}
     }
 
@@ -112,10 +117,8 @@ class App extends Component {
     handleCachedClick = (data) => {
 	this._updateStateSettings(data);
 	if (data.useCached) {
-	    const cookies =  _cookies.getAll();
-	    this.getCachedResults(cookies.resServerId, cookies.refServerId, cookies.refFile);
-	} else {
-	    //this.resetCookies();
+	    const cookie = _cookies.get(data.useCached);
+	    this.getCachedResults(cookie.resServerId, cookie.refServerId, cookie.refFile);
 	}
     }
 
@@ -167,8 +170,8 @@ class App extends Component {
 			            setCookie={this.setCookie}
 			        />
 			   }
-	    handleChange={this._updateStateSettings}
-	    enableSessionsIcon={this.state.enableSessionsButton}
+	            handleChange={this._updateStateSettings}
+	            enableSessionsIcon={this.state.enableSessionsButton}
 		/>
 		<AcceptCookiesDialog
                     open={this.state.showAcceptCookiesDialog}
@@ -181,6 +184,8 @@ class App extends Component {
 		<CachedSessionDialog
                     open={this.state.showCachedDialog}
 	            handleResponse={this.handleCachedClick}
+	            _cookies={_cookies}
+	            cookies={_cookies.getAll()}
                 />
 		</div>
 	);

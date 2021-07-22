@@ -262,6 +262,10 @@ router.post('/processData', (req, res) => {
 	resData["refFile"] = _refFiles[0];
     }
 
+    // Store the run name and date
+    resData["name"] = options.name;
+    resData["date"] = Date().toString();
+
     // Handle the double arg
     if (options.double) {
 	cmdArgs.push('--double');
@@ -273,6 +277,7 @@ router.post('/processData', (req, res) => {
     }
 
     // Next we'll handle the command-specific options
+    // biobin options
     if (options.mode === "biobin") {
 	cmdArgs.push('--marker_score');
 	cmdArgs.push(options.markerScore);
@@ -293,7 +298,8 @@ router.post('/processData', (req, res) => {
 	cmdArgs.push('--max_regions');
 	cmdArgs.push(options.maxRegions);
     }
-
+    
+    // nanofilt options
     if (options.filter) {
 	cmdArgs.push('--max_length');
 	cmdArgs.push(options.maxLen);
