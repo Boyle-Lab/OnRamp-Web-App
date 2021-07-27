@@ -7,12 +7,15 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-
 import TextField from '@material-ui/core/TextField';
+import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import SettingsIcon from '@material-ui/icons/Settings';
+import IconButton from '@material-ui/core/IconButton';
 
 /*
-This code is part of the CGIMP distribution
-(https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
+This code is part of the bulk_plasmid_seq_web distribution
+(https://github.com/Boyle-Lab/) and is governed by its license.
 Please see the LICENSE file that should have been included as part of this
 package. If not, see <https://www.gnu.org/licenses/>.
 
@@ -41,41 +44,55 @@ const styles = theme => ({
 });
 
 function SharedOptsTable(props) {
-    const { classes, names, rows, medakaModels, selectedModel, handleChange, analysisModes, selectedMode, getState } = props;
+    const { classes, names, rows, medakaModels, selectedModel, handleChange, handleSettings, analysisModes, selectedMode, getState } = props;
+
+    const handleSettingsClick = (event, name) => {
+	event.preventDefault();
+	let target = "";
+	if (name === "nanofilt") {
+	    target = "showNanofiltOpts";
+	} else if (name === "biobin") {
+	    target = "showBinningOpts";
+	}
+	console.log(target);
+	handleSettings(target, true);
+    }
     
     return (
 	    <Paper className={classes.root}>
 	    <Table className={classes.table}>
             <TableHead>
-            <TableRow key="0">
-	    {names.map( (name, index) => (
-		    <TableCell key={index.toString()} align="left">{name}</TableCell>
-	    ))}
-	    </TableRow>
             </TableHead>
             <TableBody>
             {rows.map(row => (
 		    <TableRow key={row.id}>
-		    <TableCell key="1" align="right">{row.values[0]}</TableCell>
-		    <TableCell key="2" align="right">
+		    {row.id > 3 ?
+		     <TableCell key="1" align="right"></TableCell>
+		     :
+		     <TableCell key="1" align="right">{row.values[0]}</TableCell>
+		    }
+		    <TableCell key="2" align="left">
 		    {row.id === 1 ?
-		     (<TextField
+		     (<FormControlLabel
+		      control={<TextField
                          id="name"
 		         onChange={handleChange('mode')}
 		         value={getState(row.values[3])}
                          margin="normal">
-                      </TextField>)
+			       </TextField>}
+		     />)
 		     : row.id === 2 ?
-			(<TextField
+		     (<FormControlLabel
+		      control={<TextField
 			 id="mode"
 			 select
-			 //className={classes.textField}                                                                             
+			 //className={classes.textField}
 			 value={selectedMode}
 			 onChange={handleChange('mode')}
 			 SelectProps={{
 			     native: true,
 			     MenuProps: {
-				 //className: classes.menu,                                                                          
+				 //className: classes.menu,
 			     },
 			 }}
 			 margin="normal">
@@ -84,49 +101,50 @@ function SharedOptsTable(props) {
 				 {option}
 			     </option>
 			 ))}
-			 </TextField>)
+			       </TextField>}
+		     />)
 		     : row.id === 3 ?
-			(<TextField
-			 id="medakaModel"
-			 select
-			 //className={classes.textField}                                                                             
-			 value={selectedModel}
-			 onChange={handleChange('medakaSelectedModel')}
-			 SelectProps={{
-			     native: true,
-			     MenuProps: {
-				 //className: classes.menu,                                                                          
-			     },
-			 }}
-			 margin="normal">
-			 {medakaModels.map(option => (
-				 <option key={option} value={option}>
-				 {option}
-			     </option>
-			 ))}
-			 </TextField>)
+		     (<FormControlLabel
+		      control={<TextField
+			       id="medakaModel"
+			       select
+			       //className={classes.textField}
+			       value={selectedModel}
+			       onChange={handleChange('medakaSelectedModel')}
+			       SelectProps={{
+				   native: true,
+				   MenuProps: {
+				       //className: classes.menu,
+				   },
+			       }}
+			       margin="normal">
+			       {medakaModels.map(option => (
+				       <option key={option} value={option}>
+				       {option}
+				   </option>
+			       ))}
+			       </TextField>}
+		      />)
 		     :
-			(<TextField
-			 id={row.values[3]}
-			 select
-			 value={getState(row.values[3])}
-			 onChange={handleChange(row.values[3])}
-			 SelectProps={{
-			     native: true,
-			     MenuProps: {
-				 //className: classes.menu,
-			     },
-			 }}
-			 margin="normal">
-			 {["true", "false"].map(option => (
-				 <option key={option} value={option}>
-				 {option}
-			     </option>
-			 ))}
-			 </TextField>)
+		     (<div><FormControlLabel
+		      control={<Switch
+			       id={row.values[3]}
+			       onChange={handleChange(row.values[3])}
+			       color="primary"
+					 />}
+			       label={row.values[0]}
+			       labelPlacement="end"
+		      /> {row.id === 5 ?
+			  (<IconButton color="inherit" onClick={ (event) => handleSettingsClick(event, row.values[3]) } >
+			   <SettingsIcon/>
+			   </IconButton>)
+			  : ("")
+			 }
+		      </div>
+		     )
 		    }
 		     </TableCell>
-		     <TableCell key="3" align="left">{row.values[2]}</TableCell>
+		    {/*<TableCell key="3" align="left">{row.values[2]}</TableCell>*/}
 		     </TableRow>
             ))}
         </TableBody>

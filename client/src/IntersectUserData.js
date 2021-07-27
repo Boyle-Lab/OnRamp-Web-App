@@ -4,8 +4,11 @@ import axios from "axios";
 import FileUploader from './FileUploader';
 import OptsTable from './OptsTable';
 import SharedOptsTable from './SharedOptsTable';
-
 import { ValidatorForm } from 'react-material-ui-form-validator';
+
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import GenericDialog from './GenericDialog';
 
 /*
 This code is part of the CGIMP distribution
@@ -35,6 +38,7 @@ class IntersectUserData extends Component {
 	    medakaModels: [],
 	    readFiles: [],
 	    refFiles: [],
+	    name: "",
 	    mode: "medaka",
 	    medakaSelectedModel: "",
 	    double: false,
@@ -55,7 +59,9 @@ class IntersectUserData extends Component {
 	    refServerId: null,
 	    readServerId: null,
 	    refFilesLoaded: false,
-	    readFilesLoaded: false
+	    readFilesLoaded: false,
+	    showBinningOpts: false,
+	    showNanofiltOpts: false
         };
 	this.handleFilesChange = this.handleFilesChange.bind(this);
 	this.processData = this.processData.bind(this);
@@ -65,6 +71,8 @@ class IntersectUserData extends Component {
     }
     
     componentDidMount() {
+	const name = adjectives[Math.floor(Math.random()*adjectives.length)] + '_' + nouns[Math.floor(Math.random()*nouns.length)];
+	this.updateStateSettings("name", name);
 	this.updateStateSettings("refServerId", Math.floor(1000000000 + Math.random() * 9000000000));
 	this.updateStateSettings("readServerId", Math.floor(1000000000 + Math.random() * 9000000000));
 	axios.post(browser.apiAddr + "/getMedakaModels",
@@ -122,8 +130,10 @@ class IntersectUserData extends Component {
 		   this.state.fineMap !== nextState.fineMap ||
 		   this.state.maxRegions !== nextState.maxRegions ||
 		   this.state.refServerId !== nextState.refServerId ||
-		   this.state.readServerId !== nextState.readServerId
-		   
+		   this.state.readServerId !== nextState.readServerId ||
+		   this.state.name !== nextState.name ||
+		   this.state.showBinningOpts !== nextState.showBinningOpts ||
+		   this.state.showNanofiltOpts !== nextState.showNanofiltOpts
 	    ) {
 	    return true;
 	} else {
@@ -169,6 +179,8 @@ class IntersectUserData extends Component {
 	let val;
 	if (event.target.value === "true" || event.target.value === "false") {
 	    val = parseBoolean(event.target.value)
+	} else if (event.target.checked === true || event.target.checked === false) {
+	    val = event.target.checked;
 	} else {
 	    val = event.target.value
 	}
@@ -202,7 +214,8 @@ class IntersectUserData extends Component {
 	    gapExtend: this.state.gapExtend,
 	    contextMap: this.state.contextMap,
 	    fineMap: this.state.fineMap,
-	    maxRegions: this.state.maxRegions
+	    maxRegions: this.state.maxRegions,
+	    name: this.state.name
 	}
 
 	// Server method only needs the file names and locations. Passing the full filepond
@@ -236,6 +249,8 @@ class IntersectUserData extends Component {
 		    "refServerId": res.data.data.refServerId,
 		    "resServerId": res.data.data.resServerId,
 		    "refFile": res.data.data.refFile,
+		    "name": res.data.data.name,
+		    "date": res.data.data.date
 		});
 		
             })
@@ -258,7 +273,10 @@ class IntersectUserData extends Component {
     render () {
 	console.log("Render IntersectUserData");
         return (
-	    <div>
+		<div>
+		<Grid container spacing={2}>		
+		<Grid item xs={3}>
+		
                 Upload Read Data (fastq):
                 <FileUploader
 	            onFilesChange={this.handleFilesChange}
@@ -277,31 +295,37 @@ class IntersectUserData extends Component {
 	            allowedTypes={['fa', 'fasta']}
                     updateParentState={this.updateStateSettings}
                 />
+		</Grid>
+
+	    <Grid item xs={9}>
 		<ValidatorForm
             ref="form"
             onSubmit={this.processData}
             onError={errors => console.log(errors)}
 		>
-		<SharedOpts
-                    medakaModels = {this.state.medakaModels}
-                    selectedModel = {this.state.medakaSelectedModel}
-                    handleChange = {this.handleChange}
-         	    analysisModes = {modes}
-	            selectedMode = {this.state.mode}
-        	    getState = {this.getState}
+		<SharedOptsTable
+                    names={optsHeader}
+                    rows={sharedOpts}
+                    medakaModels={this.state.medakaModels}
+                    selectedModel={this.state.medakaSelectedModel}
+                    handleChange={this.handleChange}
+                    handleSettings={this.updateStateSettings}
+                    analysisModes={modes}
+                    selectedMode={this.state.mode}
+                    getState={this.getState}
 		/>
-                {
-		    this.state.mode === "medaka" ?
-			(<div></div>)
-			:
-			<BinningOpts handleChange={this.handleChange} getState={this.getState}/>
-		}
-		{
-		    this.state.nanofilt ?
-			<NanofiltOpts handleChange = {this.handleChange} getState={this.getState}/> :
-		    (<span></span>)
-		}
-	        {/*<form onSubmit={this.processData}>*/}
+		<GenericDialog
+	            name={'Biobin Options'}
+	            open={this.state.showBinningOpts}
+	            onClose={() => this.updateStateSettings("showBinningOpts", false)}
+	            content=<BinningOpts handleChange={this.handleChange} getState={this.getState}/>
+		/>
+		<GenericDialog
+                    name={'Nanofilt Options'}
+                    open={this.state.showNanofiltOpts}
+                    onClose={() => this.updateStateSettings("showNanofiltOpts", false)}
+                    content=<NanofiltOpts handleChange={this.handleChange} getState={this.getState}/>
+                />
 		<input type="submit" value="Submit" disabled={!(this.state.readFiles.length &&
 								this.state.refFiles.length &&
 								this.props.dataIsLoaded &&
@@ -310,6 +334,8 @@ class IntersectUserData extends Component {
 							       )}
 		/>
 	        </ValidatorForm>
+		</Grid>
+		</Grid>
 	    </div>
         );
     }
@@ -318,39 +344,23 @@ class IntersectUserData extends Component {
 const optsHeader = ["Option", "Value", "Description"];
 
 const nanofiltOpts = [
-    {id: 1, values: ["max_length", "1000000", "Filtering reads by maximum length in bp. Default: 1Mb", "maxLen", "number"]},
-    {id: 2, values: ["min_length", "0", "Filtering reads by minimum length in bp. Default: 0", "minLen", "number"]},
+    {id: 1, values: ["max_length", "1000000", "Filter reads by maximum length in bp. Default: 1Mb", "maxLen", "number"]},
+    {id: 2, values: ["min_length", "0", "Filter reads by minimum length in bp. Default: 0", "minLen", "number"]},
     {id: 3, values: ["min_quality", "7", "Filter reads by quality score > N. Default: 7", "minQual", "number"]}
 ];
 
 const NanofiltOpts = ({handleChange, getState}) => (
-	<div>Nanofilt Options:<br/>
 	<OptsTable names={optsHeader} rows={nanofiltOpts} handleChange={handleChange} getState={getState}/>
-	</div>
 )
 
 const sharedOpts = [
-    {id: 1, values: ["Analysis Mode", "medaka", "Analysis mode to use.", "mode", null]},
-    {id: 2, values: ["model", "", "Medaka consensus model, Pore/Guppy version.", "medakaSelectedModel", null]},
-    {id: 3, values: ["double", "false", "Double the reference genome, great for visualization, less for consensus generation.", "double", null]},
-    {id: 4, values: ["filter", "false", "Filter reads with nanofilt.", "nanofilt", null]},
-    {id: 5, values: ["trim", "false", "Trim adapters from reads with Porechop.", "trim", null]},
+    {id: 1, values: ["Run Name", "", "Run identifier for retrieving saved sessions.", "name", null]},
+    {id: 2, values: ["Analysis Mode", "medaka", "Analysis mode to use.", "mode", null]},
+    {id: 3, values: ["Medaka Model", "", "Medaka consensus model, Pore/Guppy version.", "medakaSelectedModel", null]},
+    {id: 4, values: ["Double the reference genome", "false", "Double the reference genome, great for visualization, less for consensus generation.", "double", null]},
+    {id: 5, values: ["Use Nanofilt", "false", "Filter reads with nanofilt.", "nanofilt", null]},
+    {id: 6, values: ["Trim adapters with Porechop", "false", "Trim adapters from reads with Porechop.", "trim", null]},
 ];
-
-const SharedOpts = ({medakaModels, selectedModel, handleCheck, handleChange, analysisModes, selectedMode, getState}) => (
-	<div>General Options:<br/>
-	<SharedOptsTable
-            names={optsHeader}
-            rows={sharedOpts}
-            medakaModels={medakaModels}
-            selectedModel={selectedModel}
-            handleChange={handleChange}
-            analysisModes={analysisModes}
-            selectedMode={selectedMode}
-            getState={getState}
-	/>
-	</div>
-)
 
 const binningOpts = [
     {id: 1, values: ["marker_score", "95", "Percent score for longest unique region.", "markerScore", "number"]},
@@ -365,9 +375,7 @@ const binningOpts = [
 ];
 
 const BinningOpts = ({handleChange, getState}) => (
-	<div>Biobin Options:<br/>
 	<OptsTable names={optsHeader} rows={binningOpts} handleChange={handleChange} getState={getState}/>
-	</div>
 )
 
 function parseBoolean(string) {
@@ -376,5 +384,10 @@ function parseBoolean(string) {
     }
     return false
 }
+
+const adjectives = ['extreme', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'violent', 'belligerent', 'victorious', 'meek', 'deliberate', 'swift', 'undulating', 'cantankerous', 'zygomorphic', 'fancy', 'dull', 'shifty', 'mistaken', 'childish', 'manly', 'huge', 'miniscule', 'gorgeous', 'sandy', 'gritty', 'smooth', 'wispy', 'florrid', 'vegetal', 'animalistic', 'unprotected', 'fervent', 'insufferble', 'bulbous', 'pendulous', 'bullish', 'horrifying', 'mystical', 'Scottish', 'French', 'American', 'Samoan', 'Italian', 'lemony', 'fruity', 'brutish', 'German', 'Danish', 'African', 'Australian', 'Asian', 'Canadian', 'Polish', 'Chinese', 'Japanese', 'Korean', 'black', 'white', 'Indian'];
+
+const nouns = ['pants', 'shoe', 'visigoth', 'channel', 'hamburger', 'bar', 'fish', 'trout', 'gazelle', 'macintosh', 'davenport', 'shill', 'fabricator', 'dingbat', 'cow', 'goat', 'parakeet', 'dishwasher', 'sausage', 'taco', 'automobile', 'chicken', 'doorbell', 'dumbell', 'lifter', 'hammer', 'pliers', 'window', 'pacifier', 'baseball', 'filbert', 'sandwich', 'box', 'scrimshaw', 'yearbook', 'horse', 'methamphetamine', 'sanitizer', 'vaccine', 'plague', 'handlebar', 'mystic', 'sheikh', 'chief', 'president', 'minister', 'bellwether', 'cheesemaker', 'cobbler', 'whale', 'hunchback'];
+
 
 export default IntersectUserData;
