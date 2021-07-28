@@ -4,7 +4,7 @@ import React, { Component } from "react";
 
 import Dashboard from './Dashboard';
 import LoadAlertDialog from './LoadAlert';
-import IntersectUserData from './IntersectUserData';
+import StartNewRun from './StartNewRun';
 import ResultsDisplay from './Results';
 import Cookies from 'universal-cookie';
 import CachedSessionDialog from './CachedSessionDialog';
@@ -164,7 +164,7 @@ class App extends Component {
 			            resData={this.state.resData}
 			    />
 		                :
-		                <IntersectUserData
+		                <StartNewRun
 	                            dataIsLoaded={this.state.dataIsLoaded}
 	                            updateParentState={this.updateStateSettings}
 			            setCookie={this.setCookie}
