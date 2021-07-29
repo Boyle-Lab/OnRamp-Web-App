@@ -131,7 +131,7 @@ function SharedOptsTable(props) {
 	                    onChange={handleChange('name')}
 	                    value={getState('name')}
 	                    margin="normal"
-	                    fullWidth="true"
+	                    fullWidth={true}
 	                />
 	        </Grid>
 	        <Grid item xs={3} className={classes.leftAligned}>
@@ -198,7 +198,7 @@ function SharedOptsTable(props) {
                             },
                         }}
                         margin="normal"
-	                fullWidth="true"
+	                fullWidth={true}
 	            >
                         {medakaModels.map(option => (
 				<option key={option} value={option}>

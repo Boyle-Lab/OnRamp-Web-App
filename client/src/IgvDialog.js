@@ -42,7 +42,7 @@ class IgvDialog extends React.Component {
 	            onClose={this.props.onClose}
 	            scroll='paper'
 	            maxWidth='xl'
-	            fullWidth='true'
+	            fullWidth={true}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
 	        >
