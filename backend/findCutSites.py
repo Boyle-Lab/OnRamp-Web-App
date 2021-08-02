@@ -61,7 +61,7 @@ if __name__ == "__main__":
             res["error"] = res["error"] + "Multiple records in fasta file."
         else:
             # Use Bio.Restriction to locate cut site(s).
-            res["cut_sites"] = locals()[fasta_re_dict[fasta_filename]].search(fasta_rec[0].seq)            
+            res["cut_sites"] = locals()[fasta_re_dict[fasta_filename]].search(fasta_rec[0].seq, linear=False)
             # Each record should contain only one cut site. If not, something is wrong. Flag with an error.
             if len(res["cut_sites"]) > 1:
                 res["error"] = res["error"] + "Multiple cut sites found in plasmid sequence."
