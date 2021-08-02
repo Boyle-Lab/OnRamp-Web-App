@@ -5,10 +5,11 @@ import FileUploader from './FileUploader';
 import OptsTable from './OptsTable';
 import SharedOptsTable from './SharedOptsTable';
 import { ValidatorForm } from 'react-material-ui-form-validator';
-
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import GenericDialog from './GenericDialog';
+import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
+import REOptsTable from './REOptsTable'
 
 /*
 This code is part of the CGIMP distribution
@@ -28,6 +29,16 @@ GNU General Public License for more details.
 
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
+
+const ActionButton = withStyles({
+  root: {
+      boxShadow: 'none',
+      textTransform: 'none',
+      boxShadow: 'none',
+      border: '1px solid',
+      padding: '1px 10px',
+    },
+})(Button);
 
 const modes = ["medaka", "biobin"]
 
@@ -61,7 +72,9 @@ class StartNewRun extends Component {
 	    refFilesLoaded: false,
 	    readFilesLoaded: false,
 	    showBinningOpts: false,
-	    showNanofiltOpts: false
+	    showNanofiltOpts: false,
+	    showREOpts: false,
+	    fastaREData: []
         };
 	this.handleFilesChange = this.handleFilesChange.bind(this);
 	this.processData = this.processData.bind(this);
@@ -133,7 +146,8 @@ class StartNewRun extends Component {
 		   this.state.readServerId !== nextState.readServerId ||
 		   this.state.name !== nextState.name ||
 		   this.state.showBinningOpts !== nextState.showBinningOpts ||
-		   this.state.showNanofiltOpts !== nextState.showNanofiltOpts
+		   this.state.showNanofiltOpts !== nextState.showNanofiltOpts ||
+		   this.state.showREOpts !== nextState.showREOpts
 	    ) {
 	    return true;
 	} else {
@@ -295,6 +309,14 @@ class StartNewRun extends Component {
 	            allowedTypes={['fa', 'fasta']}
                     updateParentState={this.updateStateSettings}
                 />
+		<ActionButton
+	    variant="contained"
+	    disabled={!this.state.refFiles.length}
+	    disableRipple
+	    onClick={() => this.updateStateSettings("showREOpts", true)}
+		>
+		Edit Restriction Enzymes
+	    </ActionButton>
 		</Grid>
 
 	    <Grid item xs={9}>
@@ -325,6 +347,12 @@ class StartNewRun extends Component {
                     open={this.state.showNanofiltOpts}
                     onClose={() => this.updateStateSettings("showNanofiltOpts", false)}
                     content=<NanofiltOpts handleChange={this.handleChange} getState={this.getState}/>
+                />
+		<GenericDialog
+                    name={'Edit Restriction Enzymes'}
+                    open={this.state.showREOpts}
+                    onClose={() => this.updateStateSettings("showREOpts", false)}
+            content=<REOptsTable files={this.getFilenamesFromPond(this.state.refFiles)} updateParentState={this.handleChange} />
                 />
 		<input type="submit" value="Submit" disabled={!(this.state.readFiles.length &&
 								this.state.refFiles.length &&
