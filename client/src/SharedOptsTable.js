@@ -125,7 +125,7 @@ function SharedOptsTable(props) {
 	    <Grid item xs={4} className={classes.leftAligned}>
 	                Run Name
 	        </Grid>
-	        <Grid item xs={5} className={classes.leftAligned}>
+	        <Grid item xs={8} className={classes.leftAligned}>
 	                <TextField
 	                    id="name"
 	                    onChange={handleChange('name')}
@@ -134,9 +134,6 @@ function SharedOptsTable(props) {
 	                    fullWidth={true}
 	                />
 	        </Grid>
-	        <Grid item xs={3} className={classes.leftAligned}>
-	            
-                </Grid>
 	    </Grid>
 	</Grid>
 
@@ -147,7 +144,7 @@ function SharedOptsTable(props) {
                     Analysis Mode
                 </Grid>
 
-	        <Grid item xs={2} className={classes.rightAlignedSwitchLabel}>
+	        <Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
                     Medaka
 	        </Grid>
 	
@@ -161,7 +158,7 @@ function SharedOptsTable(props) {
 	    
                 </Grid>
 
-                <Grid item xs={2} className={classes.leftAlignedSwitchLabel}>
+                <Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
       	            Biobin
                     <IconButton
 	                color="inherit"
@@ -172,7 +169,7 @@ function SharedOptsTable(props) {
                     </IconButton>
 	      	</Grid>
 	
-                <Grid item xs={3} className={classes.leftAligned}>
+                <Grid item xs={5} className={classes.leftAligned}>
                     
                 </Grid>
             </Grid>
@@ -184,7 +181,7 @@ function SharedOptsTable(props) {
                 <Grid item xs={4} className={classes.leftAligned}>
                         Medaka Consensus Model
                 </Grid>
-                <Grid item xs={5} className={classes.leftAligned}>
+                <Grid item xs={8} className={classes.leftAligned}>
                     <TextField
                         id="medakaModel"
                         select
@@ -207,9 +204,6 @@ function SharedOptsTable(props) {
                         ))}
                     </TextField>
                 </Grid>
-                <Grid item xs={3} className={classes.leftAligned}>
-	    
-                </Grid>
             </Grid>
         </Grid>
 
@@ -220,7 +214,7 @@ function SharedOptsTable(props) {
                     Filter with Nanofilt
                 </Grid>
 
-                <Grid item xs={2} className={classes.rightAlignedSwitchLabel}>
+                <Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
                     
                 </Grid>
 
@@ -233,7 +227,7 @@ function SharedOptsTable(props) {
 
                 </Grid>
 
-                <Grid item xs={2} className={classes.leftAlignedSwitchLabel}>
+                <Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
                     <IconButton
                         color="inherit"
                         onClick={ (event) => handleSettingsClick(event, "showNanofiltOpts") }
@@ -243,7 +237,7 @@ function SharedOptsTable(props) {
                     </IconButton>
                 </Grid>
 
-                <Grid item xs={3} className={classes.leftAligned}>
+                <Grid item xs={5} className={classes.leftAligned}>
 
                 </Grid>
             </Grid>
@@ -256,7 +250,7 @@ function SharedOptsTable(props) {
                     Trim Adapters with Porechop
 		</Grid>
 
-		<Grid item xs={2} className={classes.rightAlignedSwitchLabel}>
+		<Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
 
 		</Grid>
 
@@ -270,7 +264,7 @@ function SharedOptsTable(props) {
 
 		</Grid>
 
-		<Grid item xs={2} className={classes.leftAlignedSwitchLabel}>
+		<Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
                     {/* <IconButton
 			color="inherit"
 			onClick={ (event) => handleSettingsClick(event, "showNanofiltOpts") }
@@ -280,7 +274,7 @@ function SharedOptsTable(props) {
                     </IconButton> */}
                 </Grid>
 
-                <Grid item xs={3} className={classes.leftAligned}>
+                <Grid item xs={5} className={classes.leftAligned}>
 
                 </Grid>
             </Grid>
@@ -293,7 +287,7 @@ function SharedOptsTable(props) {
                     Double the Reference Genome
 		</Grid>
 
-		<Grid item xs={2} className={classes.rightAlignedSwitchLabel}>
+		<Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
 
 		</Grid>
 
@@ -307,7 +301,7 @@ function SharedOptsTable(props) {
 
 		</Grid>
 
-		<Grid item xs={2} className={classes.leftAlignedSwitchLabel}>
+		<Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
                     {/* <IconButton
 			color="inherit"
 			onClick={ (event) => handleSettingsClick(event, "showNanofiltOpts") }
@@ -317,7 +311,7 @@ function SharedOptsTable(props) {
 			</IconButton> */}
                 </Grid>
 
-                <Grid item xs={3} className={classes.leftAligned}>
+                <Grid item xs={5} className={classes.leftAligned}>
 
                 </Grid>
             </Grid>
