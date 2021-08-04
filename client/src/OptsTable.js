@@ -7,8 +7,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-
-//import TextField from '@material-ui/core/TextField';
 import { TextValidator } from 'react-material-ui-form-validator';
 
 /*
@@ -53,16 +51,6 @@ function OptsTable(props) {
 	return true;
     }
 
-    /*
-    const validate = () => {
-	let validators = {};
-	rows.map(row => (
-	    validators[row[3]] = getState(row.values[3]) ? "" : "This field is required.";
-	    
-	));
-    }
-    */
-
     return (
 	    <Paper className={classes.root}>
 	    <Table className={classes.table}>
@@ -78,24 +66,13 @@ function OptsTable(props) {
 		    <TableRow key={row.id}>
 		    <TableCell key="1" align="right">{row.values[0]}</TableCell>
 		    <TableCell key="2" align="right">
-		    {/*
-		    <TextField
-		value={getState(row.values[3])}
-		onChange={handleChange(row.values[3])}
-		margin="dense"
-		id={row.values[3]}
-		//inputProps={{type: "number"}}
-		required={true}
-		{...( isError(getState(row.values[3]), row.values[4]) & {error: true, helperText: 'Input must be a ' + row.values[4] + '.'} ) }
-		    />
-		     */}
 		    <TextValidator
-		value={getState(row.values[3])}
-                onChange={handleChange(row.values[3])}
-                margin="dense"
-                id={row.values[3]}
-		validators={['required', 'isFloat']}
-		errorMessages={['This field is required!','Input must be a number!']}
+		        value={getState(row.values[3])}
+                        onChange={handleChange(row.values[3])}
+                        margin="dense"
+                        id={row.values[3]}
+		        validators={['required', 'isFloat']}
+		        errorMessages={['This field is required!','Input must be a number!']}
 		    />
 		    </TableCell>
 		    <TableCell key="3" align="left">{row.values[2]}</TableCell>
