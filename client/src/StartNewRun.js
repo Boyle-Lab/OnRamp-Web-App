@@ -193,13 +193,16 @@ class StartNewRun extends Component {
 	let val;
 	if (event.target.value === "true" || event.target.value === "false") {
 	    val = parseBoolean(event.target.value)
-	} else if (event.target.checked === true || event.target.checked === false) {
+	} else if (!event.target.value && (event.target.checked === true || event.target.checked === false)) {
+	    console.log(event);
 	    val = event.target.checked;
 	} else {
 	    val = event.target.value
 	}
 	this.updateStateSettings(name, val);
     };
+
+    
 
     getState = (name) => {
 	return(this.state[name])
@@ -310,20 +313,26 @@ class StartNewRun extends Component {
                     updateParentState={this.updateStateSettings}
                 />
 		<ActionButton
-	    variant="contained"
-	    disabled={!this.state.refFiles.length}
-	    disableRipple
-	    onClick={() => this.updateStateSettings("showREOpts", true)}
+	            variant="contained"
+	            disabled={!this.state.refFiles.length}
+	            disableRipple
+	            onClick={() => this.updateStateSettings("showREOpts", true)}
 		>
-		Edit Restriction Enzymes
-	    </ActionButton>
+		    Edit Restriction Enzymes
+	        </ActionButton>
+		<GenericDialog
+                    name={'Edit Restriction Enzymes'}
+                    open={this.state.showREOpts}
+                    onClose={() => this.updateStateSettings("showREOpts", false)}
+                    content=<REOptsTable files={this.getFilenamesFromPond(this.state.refFiles)} updateParentState={this.handleChange} />
+                />
 		</Grid>
 
 	    <Grid item xs={9}>
 		<ValidatorForm
-            ref="form"
-            onSubmit={this.processData}
-            onError={errors => console.log(errors)}
+                    ref="form"
+                    onSubmit={this.processData}
+                    onError={errors => console.log(errors)}
 		>
 		<SharedOptsTable
                     names={optsHeader}
@@ -347,12 +356,6 @@ class StartNewRun extends Component {
                     open={this.state.showNanofiltOpts}
                     onClose={() => this.updateStateSettings("showNanofiltOpts", false)}
                     content=<NanofiltOpts handleChange={this.handleChange} getState={this.getState}/>
-                />
-		<GenericDialog
-                    name={'Edit Restriction Enzymes'}
-                    open={this.state.showREOpts}
-                    onClose={() => this.updateStateSettings("showREOpts", false)}
-            content=<REOptsTable files={this.getFilenamesFromPond(this.state.refFiles)} updateParentState={this.handleChange} />
                 />
 		<input type="submit" value="Submit" disabled={!(this.state.readFiles.length &&
 								this.state.refFiles.length &&
