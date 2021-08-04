@@ -74,7 +74,7 @@ class StartNewRun extends Component {
 	    showBinningOpts: false,
 	    showNanofiltOpts: false,
 	    showREOpts: false,
-	    fastaREData: []
+	    fastaREData: {}
         };
 	this.handleFilesChange = this.handleFilesChange.bind(this);
 	this.processData = this.processData.bind(this);
@@ -165,7 +165,9 @@ class StartNewRun extends Component {
     
     handleFilesChange = (fileItems, dest, allowedTypes) => {
         const files = [];
-        fileItems.map( function (fileItem) {
+	const filesDict = {};
+        fileItems.map( (fileItem, index) => {
+	    console.log(fileItem.filename, index);
 	    const filenameParts = fileItem.filename.split('.');
 	    let ext = filenameParts[filenameParts.length - 1];
 	    if (ext === 'gz' || ext === 'gzip') {
@@ -178,7 +180,42 @@ class StartNewRun extends Component {
 		alert('Incorrect file type! Allowed types include: ' + typesStr + '. (Files may be compressed with gzip.)');
 		fileItem.abortLoad();
 	    }
+
+	    // Instantiate a record in the REOpts object for the given file.
+	    if (dest === 'refFiles') {
+		filesDict[fileItem.filename] = "";
+		if (!(fileItem.filename in this.state.fastaREData)) {
+		    console.log('REInit: ', fileItem.filename, index);
+		    const newFastaREData = this.state.fastaREData;
+		    const newRec = {
+			fasta_filename: fileItem.filename,
+			enzyme: "",
+			cut_sites: [],
+			error: ""
+		    }
+		    newFastaREData[fileItem.filename] = newRec;
+		    this.setState({
+			fastaREData: newFastaREData
+		    }, () => {
+			console.log("fastaREData: ", this.state.fastaREData);
+		    });
+		}		
+	    }
 	});
+	
+	// Make sure we don't have any fastREData objects for files no longer in the pond.
+	if (dest === 'refFiles' &&
+	    Object.keys(this.state.fastaREData).length !== files.length) {
+	    const newFastaREData = this.state.fastaREData;
+	    Object.keys(this.state.fastaREData).map((key, index) => {
+		if (!(key in filesDict)) {
+		    delete newFastaREData[key];
+		}
+	    });
+	    this.setState({ fastaREData: newFastaREData },
+			  () => { console.log(this.state.fastaREData); });
+	}
+	
         this.updateStateSettings(dest, files);
 	if (!files.length) {
             this.updateStateSettings(dest + 'Loaded', false);
@@ -324,7 +361,7 @@ class StartNewRun extends Component {
                     name={'Edit Restriction Enzymes'}
                     open={this.state.showREOpts}
                     onClose={() => this.updateStateSettings("showREOpts", false)}
-                    content=<REOptsTable files={this.getFilenamesFromPond(this.state.refFiles)} updateParentState={this.handleChange} />
+                    content=<REOptsTable data={this.state.fastaREData} updateParentState={this.updateStateSettings} />
                 />
 		</Grid>
 

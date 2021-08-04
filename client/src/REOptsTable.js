@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 //import TextField from '@material-ui/core/TextField';
+import { ValidatorForm } from 'react-material-ui-form-validator';
 import { TextValidator } from 'react-material-ui-form-validator';
 
 /*
@@ -41,10 +42,33 @@ const styles = theme => ({
     },
 });
 
-function OptsTable(props) {
-    const { classes, files, updateParentState } = props;
 
-    const isError = (value, type) => {
+//function OptsTable(props) {
+class OptsTable extends Component {
+    constructor(props) {
+	super(props);
+        this.state = {
+	    enzymes: {},
+	    showEnzymes: false,
+	    showOffsets: false,
+	    enableSubmit: false
+	}
+    }
+
+    componentDidMount() {
+	const enzymes = {};
+	Object.keys(this.props.data).map((key, index) => {
+	    enzymes[key] = this.props.data[key].enzyme;
+	});
+	this.setState({
+	    enzymes: enzymes,
+	    showEnzymes: true
+	}, () => {
+	    console.log('enzymes: ', this.state.enzymes);
+	});
+    }
+    
+    isError = (value, type) => {
 	console.log(value, type);
 	if (typeof(value) === type) {
 	    return false;
@@ -53,37 +77,79 @@ function OptsTable(props) {
 	return true;
     }
 
-    const handleChange = () => {
-	// Do stuff
+    handleChange = (key, dest) => event => {
+	// Handle changes to form input fields
+	event.preventDefault();
+	const newData = this.props.data;
+	newData[key][dest] = event.target.value;
+	if (dest === 'enzyme') {
+	    const newEnzymes = this.state.enzymes;
+	    newEnzymes[key] = event.target.value;	    
+	    this.setState({ 'enzymes': newEnzymes },
+			  () => {
+			      console.log(this.state.enzymes[key]);
+			  });
+	}
+	this.props.updateParentState('fastaREData', newData);
     }
 
-    return (
-	    <Paper className={classes.root}>
-	    <Table className={classes.table}>
-            <TableBody>
-            {files.map((fasta, index) => (
-		    <TableRow key={index}>
-		    <TableCell key="1" align="left">{fasta}</TableCell>
-		    <TableCell key="2" align="right">
-		    {/*
-		    <TextValidator
-		value={''}
-                onChange={handleChange()}
-                margin="dense"
-                id={index}
-		validators={['required']}
-		errorMessages={['This field is required!']}
-		    />
-		     */}
-		Placeholder
-		    </TableCell>
-		    <TableCell key="3" align="left">Placeholder</TableCell>
-		    </TableRow>
-            ))}
-        </TableBody>
-	    </Table>
-	    </Paper>
-    );
+    processData = () => {
+	// Do form stuff
+    }
+
+    render() {
+	const { classes } = this.props;
+	console.log('Render REOptsTable');
+	return (
+		<Paper className={classes.root}>
+		<ValidatorForm
+                    ref="enzymesForm"
+                    onSubmit={this.processData}
+                    onError={errors => console.log(errors)}
+		>
+		<Table className={classes.table}>
+		<TableHead>
+		<TableRow key="head">
+		{["Plasmid Sequence File", "Restriction Enzyme", "Offset"].map((val, index) => (
+			<TableCell key={val} align="left">{val}</TableCell>
+		))}
+	        </TableRow>
+	        </TableHead>
+		<TableBody>
+		{Object.keys(this.props.data).map((key, index) => (
+			<TableRow key={index.toString()}>
+			<TableCell key="1" align="left">{key}</TableCell>
+			<TableCell key="2" align="left">
+			{this.state.showEnzymes ?
+			    <TextValidator
+                                value={this.state.enzymes[key]}
+                                onChange={this.handleChange(key, 'enzyme')}
+                                margin="dense"
+                                id={'enzymes.' + index}
+                                validators={['required']}
+                                errorMessages={['This field is required!']}
+                                fullWidth={true}
+                             />
+			 :
+			 ("")
+			}
+		        </TableCell>
+			<TableCell key="3" align="right">
+			{this.state.showOffsets ?
+			 ("Placeholder")
+			 :
+			 ("")
+			}
+		        </TableCell>
+			</TableRow>
+		))}
+                </TableBody>
+	        </Table>
+		<input type="submit" value="Find Offsets" disabled={!(this.state.enableSubmit)}/>
+		</ValidatorForm>
+	        </Paper>
+	);
+    }
 }
 
 OptsTable.propTypes = {
