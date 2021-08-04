@@ -40,8 +40,8 @@ if __name__ == "__main__":
     # Put fasta-enzyme assignments into a dict.
     fasta_re_dict = json.loads(args.fasta_re_str)
 
-    # Return data will be an array encoded as json.
-    ret = []
+    # Return data will be a dict encoded as json.
+    ret = {}
     
     # Loop over fasta reference sequences to find the applicable cut site(s). (SHOULD be one per sequence. If not, will raise an error in the UI for the affected plasmid(s).)
     for fasta_file in glob(args.fasta_path + '/*'): # This only works because we know this directory only has input fastas!
@@ -67,7 +67,7 @@ if __name__ == "__main__":
                 res["error"] = res["error"] + "Multiple cut sites found in plasmid sequence."
 
         # Push the result onto the return array.
-        ret.append(res)
+        ret[fasta_filename] = res
 
         # Convert results to json and print to stdout.
         ret_str = json.dumps(ret)
