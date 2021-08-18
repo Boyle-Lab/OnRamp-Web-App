@@ -18,7 +18,7 @@ source miniconda/bin/activate
 conda init
 
 # Install the analysis pipeline
-conda create -q -y -n medaka -c conda-forge -c bioconda medaka nanofilt
+conda create -q -y -n medaka -c conda-forge -c bioconda medaka nanofilt yaml
 conda activate medaka
 git clone https://github.com/crmumm/bulkPlasmidSeq.git
 
