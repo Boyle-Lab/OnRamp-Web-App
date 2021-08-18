@@ -269,7 +269,8 @@ class StartNewRun extends Component {
 	    contextMap: this.state.contextMap,
 	    fineMap: this.state.fineMap,
 	    maxRegions: this.state.maxRegions,
-	    name: this.state.name
+	    name: this.state.name,
+	    fastaREData: this.state.fastaREData
 	}
 
 	// Server method only needs the file names and locations. Passing the full filepond

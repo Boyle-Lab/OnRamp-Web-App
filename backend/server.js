@@ -4,17 +4,19 @@ const logger = require("morgan");
 const fileUpload = require("express-fileupload");
 const cors = require('cors')
 const fs = require('fs-extra');
+const path = require('path');
 const compression = require('compression');
 const {PythonShell} = require('python-shell');
 const { exec } = require('child_process');
+const yaml = require('js-yaml');
 
 const API_PORT = 3001;
 const app = express();
 const router = express.Router();
 
 /*
-This code is part of the CGIMP distribution
-(https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
+This code is part of the bulk_plasmid_seq_web distribution
+(https://github.com/Boyle-Lab/bulk_plasmid_seq_web) and is governed by its license.
 Please see the LICENSE file that should have been included as part of this
 package. If not, see <https://www.gnu.org/licenses/>.
 
@@ -220,6 +222,38 @@ router.post('/processData', (req, res) => {
                       resServerId: serverId,
 		      origRefFiles: refFiles };
 
+    // Process restriction enzyme offsets into a yaml file to supply the
+    // --restriction_enzyme_table option.
+    const yamlData = {};
+    Object.keys(options.fastaREData).map( (key, index) => {
+	let fnameParts = key.split('.');
+	let offset = 1;
+	let ext = fnameParts[fnameParts.length - offset];
+        if (ext === 'gz' || ext === 'gzip') {
+	    offset++;
+	}
+	const newKey = fnameParts.slice(0, fnameParts.length - offset).join('.');
+
+	yamlData[newKey] = {};
+	if (options.fastaREData[key].cut_sites.length == 1) {
+	    yamlData[newKey]["cut-site"] = options.fastaREData[key].cut_sites[0];
+	} else {
+	    if (options.fastaREData[key].cut_sites.length == 0) {
+		yamlData[newKey]["cut-site"] = 0;
+	    } else {
+		return res.status(400).send('Error in restriction offsets: Multiple cut sites found for ' + options.fastaREData[key].enxyme + ' in ' + key + '!');
+	    }
+	}
+	if (options.fastaREData[key].enzyme !== "") {
+	    yamlData[newKey]["enzyme"] = options.fastaREData[key].enzyme;
+	}
+    });
+    fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
+	if (err) {
+	    return res.status(400).send('Error in restriction offsets: could not write yaml file: ' + err);
+	}
+    });
+    
     // Process the options.
     //const cmdArgs = ['/usr/local/bin/bulkPlasmidSeq/bulkPlasmidSeq.py'];
     const cmdArgs = [];
@@ -275,6 +309,10 @@ router.post('/processData', (req, res) => {
     if (options.trim) {
         cmdArgs.push('--trim');
     }
+
+    // Handle the --restriction_enzyme_table option
+    cmdArgs.push('--restriction_enzyme_table');
+    cmdArgs.push(outPath + 'restriction_enzyme_cut_sites.yaml');
 
     // Next we'll handle the command-specific options
     // biobin options

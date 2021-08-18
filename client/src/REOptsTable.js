@@ -199,29 +199,13 @@ class REOptsTable extends Component {
 			 id={"enzyme" + index.toString()}
 			 options={enzymeList.map((enzyme) => enzyme)}
 			 onChange={this.handleChange(key, 'enzyme')}
-			 //inputValue={this.state.enzymes[key]}
-			 //onInputChange={this.handleChange(key, 'enzyme')}
 			 renderInput={(params) => (
-			     
 			     <TextField
-			     {...params}
-			     label="Enter enzyme (leave blank if none used)"
-			     margin="normal"
-			     fullWidth={true}
-				 />
-				 /*
-				 <TextValidator
-                             value={this.state.enzymes[key]}
-                             onChange={this.handleChange(key, 'enzyme')}
-                             margin="dense"
-                             id={'enzymes.' + index}
-                             validators={['required']}
-                             errorMessages={['This field is required!']}
-                             fullWidth={true}
-			     {...params}
-			     InputProps={{ ...params.InputProps, type: 'search' }}
-				 />
-				 */
+			         {...params}
+			         label="Enter enzyme (leave blank if none used)"
+			         margin="normal"
+			         fullWidth={true}
+			     />
 			 )}
 			 />
 			 :
@@ -231,9 +215,13 @@ class REOptsTable extends Component {
 			<TableCell key="3" align="right">
 			{this.state.showOffsets ?
 			 (key in this.state.offsets ?
-			   (this.state.offsets[key])
+			  (this.state.offsets[key])
+			  :
+			  (key in this.state.errors && this.state.errors[key] !== "" ?
+			   (<span className='poor'>ERROR: {this.state.errors[key]}</span>)
 			   :
-			  (<span className='poor'>ERROR: {this.state.errors[key]}</span>)
+			   ("")
+			  )
 			 )
 			 :
 			 ("")
