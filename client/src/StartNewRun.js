@@ -360,8 +360,13 @@ class StartNewRun extends Component {
 		<GenericDialog
                     name={'Edit Restriction Enzymes'}
                     open={this.state.showREOpts}
-                    onClose={() => this.updateStateSettings("showREOpts", false)}
-                    content=<REOptsTable data={this.state.fastaREData} updateParentState={this.updateStateSettings} />
+                    onClose={(event, reason) => {
+			if (reason === "backdropClick") {
+			    return false;
+			}
+		        this.updateStateSettings("showREOpts", false)}
+		    }
+                    content=<REOptsTable data={this.state.fastaREData} updateParentState={this.updateStateSettings} serverId={this.state.refServerId}/>
                 />
 		</Grid>
 

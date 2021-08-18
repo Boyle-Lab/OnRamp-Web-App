@@ -60,15 +60,22 @@ if __name__ == "__main__":
         if len(fasta_rec) > 1:
             res["error"] = res["error"] + "Multiple records in fasta file."
         else:
-            # Use Bio.Restriction to locate cut site(s).
-            res["cut_sites"] = locals()[fasta_re_dict[fasta_filename]].search(fasta_rec[0].seq, linear=False)
-            # Each record should contain only one cut site. If not, something is wrong. Flag with an error.
-            if len(res["cut_sites"]) > 1:
-                res["error"] = res["error"] + "Multiple cut sites found in plasmid sequence."
-
+            if fasta_re_dict[fasta_filename] == "":
+                res["cut_sites"] = [0]
+            elif fasta_re_dict[fasta_filename] not in locals():
+                res["error"] = res["error"] + fasta_re_dict[fasta_filename] + " is not a valid restriction enzyme!"
+            else:
+                # Use Bio.Restriction to locate cut site(s).
+                res["cut_sites"] = locals()[fasta_re_dict[fasta_filename]].search(fasta_rec[0].seq, linear=False)
+                # Each record should contain only one cut site. If not, something is wrong. Flag with an error.
+                if len(res["cut_sites"]) > 1:
+                    res["error"] = res["error"] + "Multiple " + fasta_re_dict[fasta_filename] + " cut sites found!"
+                elif len(res["cut_sites"]) == 0:
+                    res["error"] = res["error"] + "No " + fasta_re_dict[fasta_filename] + " cut sites found!"
+                    
         # Push the result onto the return array.
         ret[fasta_filename] = res
 
-        # Convert results to json and print to stdout.
-        ret_str = json.dumps(ret)
-        sys.stdout.write("{}\n".format(ret_str))
+    # Convert results to json and print to stdout.
+    ret_str = json.dumps(ret)
+    sys.stdout.write("{}\n".format(ret_str))

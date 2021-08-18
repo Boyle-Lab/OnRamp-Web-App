@@ -424,3 +424,22 @@ handleGzipped = function (files, path) {
     // Return array of new file names, with gz/gzip extensions dropped.
     return _outfiles
 }
+
+// This method finds restriction enzyme offsets based on user inputs and fasta files in a directory.
+router.post('/findREOffsets', (req, res) => {
+    const { serverId, fastaREStr } = req.body;
+    let options = {
+	mode: 'text',
+	pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
+        pythonOptions: ['-u'],
+	args: [ '/tmp/' + serverId, fastaREStr ]
+    };
+    PythonShell.run('findCutSites.py', options, function (err, results) {
+        if (err) {
+            console.log(err)
+            res.status(400).send('error finding offsets:' + err);
+        }
+	console.log(results);
+        return res.json({ success: true, data: results[0] });
+    });
+});

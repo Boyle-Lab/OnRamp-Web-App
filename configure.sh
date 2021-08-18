@@ -29,3 +29,6 @@ cd EMBOSS-6.6.0
 ./configure
 make
 ln -s $(pwd)/emboss/needle /usr/local/bin/
+
+# Install biopython
+pip install biopython
