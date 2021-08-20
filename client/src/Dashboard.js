@@ -13,7 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import HomeIcon from '@material-ui/icons/Home';
 import SettingsIcon from '@material-ui/icons/Settings';
 import StorageIcon from '@material-ui/icons/Storage';
-import ContactSupportIcon from '@material-ui/icons/ContactSupport';
+import HelpIcon from '@material-ui/icons/Help';
 import Tooltip from '@material-ui/core/Tooltip';
 
 
@@ -140,6 +140,12 @@ class Dashboard extends React.Component {
 	});
     }
 
+    handleSupportClick = () => {
+        this.props.handleChange({
+            'showHelpDialog': true
+        });
+    }
+
   render() {
     const { classes } = this.props;
 
@@ -180,11 +186,11 @@ class Dashboard extends React.Component {
                         {this.props.title}
                     </Typography>
                     {
-			//<Tooltip title="Send us a question.">
-			//<IconButton color="inherit" onClick={this.handleSupportClick} >
-			//<ContactSupportIcon/>
-			//</IconButton>
-			//</Tooltip>
+			<Tooltip title="Get Help.">
+			<IconButton color="inherit" onClick={this.handleSupportClick} >
+			<HelpIcon/>
+			</IconButton>
+			</Tooltip>
 		    }
               </Toolbar>
             </AppBar>

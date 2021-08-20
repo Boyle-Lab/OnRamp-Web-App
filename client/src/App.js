@@ -9,6 +9,8 @@ import ResultsDisplay from './Results';
 import Cookies from 'universal-cookie';
 import CachedSessionDialog from './CachedSessionDialog';
 import AcceptCookiesDialog from './AcceptCookiesDialog';
+import GenericDialog from './GenericDialog';
+import HelpContent from './HelpContent';
 
 import browser from './browser_config';
 import axios from "axios";
@@ -52,6 +54,7 @@ class App extends Component {
 	    showCachedDialog: false,
 	    showAcceptCookiesDialog: false,
 	    enableSessionsButton: false,
+	    showHelpDialog: false
 	};
     }
 
@@ -191,6 +194,13 @@ class App extends Component {
 	            _cookies={_cookies}
 	            cookies={_cookies.getAll()}
                 />
+		<GenericDialog
+	            name={"How to Get Help"}
+	            open={this.state.showHelpDialog}
+	            onClose={() => this.updateStateSettings("showHelpDialog", false)}
+	            content=<HelpContent/>
+		    maxWidth={'sm'}
+	        />
 		</div>
 	);
     }

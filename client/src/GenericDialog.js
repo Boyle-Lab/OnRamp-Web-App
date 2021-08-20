@@ -40,7 +40,7 @@ class GenericDialog extends React.Component {
                     open={this.props.open}
 	            onClose={this.props.onClose}
 	            scroll='paper'
-	            maxWidth='xl'
+	            maxWidth={this.props.maxWidth}
 	            fullWidth={true}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
@@ -61,6 +61,7 @@ GenericDialog.defaultProps = {
     open: false,
     name: "Generic Dialog",
     content: null,
+    maxWidth: 'xl'
 };
 
 export default GenericDialog
