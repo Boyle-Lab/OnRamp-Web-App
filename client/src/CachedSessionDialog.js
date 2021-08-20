@@ -58,7 +58,7 @@ class CachedSessionDialog extends React.Component {
 		     ))
 		 ) : (<div/>)
 		}
-		</List>
+	        </List>
 		</Dialog>
 	);
     }
