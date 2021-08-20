@@ -7,6 +7,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Tooltip from '@material-ui/core/Tooltip';
 
 /*
 This code is part of the bulkPlasmidSeq distribution
@@ -39,7 +40,7 @@ const styles = theme => ({
 });
 
 function ResultsTable(props) {
-    const { classes, names, rows, handleInfoClick } = props;
+    const { classes, names, rows, handleInfoClick, sessionName } = props;
     const checkQuality = (gapCount, mismatchCount, seqDepth) => {
 	if (gapCount == 0 && mismatchCount == 0 && seqDepth >= 100) {
 	    return('good');
@@ -54,18 +55,21 @@ function ResultsTable(props) {
 
     return (
 	    <div>
-	    <p class='leftAlignedBold'>
+	    <p className='leftAlignedBold'>
+	        Session Name: {sessionName}
+	    </p>
+	    <p className='leftAlignedBold'>
 	    Quality Key:&nbsp;&nbsp;&nbsp;
-	    <span class='good'>Good</span>&nbsp;&nbsp;&nbsp;
-	    <span class='fair'>Fair</span>&nbsp;&nbsp;&nbsp;
-	    <span class='poor'>Poor</span>
+	    <span className='good'>Good</span>&nbsp;&nbsp;&nbsp;
+	    <span className='fair'>Fair</span>&nbsp;&nbsp;&nbsp;
+	    <span className='poor'>Poor</span>
 	    </p>
 	    <Paper className={classes.root}>
 	    <Table className={classes.table}>
             <TableHead>
             <TableRow key="0">
 	        {names.map( (name, index) => (
-		        <TableCell key={index.toString()} align="left"><span class='tableHead'>{name}</span></TableCell>
+		        <TableCell key={index.toString()} align="left"><span className='tableHead'>{name}</span></TableCell>
 	        ))}
 	    </TableRow>
             </TableHead>
@@ -73,19 +77,21 @@ function ResultsTable(props) {
             {rows.map( (row, index) => (
 		    <TableRow key={index.toString()}>
 		    <TableCell key="1" align="left">
-		        <span class={checkQuality(row.pairwise_algn_stats.gaps_str,
+		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
 						  row.pairwise_algn_stats.mismatch_count,
 						  row.sequencing_cov)}>
 		        {row.input_fasta_name}<br/>
 		        <form onSubmit={handleInfoClick}>
 		        <input type="hidden" name="input_fasta_name" value={row.input_fasta_name}/>
 		        <input type="hidden" name="input_fasta_seq" value={row.input_fasta_seq}/>
+		        <Tooltip title="Show reference plasmid sequence.">
 		        <input type="submit" value="Show Sequence"/>
+		        </Tooltip>
 		        </form>
 		        </span>
 		    </TableCell>
 		    <TableCell key="2" align="left">
-		        <span class={checkQuality(row.pairwise_algn_stats.gaps_str,
+		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
                                                   row.pairwise_algn_stats.mismatch_count,
                                                   100)}>
 		        Length: {row.pairwise_algn_stats.length}<br/>
@@ -95,19 +101,21 @@ function ResultsTable(props) {
 		        </span>
 		    </TableCell>
 		    <TableCell key="3" align="left">
-		        <span class={checkQuality(row.pairwise_algn_stats.gaps_str,
+		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
                                                   row.pairwise_algn_stats.mismatch_count,
                                                   100)}>
 		        {row.consensus_name}
 		        <form onSubmit={handleInfoClick}>
                         <input type="hidden" name="input_fasta_name" value={row.consensus_name}/>
                         <input type="hidden" name="input_fasta_seq" value={row.consensus_seq}/>
+		        <Tooltip title="Show plasmid consensus sequence.">
                         <input type="submit" value="Show Sequence"/>
+		        </Tooltip>
                         </form>
 		        </span>
 		    </TableCell>
 		    <TableCell key="4" align="left">
-		        <span class={checkQuality(row.pairwise_algn_stats.gaps_str,
+		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
                                                   row.pairwise_algn_stats.mismatch_count,
                                                   100)}>
 		        {row.pairwise_algn_name}<br/>
@@ -118,7 +126,9 @@ function ResultsTable(props) {
 		        <form onSubmit={handleInfoClick}>
                         <input type="hidden" name="input_fasta_name" value={row.pairwise_algn_name}/>
                         <input type="hidden" name="input_fasta_seq" value={row.pairwise_algn_seq}/>
+		        <Tooltip title="Show pairwise alignment of plasmid reference and consensus sequences.">
                         <input type="submit" value="Show Alignment"/>
+		        </Tooltip>
                         </form>
 		        </span>
 		    </TableCell>

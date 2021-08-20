@@ -5,6 +5,7 @@ import IgvDialog from './IgvDialog';
 import Downloader from './Downloader';
 import ResultsTable from './ResultsTable';
 import InfoDialog from './InfoDialog';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import browser from './browser_config';
 import axios from "axios";
@@ -71,6 +72,7 @@ class ResultsDisplay extends Component {
 	            names={["Plasmid Reference Fasta", "Quality Metrics", "Consensus Sequence", "Pairwise Alignment"]}
 	            rows={this.props.resData}
 	            handleInfoClick={this.showInfo}
+	            sessionName={this.props.sessionName}
 		/>
 		<InfoDialog
 	            open={this.state.showInfoDialog}
@@ -86,9 +88,13 @@ class ResultsDisplay extends Component {
 	            resServerId={this.props.resServerId}
 		 />
 		{this.state.showIgv ?
+		 <Tooltip title="Hide the IGV Browser dialog.">
 		 <button onClick={this.handleClick}>Hide IGV Browser</button>
+		 </Tooltip>
 		 :
+		 <Tooltip title="Show results in the IGV Browser.">
 		 <button onClick={this.handleClick}>Show Results in IGV Browser</button>
+		 </Tooltip>
 		}
 		<Downloader
 	            serverId={this.props.resServerId}

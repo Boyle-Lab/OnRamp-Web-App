@@ -13,7 +13,10 @@ import TextField from '@material-ui/core/TextField';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import SettingsIcon from '@material-ui/icons/Settings';
+import HelpIcon from '@material-ui/icons/Help';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 
 import Grid from '@material-ui/core/Grid';
 
@@ -122,10 +125,15 @@ function SharedOptsTable(props) {
 	{/* Run Name */}
 	<Grid item xs={12}>
 	    <Grid container alignItems="center">
-	    <Grid item xs={4} className={classes.leftAligned}>
+	        <Grid item xs={4} className={classes.leftAligned}>
+                    <Tooltip title="Give your run a unique identifier.">
+	              <Typography component="div">
 	                Run Name
+	              </Typography>
+                    </Tooltip>
 	        </Grid>
 	        <Grid item xs={8} className={classes.leftAligned}>
+	            <Tooltip title="Give your run a unique identifier.">
 	                <TextField
 	                    id="name"
 	                    onChange={handleChange('name')}
@@ -133,6 +141,7 @@ function SharedOptsTable(props) {
 	                    margin="normal"
 	                    fullWidth={true}
 	                />
+                    </Tooltip>	    
 	        </Grid>
 	    </Grid>
 	</Grid>
@@ -141,7 +150,12 @@ function SharedOptsTable(props) {
 	<Grid item xs={12}>
             <Grid container alignItems="center">
                 <Grid item xs={4} className={classes.leftAligned}>
-                    Analysis Mode
+	           <Tooltip title="Toggle between analysis modes.">
+                      <Typography component="div">
+                        Analysis Mode
+	              </Typography>
+                    </Tooltip>
+
                 </Grid>
 
 	        <Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
@@ -149,25 +163,27 @@ function SharedOptsTable(props) {
 	        </Grid>
 	
                 <Grid item xs={1} className={classes.centerAligned}>
-
+                  <Tooltip title="Toggle between analysis modes.">
                     <Switch
                         id={"mode"}
                         onChange={handleModeSwitch}
                         color="primary"
                     />
-	    
+	          </Tooltip>
                 </Grid>
 
                 <Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
       	            Biobin
-                    <IconButton
+	            <Tooltip title="Change Biobin settings.">
+                      <IconButton
 	                color="inherit"
 	                onClick={ (event) => handleSettingsClick(event, "showBinningOpts") }
 	                disabled={!showBinningOpts}
-	            >
+	              >
                         <SettingsIcon/>
-                    </IconButton>
-	      	</Grid>
+                      </IconButton>
+                    </Tooltip>
+	        </Grid>
 	
                 <Grid item xs={5} className={classes.leftAligned}>
                     
@@ -179,9 +195,14 @@ function SharedOptsTable(props) {
 	<Grid item xs={12}>
             <Grid container alignItems="center">
                 <Grid item xs={4} className={classes.leftAligned}>
+                    <Tooltip title="Select a model for consensus sequence generation.">
+                      <Typography component="div">
                         Medaka Consensus Model
+	              </Typography>
+                    </Tooltip>
                 </Grid>
-                <Grid item xs={8} className={classes.leftAligned}>
+              <Grid item xs={8} className={classes.leftAligned}>
+	          <Tooltip title="Select a model for consensus sequence generation.">
                     <TextField
                         id="medakaModel"
                         select
@@ -203,6 +224,7 @@ function SharedOptsTable(props) {
                             </option>
                         ))}
                     </TextField>
+	          </Tooltip>
                 </Grid>
             </Grid>
         </Grid>
@@ -211,7 +233,11 @@ function SharedOptsTable(props) {
         <Grid item xs={12}>
             <Grid container alignItems="center">
                 <Grid item xs={4} className={classes.leftAligned}>
-                    Filter with Nanofilt
+                  <Tooltip title="Filter reads by length and quality.">
+                      <Typography component="div">
+                          Filter with Nanofilt
+	              </Typography>
+	          </Tooltip>
                 </Grid>
 
                 <Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
@@ -219,22 +245,24 @@ function SharedOptsTable(props) {
                 </Grid>
 
                 <Grid item xs={1} className={classes.centerAligned}>
-
+	          <Tooltip title="Filter reads by length and quality.">
                     <Switch
                         onChange={handleNanofiltSwitch}
                         color="primary"
                     />
-
+                  </Tooltip>
                 </Grid>
 
                 <Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
-                    <IconButton
-                        color="inherit"
-                        onClick={ (event) => handleSettingsClick(event, "showNanofiltOpts") }
-                        disabled={!showNanofiltOpts}
-                    >
-                        <SettingsIcon/>
-                    </IconButton>
+	            <Tooltip title="Change Nanofilt settings.">
+                        <IconButton
+                            color="inherit"
+                            onClick={ (event) => handleSettingsClick(event, "showNanofiltOpts") }
+                            disabled={! showNanofiltOpts}
+                        >
+                            <SettingsIcon/>
+                        </IconButton>
+	            </Tooltip>
                 </Grid>
 
                 <Grid item xs={5} className={classes.leftAligned}>
@@ -246,8 +274,12 @@ function SharedOptsTable(props) {
 	{/* Trim Option */}
 	<Grid item xs={12}>
             <Grid container alignItems="center">
-		<Grid item xs={4} className={classes.leftAligned}>
-                    Trim Adapters with Porechop
+	        <Grid item xs={4} className={classes.leftAligned}>
+	            <Tooltip title="Trim adapter sequences from reads with Porechop.">
+	              <Typography component="div">
+                          Trim Adapters with Porechop
+                      </Typography>
+	            </Tooltip>
 		</Grid>
 
 		<Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
@@ -255,13 +287,13 @@ function SharedOptsTable(props) {
 		</Grid>
 
 		<Grid item xs={1} className={classes.centerAligned}>
-
+                  <Tooltip title="Trim adapter sequences from reads with Porechop.">
                     <Switch
                         id="trim"
 	                onChange={handleSwitch}
 			color="primary"
                     />
-
+                  </Tooltip>
 		</Grid>
 
 		<Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
@@ -284,21 +316,25 @@ function SharedOptsTable(props) {
 	<Grid item xs={12}>
             <Grid container alignItems="center">
 		<Grid item xs={4} className={classes.leftAligned}>
-                    Double the Reference Genome
-		</Grid>
+                    <Tooltip title="Double the reference genome to improve visualization.">
+	              <Typography container="div">
+                        Double the Reference Genome
+	              </Typography>
+                    </Tooltip>
+	        </Grid>
 
 		<Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
 
 		</Grid>
 
 		<Grid item xs={1} className={classes.centerAligned}>
-
+                  <Tooltip title="Double the reference genome to improve visualization.">
                     <Switch
 	                id="double"
 			onChange={handleSwitch}
 			color="primary"
                     />
-
+                  </Tooltip>
 		</Grid>
 
 		<Grid item xs={1} className={classes.leftAlignedSwitchLabel}>

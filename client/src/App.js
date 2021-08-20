@@ -46,6 +46,7 @@ class App extends Component {
 	    refFile: null,
 	    algnFile: null,
 	    resData: null,
+	    sessionName: null,
 	    useCookies: true,
 	    useCached: 0,
 	    showCachedDialog: false,
@@ -118,16 +119,17 @@ class App extends Component {
 	this._updateStateSettings(data);
 	if (data.useCached) {
 	    const cookie = _cookies.get(data.useCached);
-	    this.getCachedResults(cookie.resServerId, cookie.refServerId, cookie.refFile);
+	    this.getCachedResults(cookie.resServerId, cookie.refServerId, cookie.refFile, cookie.name);
 	}
     }
 
     // Get a cached result set from the server.
-    getCachedResults = (resServerId, refServerId, refFile) => {
+    getCachedResults = (resServerId, refServerId, refFile, sessionName) => {
 	axios.post(browser.apiAddr + "/processCachedData",
                    {resServerId: resServerId,
 		    refServerId: refServerId,
-		    refFile: refFile
+		    refFile: refFile,
+		    name: sessionName
                    }
                   )
             .then(res => {
@@ -139,7 +141,8 @@ class App extends Component {
 		    "algnFile": res.data.data.algnFile,
 		    "dataIsLoaded": true,
 		    "resData": res.data.stats,
-		    "showResults": true
+		    "showResults": true,
+		    "sessionName": res.data.data.name
 		});
             })
             .catch(error => {
@@ -162,7 +165,8 @@ class App extends Component {
 			            refFile={this.state.refFile}
 			            algnFile={this.state.algnFile}
 			            resData={this.state.resData}
-			    />
+			            sessionName={this.state.sessionName}
+			        />
 		                :
 		                <StartNewRun
 	                            dataIsLoaded={this.state.dataIsLoaded}

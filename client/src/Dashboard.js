@@ -10,11 +10,11 @@ import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-//import MenuIcon from '@material-ui/icons/Menu';
-//import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import HomeIcon from '@material-ui/icons/Home';
 import SettingsIcon from '@material-ui/icons/Settings';
 import StorageIcon from '@material-ui/icons/Storage';
+import ContactSupportIcon from '@material-ui/icons/ContactSupport';
+import Tooltip from '@material-ui/core/Tooltip';
 
 
 /*
@@ -116,17 +116,17 @@ const styles = theme => ({
 });
 
 class Dashboard extends React.Component {
-  state = {
-    open: false,
-  };
-
-  handleDrawerOpen = () => {
-    this.setState({ open: true });
-  };
-
-  handleDrawerClose = () => {
-    this.setState({ open: false });
-  };
+    state = {
+	open: false,
+    };
+    
+    handleDrawerOpen = () => {
+	this.setState({ open: true });
+    };
+    
+    handleDrawerClose = () => {
+	this.setState({ open: false });
+    };
 
     handleHomeClick = () => {
 	this.props.handleChange({
@@ -144,67 +144,55 @@ class Dashboard extends React.Component {
     const { classes } = this.props;
 
     return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <AppBar
-          position="absolute"
-          className={classNames(classes.appBar, this.state.open && classes.appBarShift)}
-        >
-            <Toolbar disableGutters={!this.state.open} className={classes.toolbar}>
-            <IconButton
-              color="inherit"
-              onClick={this.handleHomeClick}
+	<div className={classes.root}>
+            <CssBaseline />
+            <AppBar
+                position="absolute"
+                className={classNames(classes.appBar, this.state.open && classes.appBarShift)}
             >
-              <HomeIcon />
-            </IconButton>
-	    <IconButton
-              color="inherit"
-              onClick={this.handleSessionsClick}
-	      disabled={!this.props.enableSessionsIcon}
-            >
-	    <StorageIcon />
-	    </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              className={classes.title}
-            >
-            {this.props.title}
-            </Typography> 
-	    {
-		//<IconButton color="inherit" onClick={this.handleSettingsClick} >
-		//<SettingsIcon/>
-		//</IconButton>
-	    }
-          </Toolbar>
+                <Toolbar disableGutters={!this.state.open} className={classes.toolbar}>
+	          <Tooltip title="Go Home">
+                    <IconButton
+                        color="inherit"
+                        onClick={this.handleHomeClick}
+                    >
+                       <HomeIcon />
+                    </IconButton>
+	          </Tooltip>
+	          <Tooltip title="Load a stored session.">
+	            <IconButton
+                        color="inherit"
+                        onClick={this.handleSessionsClick}
+	                disabled={!this.props.enableSessionsIcon}
+                    >
+	                <StorageIcon />
+	            </IconButton>
+                 </Tooltip>
+                    <Typography
+                        component="h1"
+                        variant="h6"
+                        color="inherit"
+                        noWrap
+                        className={classes.title}
+                    >
+                        {this.props.title}
+                    </Typography>
+                    {
+			//<Tooltip title="Send us a question.">
+			//<IconButton color="inherit" onClick={this.handleSupportClick} >
+			//<ContactSupportIcon/>
+			//</IconButton>
+			//</Tooltip>
+		    }
+              </Toolbar>
             </AppBar>
-	    {/*
-        <Drawer
-          variant="permanent"
-          classes={{
-              paper: classNames(classes.drawerPaper, !this.state.open && classes.drawerPaperClose),
-          }}
-          open={this.state.open}
-        >
-          <div className={classes.toolbarIcon}>
-            <IconButton onClick={this.handleDrawerClose}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Divider />
-          <List>{this.props.controls}</List>
-          <Divider />
-		    </Drawer>
-	    */}
-        <main className={classes.content}>
-            <div className={classes.appBarSpacer} />
-            <Typography component="div" className={classes.chartContainer}>
-	        {this.props.content}
-            </Typography>
-        </main>
-      </div>
+            <main className={classes.content}>
+                <div className={classes.appBarSpacer} />
+                <Typography component="div" className={classes.chartContainer}>
+	            {this.props.content}
+                </Typography>
+            </main>
+        </div>
     );
   }
 }

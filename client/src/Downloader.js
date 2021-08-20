@@ -2,6 +2,7 @@
 
 import React, { Component } from "react";
 import LoadAlertDialog from './LoadAlert';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import browser from './browser_config';
 import axios from "axios";
@@ -55,7 +56,9 @@ class Downloader extends Component {
                     title={"Preparing Files..."}
 	            message={"This may take several minutes; please be patient!"}
                 />
+		<Tooltip title="Save results to your local hard drive.">
 		<button onClick={this.downloadResults}>Download Results</button>
+		</Tooltip>
 		</div>
 	);
     }

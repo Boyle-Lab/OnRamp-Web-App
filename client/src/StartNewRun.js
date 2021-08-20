@@ -10,6 +10,8 @@ import GenericDialog from './GenericDialog';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import REOptsTable from './REOptsTable'
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 
 /*
 This code is part of the CGIMP distribution
@@ -299,6 +301,7 @@ class StartNewRun extends Component {
 		this.props.updateParentState("dataIsLoaded", true);
 		this.props.updateParentState("resData", res.data.stats);
 		this.props.updateParentState("showResults", true);
+		this.props.updateParentState("sessionName", res.data.data.name);
 		// Set session cookies.
 		this.props.setCookie({
 		    "refServerId": res.data.data.refServerId,
@@ -331,8 +334,11 @@ class StartNewRun extends Component {
 		<div>
 		<Grid container spacing={2}>		
 		<Grid item xs={3}>
-		
+		<Tooltip title="Sequencing file(s) containing reads in fastq format (.fastq or .fq). May be comressed with gzip (.fastq.gz or .fq.gz).">
+		<Typography container="div">
                 Upload Read Data (fastq):
+	        </Typography>
+		</Tooltip>
                 <FileUploader
 	            onFilesChange={this.handleFilesChange}
 	            files={this.state.readFiles}
@@ -341,7 +347,11 @@ class StartNewRun extends Component {
 	            allowedTypes={['fq', 'fastq']}
 	            updateParentState={this.updateStateSettings}
 		/>
+		<Tooltip title="Plasmid reference sequence file(s) in fasta format (.fasta or .fa). May be compressed with gzip (.fasta.gz or .fa.gz).">
+		<Typography container="div">
 		Upload Plasmid Sequences (fasta):
+	        </Typography>
+		</Tooltip>
                 <FileUploader
                     onFilesChange={this.handleFilesChange}
                     files={this.state.refFiles}
@@ -350,6 +360,7 @@ class StartNewRun extends Component {
 	            allowedTypes={['fa', 'fasta']}
                     updateParentState={this.updateStateSettings}
                 />
+		<Tooltip title="Enter or change restriction enzymes used to linearize plasmids for sequencing.">
 		<ActionButton
 	            variant="contained"
 	            disabled={!this.state.refFiles.length}
@@ -358,6 +369,7 @@ class StartNewRun extends Component {
 		>
 		    Edit Restriction Enzymes
 	        </ActionButton>
+		</Tooltip>
 		<GenericDialog
                     name={'Edit Restriction Enzymes'}
                     open={this.state.showREOpts}
@@ -400,6 +412,7 @@ class StartNewRun extends Component {
                     onClose={() => this.updateStateSettings("showNanofiltOpts", false)}
                     content=<NanofiltOpts handleChange={this.handleChange} getState={this.getState}/>
                 />
+		<Tooltip title="Start your analysis!">
 		<input type="submit" value="Submit" disabled={!(this.state.readFiles.length &&
 								this.state.refFiles.length &&
 								this.props.dataIsLoaded &&
@@ -407,6 +420,7 @@ class StartNewRun extends Component {
 								this.state.readFilesLoaded
 							       )}
 		/>
+		</Tooltip>
 	        </ValidatorForm>
 		</Grid>
 		</Grid>
@@ -459,9 +473,9 @@ function parseBoolean(string) {
     return false
 }
 
-const adjectives = ['extreme', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'violent', 'belligerent', 'victorious', 'meek', 'deliberate', 'swift', 'undulating', 'cantankerous', 'zygomorphic', 'fancy', 'dull', 'shifty', 'mistaken', 'childish', 'manly', 'huge', 'miniscule', 'gorgeous', 'sandy', 'gritty', 'smooth', 'wispy', 'florrid', 'vegetal', 'animalistic', 'unprotected', 'fervent', 'insufferble', 'bulbous', 'pendulous', 'bullish', 'horrifying', 'mystical', 'lemony', 'fruity', 'brutish', 'fantastic', 'horrible', 'cheesy', 'horrendous'];
+const adjectives = ['extreme', 'orange', 'green', 'blue', 'indigo', 'violet', 'violent', 'belligerent', 'victorious', 'meek', 'deliberate', 'swift', 'undulating', 'cantankerous', 'zygomorphic', 'fancy', 'dull', 'shifty', 'mistaken', 'childish', 'manly', 'huge', 'miniscule', 'gorgeous', 'sandy', 'gritty', 'smooth', 'wispy', 'florrid', 'vegetal', 'animalistic', 'unprotected', 'fervent', 'insufferble', 'bulbous', 'pendulous', 'bullish', 'horrifying', 'mystical', 'lemony', 'fruity', 'brutish', 'fantastic', 'horrible', 'cheesy', 'horrendous', "mauve", "pink", "puce", "stinky", "fabulous", "reverent", "irreverent", "illogical", "logical", "reasonable", "unreasonable", "lugubrious", "masterful", "demanding", "fabricated", 'knobby', 'restful', 'serene', 'bustling', 'bellicose', 'burgeoning', 'bumbling'];
 
-const nouns = ['pants', 'shoe', 'channel', 'hamburger', 'bar', 'fish', 'trout', 'gazelle', 'macintosh', 'davenport', 'shill', 'fabricator', 'dingbat', 'cow', 'goat', 'parakeet', 'dishwasher', 'sausage', 'taco', 'automobile', 'chicken', 'doorbell', 'dumbell', 'lifter', 'hammer', 'pliers', 'window', 'pacifier', 'baseball', 'filbert', 'sandwich', 'box', 'scrimshaw', 'yearbook', 'horse', 'methamphetamine', 'sanitizer', 'vaccine', 'plague', 'handlebar', 'mystic', 'sheikh', 'chief', 'president', 'minister', 'bellwether', 'cheesemaker', 'cobbler', 'whale', 'hunchback', 'chair'];
+const nouns = ['pants', 'shoe', 'channel', 'hamburger', 'bar', 'fish', 'trout', 'gazelle', 'macintosh', 'davenport', 'shill', 'fabricator', 'dingbat', 'cow', 'goat', 'parakeet', 'dishwasher', 'sausage', 'taco', 'automobile', 'chicken', 'doorbell', 'dumbell', 'lifter', 'hammer', 'pliers', 'window', 'pacifier', 'baseball', 'filbert', 'sandwich', 'box', 'scrimshaw', 'yearbook', 'horse', 'methamphetamine', 'sanitizer', 'vaccine', 'plague', 'handlebar', 'mystic', 'president', 'minister', 'bellwether', 'cheesemaker', 'cobbler', 'whale', 'hunchback', 'chair', 'hamburger', 'child', 'camel', 'llama', 'screwdriver', 'micropipette', 'centrifuge', 'freezer', 'gearshift', 'knob', 'guitar', 'violin', 'piano', 'harpsichord', 'tuba', 'trombone', 'saxophone', 'triangle', 'square', 'rectangle', 'parallellogram', 'rhombus', 'serenity', 'filter', 'funnel', 'trilobite', 'dinosaur', 'bracken', 'bracket', 'racket', 'rack', 'shack', 'lever', 'octogon', 'hexagon', 'pentagon', 'trapezoid', 'sine', 'cosine', 'tangent', 'cotangent', 'secant', 'gravel', 'garden', 'tomato', 'potato', 'pepper', 'corvid', 'tube', 'slacks', 'trousers', 'suspenders', 'undershirt', 'flannel', 'kilt', 'lemon', 'lime', 'grapefruit', 'orange', 'satsuma', 'tatsoi', 'celery', 'carrot', 'beans'];
 
 
 export default StartNewRun;

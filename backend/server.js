@@ -398,13 +398,14 @@ router.post('/processData', (req, res) => {
 // This method retrieves existing data from the server for a session run
 // within the last 24 hours. (session data stored in a cookie)
 router.post('/processCachedData', (req, res) => {
-    const { resServerId, refServerId, refFile } = req.body;
+    const { resServerId, refServerId, refFile, name } = req.body;
 
     // Container for results locations.
     const resData = { algnFile: "filtered_alignment.bam",
                       refServerId: refServerId,
                       resServerId: resServerId,
-		      refFile: refFile
+		      refFile: refFile,
+		      name: name
 		    };
 
     // Get locations of data on the server.
