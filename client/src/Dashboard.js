@@ -159,7 +159,8 @@ class Dashboard extends React.Component {
                        <HomeIcon />
                     </IconButton>
 	          </Tooltip>
-	          <Tooltip title="Load a stored session.">
+	        <Tooltip title="Load a stored session.">
+	          <span>
 	            <IconButton
                         color="inherit"
                         onClick={this.handleSessionsClick}
@@ -167,7 +168,8 @@ class Dashboard extends React.Component {
                     >
 	                <StorageIcon />
 	            </IconButton>
-                 </Tooltip>
+	          </span>
+                </Tooltip>
                     <Typography
                         component="h1"
                         variant="h6"

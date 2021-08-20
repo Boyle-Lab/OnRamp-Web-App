@@ -361,6 +361,7 @@ class StartNewRun extends Component {
                     updateParentState={this.updateStateSettings}
                 />
 		<Tooltip title="Enter or change restriction enzymes used to linearize plasmids for sequencing.">
+		<span>
 		<ActionButton
 	            variant="contained"
 	            disabled={!this.state.refFiles.length}
@@ -369,6 +370,7 @@ class StartNewRun extends Component {
 		>
 		    Edit Restriction Enzymes
 	        </ActionButton>
+		</span>
 		</Tooltip>
 		<GenericDialog
                     name={'Edit Restriction Enzymes'}

@@ -175,13 +175,15 @@ function SharedOptsTable(props) {
                 <Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
       	            Biobin
 	            <Tooltip title="Change Biobin settings.">
+	             <span>
                       <IconButton
 	                color="inherit"
 	                onClick={ (event) => handleSettingsClick(event, "showBinningOpts") }
 	                disabled={!showBinningOpts}
 	              >
                         <SettingsIcon/>
-                      </IconButton>
+                       </IconButton>
+	              </span>
                     </Tooltip>
 	        </Grid>
 	
@@ -255,13 +257,15 @@ function SharedOptsTable(props) {
 
                 <Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
 	            <Tooltip title="Change Nanofilt settings.">
+	              <span>
                         <IconButton
                             color="inherit"
                             onClick={ (event) => handleSettingsClick(event, "showNanofiltOpts") }
                             disabled={! showNanofiltOpts}
                         >
                             <SettingsIcon/>
-                        </IconButton>
+                         </IconButton>
+	              </span>
 	            </Tooltip>
                 </Grid>
 
