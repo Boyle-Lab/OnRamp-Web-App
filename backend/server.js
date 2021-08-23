@@ -216,11 +216,18 @@ router.post('/processData', (req, res) => {
     const outPath = '/tmp/' + serverId + '/';
     fs.mkdir(outPath);
 
+    // JSON object for storage of run params. This will be stored as part of
+    // the resData object and be written to disk so it is included in results
+    // downloads.
+    const runParams = {};
+    
     // Container for results locations.
     const resData = { algnFile: "filtered_alignment.bam",
                       refServerId: refServerId,
                       resServerId: serverId,
-		      origRefFiles: refFiles };
+		      origRefFiles: refFiles,
+		      runParams: runParams
+		    };
 
     // Process restriction enzyme offsets into a yaml file to supply the
     // --restriction_enzyme_table option.
@@ -253,19 +260,23 @@ router.post('/processData', (req, res) => {
 	    return res.status(400).send('Error in restriction offsets: could not write yaml file: ' + err);
 	}
     });
+    // Store this as part of the run params too.
+    runParams["plasmidEnzymeData"] = yamlData;
     
     // Process the options.
     //const cmdArgs = ['/usr/local/bin/bulkPlasmidSeq/bulkPlasmidSeq.py'];
     const cmdArgs = [];
     cmdArgs.push(options.mode); // Analysis mode is the first arg.
-
+    runParams["mode"] = options.mode
+	
     // Read file/directory is next
     cmdArgs.push('-i');
     if (_readFiles.length > 1) {
-	cmdArgs.push(readPath)
+	cmdArgs.push(readPath);
     } else {
 	cmdArgs.push(readPath + _readFiles[0]);
     }
+    runParams["sequencingReadFiles"] = readFiles;
 
     // Ref file/directory is next
     cmdArgs.push('-r');
@@ -295,19 +306,29 @@ router.post('/processData', (req, res) => {
 	cmdArgs.push(refPath + _refFiles[0]);
 	resData["refFile"] = _refFiles[0];
     }
+    runParams["plasmidReferenceFiles"] = refFiles;
 
     // Store the run name and date
     resData["name"] = options.name;
     resData["date"] = Date().toString();
+    runParams["name"] = options.name;
+    runParams["date"] = resData["date"];
+
+    // Handle the medaka consensus model
+    cmdArgs.push('--model');
+    cmdArgs.push(options.medakaModel);
+    runParams["medakaConsensusModel"] = options.medakaModel;
 
     // Handle the double arg
     if (options.double) {
 	cmdArgs.push('--double');
+	runParams["double"] = true;
     }
 
     // Handle the trim arg
     if (options.trim) {
         cmdArgs.push('--trim');
+	runParams["trim"] = true;
     }
 
     // Handle the --restriction_enzyme_table option
@@ -317,40 +338,65 @@ router.post('/processData', (req, res) => {
     // Next we'll handle the command-specific options
     // biobin options
     if (options.mode === "biobin") {
+	runParams["biobinOptions"] = {};
 	cmdArgs.push('--marker_score');
 	cmdArgs.push(options.markerScore);
+	runParams["biobinOptions"]["marker_score"] = options.markerScore;
 	cmdArgs.push('--kmer_length');
 	cmdArgs.push(options.kmerLen);
+	runParams["biobinOptions"]["kmer_length"] = options.kmerLen;
 	cmdArgs.push('--match');
 	cmdArgs.push(options.match);
+	runParams["biobinOptions"]["match"] = options.match;
 	cmdArgs.push('--mismatch');
 	cmdArgs.push(options.mismatch);
+	runParams["biobinOptions"]["mismatch"] = options.mismatch;
 	cmdArgs.push('--gap_open');
 	cmdArgs.push(options.gapOpen);
+	runParams["biobinOptions"]["gap_open"] = options.gapOpen;
 	cmdArgs.push('--gap_extend');
 	cmdArgs.push(options.gapExtend);
+	runParams["biobinOptions"]["gap_extend"] = options.gapExtend;
 	cmdArgs.push('--context_map');
 	cmdArgs.push(options.contextMap);
+	runParams["biobinOptions"]["context_map"] = options.contextMap;
 	cmdArgs.push('--fine_map');
 	cmdArgs.push(options.fineMap);
+	runParams["biobinOptions"]["fine_map"] = options.fineMap;
 	cmdArgs.push('--max_regions');
 	cmdArgs.push(options.maxRegions);
+	runParams["biobinOptions"]["max_regions"] = options.maxRegions;
     }
-    
+        
     // nanofilt options
     if (options.filter) {
+	cmdArgs.push('--filter');
+	runParams["filter"] = true;
+	runParams["nanofiltOptions"] = {};
 	cmdArgs.push('--max_length');
 	cmdArgs.push(options.maxLen);
+	runParams["nanofiltOptions"]["max_length"] = options.maxLen;
 	cmdArgs.push('--min_length');
 	cmdArgs.push(options.minLen);
+	runParams["nanofiltOptions"]["min_length"] = options.minLen;
 	cmdArgs.push('--min_quality');
 	cmdArgs.push(options.minQual);
+	runParams["nanofiltOptions"]["min_quality"] = options.minQual;
     }
 
     // Add the output directory
     cmdArgs.push('-o');
     cmdArgs.push(outPath);
-    
+
+    // Write the run params to the output directory as JSON.
+    fs.writeFile(outPath + 'run_params.json', JSON.stringify(runParams), (err) => {
+	if (err) {
+	    // File not written. Return an error.
+	    return res.status(400).send("Could not write params file.");
+	}
+    });
+
+    // Proceed with the analysis.
     console.log(cmdArgs.join(' '));
 
     let pipelineOptions = {
@@ -400,34 +446,42 @@ router.post('/processData', (req, res) => {
 router.post('/processCachedData', (req, res) => {
     const { resServerId, refServerId, refFile, name } = req.body;
 
-    // Container for results locations.
-    const resData = { algnFile: "filtered_alignment.bam",
-                      refServerId: refServerId,
-                      resServerId: resServerId,
-		      refFile: refFile,
-		      name: name
-		    };
-
     // Get locations of data on the server.
     const refPath = '/tmp/' + refServerId + '/';
-    const resPath = '/tmp/' + resServerId + '/';    
+    const resPath = '/tmp/' + resServerId + '/';
 
-    let pipelineOptions = {
-        mode: 'text',
-        pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
-        pythonOptions: ['-u'],
-        args: [refPath, resPath + 'consensus_sequences', resPath + 'filtered_alignment.bam']
-    }
+    // Get the run params from the stored session.
+    fs.readFile(resPath + 'run_params.json', 'utf8', (err, data) => {
+	if (err) {
+            res.status(400).send('Cannot restore session:' + err);
+	}
     
-    PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
-        if (err) {
-            console.log(err)
-            res.status(400).send('Runtime error:' + err);
-        } else {
-            return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
-        }
-    });
-    
+	// Container for results locations.
+	const resData = { algnFile: "filtered_alignment.bam",
+			  refServerId: refServerId,
+			  resServerId: resServerId,
+			  refFile: refFile,
+			  name: name,
+			  runParams: JSON.parse(data)
+			};
+	
+	// Get stats for the reference sequences.
+	let pipelineOptions = {
+            mode: 'text',
+            pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
+            pythonOptions: ['-u'],
+            args: [refPath, resPath + 'consensus_sequences', resPath + 'filtered_alignment.bam']
+	}
+	
+	PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
+            if (err) {
+		console.log(err)
+		res.status(400).send('Runtime error:' + err);
+            } else {
+		return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+            }
+	});
+    });    
 });
 
 // append /api for our http requests
