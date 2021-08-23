@@ -11,7 +11,7 @@ import ContactSupportIcon from '@material-ui/icons/ContactSupport';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import Grid from '@material-ui/core/Grid';
-
+import Divider from '@material-ui/core/Divider';
 
 /*
 This code is part of the bulk_plasmid_seq_web distribution
@@ -84,8 +84,9 @@ function HelpContent(props) {
                     </Tooltip>	    
 	        </Grid>
 	    </Grid>
+	  <Divider/>
 	</Grid>
-
+	
 	{/* Email Link */}
 	<Grid item xs={12}>
             <Grid container alignItems="center">
@@ -109,8 +110,9 @@ function HelpContent(props) {
 	          </Tooltip>
                 </Grid>
             </Grid>
+	  <Divider/>
         </Grid>
-
+	
 	{/* Citation Info */}
 	<Grid item xs={12}>
             <Grid container alignItems="center">
