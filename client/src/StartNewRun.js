@@ -53,7 +53,7 @@ class StartNewRun extends Component {
 	    refFiles: [],
 	    name: "",
 	    mode: "medaka",
-	    medakaSelectedModel: "",
+	    medakaSelectedModel: "r941_min_high_g360",
 	    double: false,
 	    trim: false,
 	    nanofilt: false,
@@ -99,7 +99,8 @@ class StartNewRun extends Component {
             .then(res => {
                 const models = JSON.parse(res.data.data);
 		this.updateStateSettings("medakaModels", models.models);
-		this.updateStateSettings("medakaSelectedModel", models.default_model);
+		// We will now use the default model indicated in the pipeline.
+		//this.updateStateSettings("medakaSelectedModel", models.default_model);
 		this.props.updateParentState("dataIsLoaded", true);
             })
             .catch(error => {
@@ -272,7 +273,8 @@ class StartNewRun extends Component {
 	    fineMap: this.state.fineMap,
 	    maxRegions: this.state.maxRegions,
 	    name: this.state.name,
-	    fastaREData: this.state.fastaREData
+	    fastaREData: this.state.fastaREData,
+	    trim: this.state.trim
 	}
 
 	// Server method only needs the file names and locations. Passing the full filepond
@@ -302,6 +304,8 @@ class StartNewRun extends Component {
 		this.props.updateParentState("resData", res.data.stats);
 		this.props.updateParentState("showResults", true);
 		this.props.updateParentState("sessionName", res.data.data.name);
+		console.log(res.data.data.runParams);
+		this.props.updateParentState("runParams", res.data.data.runParams);
 		// Set session cookies.
 		this.props.setCookie({
 		    "refServerId": res.data.data.refServerId,

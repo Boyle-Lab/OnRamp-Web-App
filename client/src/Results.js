@@ -6,6 +6,8 @@ import Downloader from './Downloader';
 import ResultsTable from './ResultsTable';
 import InfoDialog from './InfoDialog';
 import Tooltip from '@material-ui/core/Tooltip';
+import GenericDialog from './GenericDialog';
+import RunParams from './RunParams';
 
 import browser from './browser_config';
 import axios from "axios";
@@ -37,11 +39,13 @@ class ResultsDisplay extends Component {
 	    showInfoDialog: false,
 	    infoDialogContent: null,
 	    infoDialogName: null,
-	    showIgv: false
+	    showIgv: false,
+	    showRunParams: false
 	};
     }
 
     componentDidMount() {
+	console.log(this.props.runParams);
     }
 
     componentWillUnmount() {
@@ -59,8 +63,8 @@ class ResultsDisplay extends Component {
 	this.setState({ "showInfoDialog": false });
     }
 
-    handleClick = (event) => {
-	this.setState({ showIgv: !this.state.showIgv });
+    handleClick = target => event => {
+	this.setState({ [target]: !this.state[target] });
 	event.preventDefault();
     }
 
@@ -82,20 +86,33 @@ class ResultsDisplay extends Component {
 		/>
 		<IgvDialog
 	            open={this.state.showIgv}
-	            onClose={this.handleClick}
+	            onClose={() => this.handleClick("showIgv")}
 	            refFile={this.props.refFile}
 	            algnFile={this.props.algnFile}
 	            resServerId={this.props.resServerId}
-		 />
+		/>
+		<GenericDialog
+            name="Run Parameters"
+            open={this.state.showRunParams}
+            onClose={this.handleClick("showRunParams")}
+            content={<RunParams runParams={this.props.runParams}/>}
+                />
 		{this.state.showIgv ?
 		 <Tooltip title="Hide the IGV Browser dialog.">
-		 <button onClick={this.handleClick}>Hide IGV Browser</button>
+		 <button onClick={this.handleClick("showIgv")}>
+		     Hide IGV Browser
+		 </button>
 		 </Tooltip>
 		 :
 		 <Tooltip title="Show results in the IGV Browser.">
-		 <button onClick={this.handleClick}>Show Results in IGV Browser</button>
+		 <button onClick={this.handleClick("showIgv")}>
+		     Show Results in IGV Browser
+		 </button>
 		 </Tooltip>
 		}
+		<button onClick={this.handleClick("showRunParams")}>
+		    Show Run Parameters
+	        </button>
 		<Downloader
 	            serverId={this.props.resServerId}
 		/>

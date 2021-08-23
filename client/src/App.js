@@ -49,6 +49,7 @@ class App extends Component {
 	    algnFile: null,
 	    resData: null,
 	    sessionName: null,
+	    runParams: null,
 	    useCookies: true,
 	    useCached: 0,
 	    showCachedDialog: false,
@@ -145,7 +146,8 @@ class App extends Component {
 		    "dataIsLoaded": true,
 		    "resData": res.data.stats,
 		    "showResults": true,
-		    "sessionName": res.data.data.name
+		    "sessionName": res.data.data.name,
+		    "runParams": res.data.data.runParams
 		});
             })
             .catch(error => {
@@ -169,6 +171,7 @@ class App extends Component {
 			            algnFile={this.state.algnFile}
 			            resData={this.state.resData}
 			            sessionName={this.state.sessionName}
+			            runParams = {this.state.runParams}
 			        />
 		                :
 		                <StartNewRun
