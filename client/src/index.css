@@ -102,3 +102,7 @@ a:hover {
     font-family: monospace;
     font-weight: bold;
 }
+
+.bold {
+    font-weight: bold
+}

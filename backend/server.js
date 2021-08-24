@@ -241,7 +241,7 @@ router.post('/processData', (req, res) => {
 	}
 	const newKey = fnameParts.slice(0, fnameParts.length - offset).join('.');
 
-	yamlData[newKey] = {};
+	yamlData[newKey] = { fileName: key };
 	if (options.fastaREData[key].cut_sites.length == 1) {
 	    yamlData[newKey]["cut-site"] = options.fastaREData[key].cut_sites[0];
 	} else {
