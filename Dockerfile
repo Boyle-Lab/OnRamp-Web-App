@@ -37,3 +37,8 @@ RUN pip install --upgrade virtualenv
 
 # Add an editor, because it's handy to have.
 RUN apt-get update && apt-get -y --no-install-recommends install emacs
+
+# Install and enable cron
+RUN apt-get update && apt-get -y --no-install-recommends install cron
+RUN apt-get update && apt-get install --reinstall systemd
+RUN systemctl enable cron
