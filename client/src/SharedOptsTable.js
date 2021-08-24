@@ -315,47 +315,6 @@ function SharedOptsTable(props) {
                 </Grid>
             </Grid>
         </Grid>
-
-	{/* Double Option */}
-	<Grid item xs={12}>
-            <Grid container alignItems="center">
-		<Grid item xs={4} className={classes.leftAligned}>
-                    <Tooltip title="Double the reference genome to improve visualization.">
-	              <Typography container="div">
-                        Double the Reference Genome
-	              </Typography>
-                    </Tooltip>
-	        </Grid>
-
-		<Grid item xs={1} className={classes.rightAlignedSwitchLabel}>
-
-		</Grid>
-
-		<Grid item xs={1} className={classes.centerAligned}>
-                  <Tooltip title="Double the reference genome to improve visualization.">
-                    <Switch
-	                id="double"
-			onChange={handleSwitch}
-			color="primary"
-                    />
-                  </Tooltip>
-		</Grid>
-
-		<Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
-                    {/* <IconButton
-			color="inherit"
-			onClick={ (event) => handleSettingsClick(event, "showNanofiltOpts") }
-			disabled={!showNanofiltOpts}
-                    >
-                        <SettingsIcon/>
-			</IconButton> */}
-                </Grid>
-
-                <Grid item xs={5} className={classes.leftAligned}>
-
-                </Grid>
-            </Grid>
-        </Grid>	
 	
     </Paper>	
     </Grid>
