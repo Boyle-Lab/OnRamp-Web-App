@@ -18,7 +18,7 @@ source miniconda/bin/activate
 conda init
 
 # Install the analysis pipeline
-conda create -q -y -n medaka -c conda-forge -c bioconda medaka nanofilt pyyaml
+conda create -q -y -n medaka -c conda-forge -c bioconda medaka nanofilt pyyaml porechop
 conda activate medaka
 git clone https://github.com/crmumm/bulkPlasmidSeq.git
 
@@ -32,3 +32,4 @@ ln -s $(pwd)/emboss/needle /usr/local/bin/
 
 # Install biopython
 pip install biopython
+
