@@ -77,9 +77,6 @@ function ResultsTable(props) {
             {rows.map( (row, index) => (
 		    <TableRow key={index.toString()}>
 		    <TableCell key="1" align="left">
-		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
-						  row.pairwise_algn_stats.mismatch_count,
-						  row.sequencing_cov)}>
 		        {row.input_fasta_name}<br/>
 		        <form onSubmit={handleInfoClick}>
 		        <input type="hidden" name="input_fasta_name" value={row.input_fasta_name}/>
@@ -88,7 +85,6 @@ function ResultsTable(props) {
 		        <input type="submit" value="Show Sequence"/>
 		        </Tooltip>
 		        </form>
-		        </span>
 		    </TableCell>
 		    <TableCell key="2" align="left">
 		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
@@ -101,9 +97,6 @@ function ResultsTable(props) {
 		        </span>
 		    </TableCell>
 		    <TableCell key="3" align="left">
-		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
-                                                  row.pairwise_algn_stats.mismatch_count,
-                                                  100)}>
 		        {row.consensus_name}
 		        <form onSubmit={handleInfoClick}>
                         <input type="hidden" name="input_fasta_name" value={row.consensus_name}/>
@@ -112,12 +105,8 @@ function ResultsTable(props) {
                         <input type="submit" value="Show Sequence"/>
 		        </Tooltip>
                         </form>
-		        </span>
 		    </TableCell>
 		    <TableCell key="4" align="left">
-		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
-                                                  row.pairwise_algn_stats.mismatch_count,
-                                                  100)}>
 		        {row.pairwise_algn_name}<br/>
 		        Identity: {row.pairwise_algn_stats.identity_str}/{row.pairwise_algn_stats.length} ({row.pairwise_algn_stats.identity_pct}%)<br/>
 		        Similarity: {row.pairwise_algn_stats.similarity_str}/{row.pairwise_algn_stats.length} ({row.pairwise_algn_stats.similarity_pct}%)<br/>
@@ -130,7 +119,6 @@ function ResultsTable(props) {
                         <input type="submit" value="Show Alignment"/>
 		        </Tooltip>
                         </form>
-		        </span>
 		    </TableCell>
 		    {/*<TableCell key="5" align="left">{""}</TableCell>*/ /* This cell reserved for IGV links */}
 		    </TableRow>
