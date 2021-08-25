@@ -202,7 +202,7 @@ class App extends Component {
 	            open={this.state.showHelpDialog}
 	            onClose={() => this.updateStateSettings("showHelpDialog", false)}
 	            content=<HelpContent/>
-		    maxWidth={'sm'}
+		    maxWidth={'md'}
 	        />
 		</div>
 	);

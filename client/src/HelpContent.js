@@ -92,10 +92,10 @@ function HelpContent(props) {
         <Grid item xs={12}>
             <Grid container alignItems="center">
                 <Grid item xs={2} className={classes.centerAligned}>
-                    <Tooltip title="Report a bug or issue..">
+                    <Tooltip title="Report a bug or issue.">
                       <IconButton
                         color="inherit"
-                        href="https://www.github.com/crmumm/bulkPlasmidSeq/issues"
+                        href="https://github.com/Boyle-Lab/bulk_plasmid_seq_web/issues"
                       >
                           <BugReportIcon fontSize="large"/>
                       </IconButton>
@@ -105,7 +105,7 @@ function HelpContent(props) {
                     <Tooltip title="Report a bug or issue.">
                         <Typography container="div" align="left">
                             Report or track bugs and issues:<br/>
-                            <a href="https://www.github.com/crmumm/bulkPlasmidSeq/issues">https://www.github.com/crmumm/bulkPlasmidSeq/issues</a>
+                            <a href="https://github.com/Boyle-Lab/bulk_plasmid_seq_web/issues">https://github.com/Boyle-Lab/bulk_plasmid_seq_web/issues</a>
                         </Typography>
                     </Tooltip>
                 </Grid>
