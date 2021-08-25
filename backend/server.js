@@ -408,8 +408,22 @@ router.post('/processData', (req, res) => {
     
     PythonShell.run('/usr/local/bulkPlasmidSeq/bulkPlasmidSeq.py', pipelineOptions, function (err, resStats) {
 	if (err) {
-	    console.log(err)
-	    res.status(400).send('Runtime error:' + err);
+	    console.log(err);
+	    // For biobin mode, we sometimes get no results due to zero mapped
+	    // reads being assigned to any plasmids. We need to handle this
+	    // gracefully.
+	    if (options.mode === 'biobin') {
+		// The inconvenient thing is that you can't directly look at the stderr
+		// output originating from the python script. err.stack contains this
+		// output, but as part of a larger unstructured string. We will need to
+		// parse out the actual error to verify that there were no assigned reads.
+		const stackTrace = err.stack.split('\n');
+		if (stackTrace[0] === 'Error: No reads were assigned to any plasmid!') {
+		    return res.json({ success: false, error: true, message: stackTrace[0] });
+		}
+	    } else {
+		res.status(400).send('Runtime error:' + err);
+	    }
 	} else {
 	    // Clean up input files, since these are not neeeded any more.
 	    /*

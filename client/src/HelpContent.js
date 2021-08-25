@@ -13,6 +13,7 @@ import BugReportIcon from '@material-ui/icons/BugReport';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
+import ErrorContent from './ErrorContent';
 
 /*
 This code is part of the bulk_plasmid_seq_web distribution

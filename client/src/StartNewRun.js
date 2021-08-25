@@ -12,6 +12,7 @@ import { withStyles } from '@material-ui/core/styles';
 import REOptsTable from './REOptsTable'
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import ErrorContent from './ErrorContent';
 
 /*
 This code is part of the CGIMP distribution
@@ -76,7 +77,9 @@ class StartNewRun extends Component {
 	    showBinningOpts: false,
 	    showNanofiltOpts: false,
 	    showREOpts: false,
-	    fastaREData: {}
+	    fastaREData: {},
+	    processingErr: null,
+	    showErrorDialog: false
         };
 	this.handleFilesChange = this.handleFilesChange.bind(this);
 	this.processData = this.processData.bind(this);
@@ -150,7 +153,8 @@ class StartNewRun extends Component {
 		   this.state.name !== nextState.name ||
 		   this.state.showBinningOpts !== nextState.showBinningOpts ||
 		   this.state.showNanofiltOpts !== nextState.showNanofiltOpts ||
-		   this.state.showREOpts !== nextState.showREOpts
+		   this.state.showREOpts !== nextState.showREOpts ||
+		   this.state.showErrorDialog !== nextState.showErrorDialog
 	    ) {
 	    return true;
 	} else {
@@ -295,30 +299,43 @@ class StartNewRun extends Component {
                    }
                   )
             .then(res => {
-		// Display the results in the parent component.
-		this.props.updateParentState("refServerId", res.data.data.refServerId);
-		this.props.updateParentState("resServerId", res.data.data.resServerId);
-		this.props.updateParentState("refFile", res.data.data.refFile);
-		this.props.updateParentState("algnFile", res.data.data.algnFile);
-		this.props.updateParentState("dataIsLoaded", true);
-		this.props.updateParentState("resData", res.data.stats);
-		this.props.updateParentState("showResults", true);
-		this.props.updateParentState("sessionName", res.data.data.name);
-		console.log(res.data.data.runParams);
-		this.props.updateParentState("runParams", res.data.data.runParams);
-		// Set session cookies.
-		this.props.setCookie({
-		    "refServerId": res.data.data.refServerId,
-		    "resServerId": res.data.data.resServerId,
-		    "refFile": res.data.data.refFile,
-		    "name": res.data.data.name,
-		    "date": res.data.data.date
-		});
-		
-            })
+		if (res.data.success) {
+		    // Display the results in the parent component.
+		    this.props.updateParentState("refServerId", res.data.data.refServerId);
+		    this.props.updateParentState("resServerId", res.data.data.resServerId);
+		    this.props.updateParentState("refFile", res.data.data.refFile);
+		    this.props.updateParentState("algnFile", res.data.data.algnFile);
+		    this.props.updateParentState("dataIsLoaded", true);
+		    this.props.updateParentState("resData", res.data.stats);
+		    this.props.updateParentState("showResults", true);
+		    this.props.updateParentState("sessionName", res.data.data.name);
+		    console.log(res.data.data.runParams);
+		    this.props.updateParentState("runParams", res.data.data.runParams);
+		    // Set session cookies.
+		    this.props.setCookie({
+			"refServerId": res.data.data.refServerId,
+			"resServerId": res.data.data.resServerId,
+			"refFile": res.data.data.refFile,
+			"name": res.data.data.name,
+			"date": res.data.data.date
+		    });
+		} else {
+		    // The pipeline reported an error.
+                    this.props.updateParentState("dataIsLoaded", true);
+                    this.setState({
+			processingErr: res.data.message,
+			showErrorDialog: true
+                    });
+		}
+	    })
             .catch(error => {
                 console.log(error);
 		// Handle the error
+ 		//this.props.updateParentState("dataIsLoaded", true);
+		//this.setState({
+		//    processingErr: error,
+		//    showErrorDialog: true
+		//});
             });
 	event.preventDefault();
     }
@@ -430,6 +447,12 @@ class StartNewRun extends Component {
 	        </ValidatorForm>
 		</Grid>
 		</Grid>
+		<GenericDialog
+	            name={'Error!'}
+	            open={this.state.showErrorDialog}
+	            onClose={() => this.updateStateSettings("showErrorDialog", false)}
+	            content=<ErrorContent error={this.state.processingErr}/>
+		/>
 	    </div>
         );
     }
