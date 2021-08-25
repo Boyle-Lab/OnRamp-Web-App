@@ -532,7 +532,7 @@ router.post('/findREOffsets', (req, res) => {
             console.log(err)
             res.status(400).send('error finding offsets:' + err);
         }
-	console.log(results);
+	//console.log(results);
         return res.json({ success: true, data: results[0] });
     });
 });
