@@ -9,6 +9,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ContactSupportIcon from '@material-ui/icons/ContactSupport';
 import GitHubIcon from '@material-ui/icons/GitHub';
+import BugReportIcon from '@material-ui/icons/BugReport';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
@@ -78,14 +79,40 @@ function HelpContent(props) {
 	        <Grid item xs={10} className={classes.leftAligned}>
 	            <Tooltip title="View project at GitHub.">
 	                <Typography container="div" align="left">
-                            Visit the project page at GitHub:<br/>
+                            Visit the project page at GitHub for more information and documentation:<br/>
                             <a href="https://www.github.com/crmumm/bulkPlasmidSeq">https://www.github.com/crmumm/bulkPlasmidSeq</a>
 	                </Typography>
                     </Tooltip>	    
 	        </Grid>
 	    </Grid>
 	  <Divider/>
-	</Grid>
+	    </Grid>
+
+	{/* Bug Report Link (goes to gitHub Issues page) */}
+        <Grid item xs={12}>
+            <Grid container alignItems="center">
+                <Grid item xs={2} className={classes.centerAligned}>
+                    <Tooltip title="Report a bug or issue..">
+                      <IconButton
+                        color="inherit"
+                        href="https://www.github.com/crmumm/bulkPlasmidSeq/issues"
+                      >
+                          <BugReportIcon fontSize="large"/>
+                      </IconButton>
+                    </Tooltip>
+                </Grid>
+                <Grid item xs={10} className={classes.leftAligned}>
+                    <Tooltip title="Report a bug or issue.">
+                        <Typography container="div" align="left">
+                            Report or track bugs and issues:<br/>
+                            <a href="https://www.github.com/crmumm/bulkPlasmidSeq/issues">https://www.github.com/crmumm/bulkPlasmidSeq/issues</a>
+                        </Typography>
+                    </Tooltip>
+                </Grid>
+            </Grid>
+          <Divider/>
+            </Grid>
+
 	
 	{/* Email Link */}
 	<Grid item xs={12}>
