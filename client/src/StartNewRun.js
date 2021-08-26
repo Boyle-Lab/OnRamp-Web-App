@@ -299,44 +299,35 @@ class StartNewRun extends Component {
                    }
                   )
             .then(res => {
-		if (res.data.success) {
-		    // Display the results in the parent component.
-		    this.props.updateParentState("refServerId", res.data.data.refServerId);
-		    this.props.updateParentState("resServerId", res.data.data.resServerId);
-		    this.props.updateParentState("refFile", res.data.data.refFile);
-		    this.props.updateParentState("algnFile", res.data.data.algnFile);
-		    this.props.updateParentState("dataIsLoaded", true);
-		    this.props.updateParentState("resData", res.data.stats);
-		    this.props.updateParentState("showResults", true);
-		    this.props.updateParentState("sessionName", res.data.data.name);
-		    console.log(res.data.data.runParams);
-		    this.props.updateParentState("runParams", res.data.data.runParams);
-		    // Set session cookies.
-		    this.props.setCookie({
-			"refServerId": res.data.data.refServerId,
-			"resServerId": res.data.data.resServerId,
-			"refFile": res.data.data.refFile,
-			"name": res.data.data.name,
-			"date": res.data.data.date
-		    });
-		} else {
-		    // The pipeline reported an error.
-                    this.props.updateParentState("dataIsLoaded", true);
-                    this.setState({
-			processingErr: res.data.message,
-			showErrorDialog: true
-                    });
-		}
+		// Display the results in the parent component.
+		this.props.updateParentState("refServerId", res.data.data.refServerId);
+		this.props.updateParentState("resServerId", res.data.data.resServerId);
+		this.props.updateParentState("refFile", res.data.data.refFile);
+		this.props.updateParentState("algnFile", res.data.data.algnFile);
+		this.props.updateParentState("dataIsLoaded", true);
+		this.props.updateParentState("resData", res.data.stats);
+		this.props.updateParentState("showResults", true);
+		this.props.updateParentState("sessionName", res.data.data.name);
+		console.log(res.data.data.runParams);
+		this.props.updateParentState("runParams", res.data.data.runParams);
+		// Set session cookies.
+		this.props.setCookie({
+		    "refServerId": res.data.data.refServerId,
+		    "resServerId": res.data.data.resServerId,
+		    "refFile": res.data.data.refFile,
+		    "name": res.data.data.name,
+		    "date": res.data.data.date
+		});
 	    })
-            .catch(error => {
-                console.log(error);
-		// Handle the error
- 		//this.props.updateParentState("dataIsLoaded", true);
-		//this.setState({
-		//    processingErr: error,
-		//    showErrorDialog: true
-		//});
-            });
+	    .catch(error => {
+		//console.log(error.response);
+		this.props.updateParentState("dataIsLoaded", true);
+                this.setState({
+                    processingErr: error.response.data.message,
+                    showErrorDialog: true
+                });
+	    });
+	
 	event.preventDefault();
     }
 

@@ -53,11 +53,11 @@ app.use(fileUpload());
 // This is our file upload method.
 router.post('/upload', (req, res) => {
     if (Object.keys(req.files).length == 0) {
-	return res.status(400).send('No files were uploaded.');
+	return res.status(400).json({ message: 'No files were uploaded.' });
     }
     const serverId = req.query.serverId;
     fs.mkdir('/tmp/' + serverId, { recursive: true }, (err) => {
-	if (err) { return res.status(500).send(err); };
+	if (err) { return res.status(500).json({ message: err }); };
     });
     req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
 	if (err) { return res.status(500).send(err); }
@@ -78,8 +78,10 @@ router.delete('/delete', (req, res) => {
 	    console.log(err);
 	} else {
 	    fs.remove(_filePath, (err) => {
-		if (err) { console.log(err); }//return res.status(500).send(err); };
-	    });
+		if (err) { console.log(err);
+			   //return res.status(500).send(err);
+			 }
+	    });		     
 	}
     });
     res.set('Content-Type', 'text/plain');
@@ -108,7 +110,7 @@ router.post("/getFile", (req, res) => {
 router.post('/writeJson', (req, res) => {
     const { fileName, index } = req.body;
     if (index.length == 0) {
-        return res.status(400).send('No content.');
+        return res.status(400).json({ message: 'No content.' });
     }
     fs.writeFile(fileName, JSON.stringify(index), (err) => { return });
     return res.status(200).send('Success');
@@ -121,7 +123,7 @@ router.get("/getResult", (req, res) => {
     res.set('Content-Type', contentType);
     fs.readFile(filePath, encodingType, (err, data) => {
         if (err) {
-            return res.status(400).send(err);
+            return res.status(400).json({ message: err });
         }
         return res.status(200).send(data);
     });
@@ -135,7 +137,7 @@ router.get("/downloadResults", (req, res) => {
 	     'Content-Disposition': 'attachment; filename=' + fileName});
     fs.readFile(filePath, null, (err, data) => {
         if (err) {
-            return res.status(400).send(err);
+            return res.status(400).json({ message: err });
         }
         return res.status(200).send(data);
     });
@@ -156,22 +158,10 @@ router.post("/prepareResults", (req, res) => {
     exec('tar -czf ' + destPath + outFile + ' ' + resultsPath + '*', (err, stdout, stderr) => {
 	if (err) {
 	    console.log(err);
-	    return res.status(400).send('Results retrieval failed: ' + err);
+	    return res.status(400).json({ message: 'Results retrieval failed: ' + err });
 	}
 	res.set('Content-Type', 'text/plain');
 	return res.json({success: true, data: {serverId: resServerId, fileName: outFile} });
-	/*
-	// Send the tarball.
-	res.set({'Content-Type': 'application/x-gtar',
-		 'Content-Disposition': 'attachment;filename=' + outFile});
-	res.download(destPath + outFile, outFile, function (err) {
-	    if (err) {
-		console.log(err);
-		return res.status(400).send('Results retrieval failed: ' + err);
-	    }
-	    //console.log("Sending tarball: " + outFile);
-	    return res.status(200);
-	});*/
     });
 });
 
@@ -185,7 +175,7 @@ router.post('/getMedakaModels', (req, res) => {
 	    PythonShell.run('getMedakaModels.py', options, function (err, results) {
 		if (err) {
 		    console.log(err)
-		    res.status(400).send('error getting medaka models:' + err);
+		    res.status(500).json({ message: 'error getting medaka models:' + err });
 		}
 		// Cache the modes for future use.
 		fs.writeFile("medakaModels.json", results, (err) => {
@@ -248,7 +238,7 @@ router.post('/processData', (req, res) => {
 	    if (options.fastaREData[key].cut_sites.length == 0) {
 		yamlData[newKey]["cut-site"] = 0;
 	    } else {
-		return res.status(400).send('Error in restriction offsets: Multiple cut sites found for ' + options.fastaREData[key].enxyme + ' in ' + key + '!');
+		return res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + options.fastaREData[key].enxyme + ' in ' + key + '!' });
 	    }
 	}
 	if (options.fastaREData[key].enzyme !== "") {
@@ -257,7 +247,7 @@ router.post('/processData', (req, res) => {
     });
     fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
 	if (err) {
-	    return res.status(400).send('Error in restriction offsets: could not write yaml file: ' + err);
+	    return res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
 	}
     });
     // Store this as part of the run params too.
@@ -296,7 +286,7 @@ router.post('/processData', (req, res) => {
 	exec(filesToCat.join(' '), (error, stdout, stderr) => {
 	    if (error) {
 		console.log(error);
-		return res.status(400).send('Error combining reference files: ' + error);
+		return res.status(500).json({ message: 'Error combining reference files: ' + error });
 	    }
 	    //console.log("Ref files combined.");
 	});
@@ -392,7 +382,7 @@ router.post('/processData', (req, res) => {
     fs.writeFile(outPath + 'run_params.json', JSON.stringify(runParams), (err) => {
 	if (err) {
 	    // File not written. Return an error.
-	    return res.status(400).send("Could not write params file.");
+	    return res.status(500).json({ message: "Could not write params file." });
 	}
     });
 
@@ -419,10 +409,10 @@ router.post('/processData', (req, res) => {
 		// parse out the actual error to verify that there were no assigned reads.
 		const stackTrace = err.stack.split('\n');
 		if (stackTrace[0] === 'Error: No reads were assigned to any plasmid!') {
-		    return res.json({ success: false, error: true, message: stackTrace[0] });
+		    return res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
 		}
 	    } else {
-		res.status(400).send('Runtime error:' + err);
+		res.status(400).json({ message: 'Runtime error:' + err });
 	    }
 	} else {
 	    // Clean up input files, since these are not neeeded any more.
@@ -446,7 +436,7 @@ router.post('/processData', (req, res) => {
 	    PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
 		if (err) {
 		    console.log(err)
-		    res.status(400).send('Runtime error:' + err);
+		    res.status(400).json({ message: 'Runtime error:' + err });
 		} else {
 		    return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
 		}
@@ -467,7 +457,8 @@ router.post('/processCachedData', (req, res) => {
     // Get the run params from the stored session.
     fs.readFile(resPath + 'run_params.json', 'utf8', (err, data) => {
 	if (err) {
-            res.status(400).send('Cannot restore session:' + err);
+	    console.log(err);
+            res.status(500).json({ message: 'Cannot restore session:' + err });
 	}
     
 	// Container for results locations.
@@ -490,7 +481,7 @@ router.post('/processCachedData', (req, res) => {
 	PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
             if (err) {
 		console.log(err)
-		res.status(400).send('Runtime error:' + err);
+		res.status(500).json({ message: 'Runtime error:' + err });
             } else {
 		return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
             }
@@ -544,7 +535,7 @@ router.post('/findREOffsets', (req, res) => {
     PythonShell.run('findCutSites.py', options, function (err, results) {
         if (err) {
             console.log(err)
-            res.status(400).send('error finding offsets:' + err);
+            res.status(400).json({ message: 'error finding offsets:' + err });
         }
 	//console.log(results);
         return res.json({ success: true, data: results[0] });

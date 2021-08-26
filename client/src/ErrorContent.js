@@ -46,7 +46,8 @@ const styles = theme => ({
     centerAligned: {
         display: "flex",
         justifyContent: "center",
-	padding: "10px 10px 10x 10px"
+	padding: "10px 10px 10x 10px",
+	margin: '40px 0px 40px 0px'
     },
     bold: {
 	fontWeight: "bold"
@@ -61,9 +62,10 @@ function ErrorContent(props) {
 	    <Grid container className={classes.root} spacing={0}>
 	        <Grid item xs={12} className={classes.centerligned}>
 	            <Typography container="div" align="center" className={classes.bold}>
-	                There was a problem with your analysis. Please see the error message below for more information:
-	</Typography>
-	    <Divider />
+	                The analysis pipeline encountered an error.<br/>
+	                See the information below for more details: 
+	            </Typography>
+	          <Divider />
 	        </Grid>
                 <Divider />
 	        <Grid item xs={12} className={classes.centerAligned}>
