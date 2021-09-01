@@ -35,6 +35,9 @@ CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
 const _cookies = new Cookies();
 
+// To enable debugging messages, set this to true.
+const verbose = false;
+
 class App extends Component {
     // initialize our state
     constructor(props) {
@@ -80,7 +83,9 @@ class App extends Component {
     _updateStateSettings = (data) => {
 	Object.keys(data).forEach( (key) => {
 	    this.setState({ [key]: data[key] }, () => {
-		console.log(key, this.state[key]);
+		if (verbose) {
+		    console.log(key, this.state[key]);
+		}
 	    });
 	});
     }
@@ -158,6 +163,9 @@ class App extends Component {
 
     // Render the UI.
     render() {
+	if (verbose) {
+	    console.log('Render App.js');
+	}
 	return (
 		<div>
 		<Dashboard

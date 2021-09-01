@@ -1,12 +1,16 @@
 import React, { useRef, useEffect } from "react";
 import axios from "axios";
+//import { FilePond, registerPlugin } from 'react-filepond';
 import { FilePond } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
+//import FilePondPluginFileRename from 'filepond-plugin-file-rename';
 import browser from './browser_config';
+//registerPlugin(FilePondPluginFileRename);
+
 
 /*
-This code is part of the CGIMP distribution
-(https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
+This code is part of the bulk_plasmid_seq_web distribution
+(https://github.com/Boyle-Lab/bulk_plasmid_seq_web) and is governed by its license.
 Please see the LICENSE file that should have been included as part of this
 package. If not, see <https://www.gnu.org/licenses/>.
 
@@ -23,15 +27,21 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
+// Set to true to nable debugging messages.
+const verbose = true;
+
 const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, updateParentState }) => {
     // Create a reference to watch for events in the filepond
     const pond = React.useRef(null);
     React.useEffect(() => {
 	pond.current._pond.on('removefile', (error, file) => {
 	    axios.delete(browser.apiAddr + '/delete',
-                         {params: { serverId: serverId,
-				    fileName: file.filename}
-			 }                                                                           
+                         {
+			     params: {
+				 serverId: serverId,
+				 fileName: file.filename
+			     }
+			 }                                                             
                         ); 
 	});
     });
@@ -54,8 +64,7 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 	    if (error) {
 		console.log(error);
 	    }
-	    updateParentState(loadDest, false);
-	    
+	    //updateParentState(loadDest, false);
         });
     });
     React.useEffect(() => {
@@ -67,7 +76,59 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
         });
     });
 
-    console.log('Render FileUploader ' + dest)
+    /* This listener watches for duplicate filenames and renames
+       by appending '..._1...', '..._2...', etc., tags to the file
+       name root. */
+    React.useEffect(() => {
+        pond.current._pond.on('initfile', (file, error) => {
+            if (error) {
+                console.log(error);
+            }
+	    // Check for duplicate file names and rename as needed.
+	    if (checkForDuplicates(pond.current._pond)) {
+		const files = pond.current._pond.getFiles();
+		let filenames = getFilenames(pond.current._pond);
+		files.map( (file, index) => {
+		    console.log(file.file.name);
+		    if (filenames.lastIndexOf(file.filename) > filenames.indexOf(file.filename)) {
+			// File is a duplicate. Rename it.
+			const newFilename = createNewFilename(pond.current._pond, file.file.name);
+
+			// Setting filename directly does not work. "no setter" even though I
+			// hacked the filepond code to add one :-/
+			//file.filename = newFilename;
+			//console.log(file.filename);
+
+			// Because we can't access the file name directly, we must create
+			// a copy of the original with the new name.
+			// This creates a copy of the duplicate file with a new name
+			const renamedFile = renameFile(file.file, newFilename);
+
+			// We have to add the renamed file and remove the original
+			pond.current._pond.addFile(renamedFile);
+			pond.current._pond.removeFile(file);
+
+			/*
+			// Refresh the list of files so we don't rename both copies.
+                        //filenames = getFilenames(pond.current._pond);
+			
+			Because of the collision between file names between duplicates,
+			the file removal above causes deletion of the original file on
+			the server. However, if we rename both files, we can avoid
+			having a file in the pond without a corresponding file on the
+			server. This is sort of a hack, but seems to be the best we can
+			do for now.
+			*/
+		    }
+		});
+	    }
+        });
+	
+    });
+
+    if (verbose) {
+	console.log('Render FileUploader ' + dest)
+    }
     return (
             <FilePond
                 allowMultiple={true}
@@ -85,5 +146,46 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
     );
 }
 
+function getFilenames(pond) {
+    const files	= pond.getFiles();
+    const filenames = [];
+    files.map( (_file, index) => {
+	filenames.push(_file.filename);
+    });
+    return filenames;
+}
+
+function createNewFilename(pond, filename) {
+    const filenames = getFilenames(pond);
+    let suffix = 1;
+    const fnameParts = filename.split('.');
+    const fnameRoot = fnameParts[0];
+    const ext = fnameParts.slice(1,fnameParts.length).join('.');
+    let newFname = fnameRoot + '_' + suffix + '.' + ext;
+    while (filenames.some((item, index) => item === newFname)) {
+        suffix++;
+        newFname = fnameRoot + '_' + suffix + '.' + ext;
+    }
+    return newFname
+}
+
+function checkForDuplicates(pond) {
+    // Check the current file pond for duplicate filenames and rename as found.
+    const filenames = getFilenames(pond);
+    if (filenames.some((item, index) => index !== filenames.indexOf(item))) {
+	// There are duplicates.
+	return true;
+    } else {
+	// No duplicates.
+	return false;
+    }
+}
+
+var renameFile = function renameFile(file, name) {
+    var renamedFile = file.slice(0, file.size, file.type);
+    renamedFile.lastModifiedDate = file.lastModifiedDate;
+    renamedFile.name = name;
+    return renamedFile;
+};
 
 export default FileUploader;

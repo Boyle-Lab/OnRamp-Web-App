@@ -45,6 +45,9 @@ const ActionButton = withStyles({
 
 const modes = ["medaka", "biobin"]
 
+// This toggles several console.log messages for dubugging purposes.
+const verbose = false;
+
 class StartNewRun extends Component {
     constructor(props) {
         super(props);
@@ -167,14 +170,14 @@ class StartNewRun extends Component {
     }
 
     updateStateSettings = (name, value) => {
-	this.setState({ [name]: value }, () => { console.log(name, this.state[name]) });
+	this.setState({ [name]: value }, () => { if (verbose) {console.log(name, this.state[name]) } });
     }
     
     handleFilesChange = (fileItems, dest, allowedTypes) => {
         const files = [];
 	const filesDict = {};
         fileItems.map( (fileItem, index) => {
-	    console.log(fileItem.filename, index);
+	    //console.log(fileItem.filename, index);
 	    const filenameParts = fileItem.filename.split('.');
 	    let ext = filenameParts[filenameParts.length - 1];
 	    if (ext === 'gz' || ext === 'gzip') {
@@ -192,7 +195,7 @@ class StartNewRun extends Component {
 	    if (dest === 'refFiles') {
 		filesDict[fileItem.filename] = "";
 		if (!(fileItem.filename in this.state.fastaREData)) {
-		    console.log('REInit: ', fileItem.filename, index);
+		    //console.log('REInit: ', fileItem.filename, index);
 		    const newFastaREData = this.state.fastaREData;
 		    const newRec = {
 			fasta_filename: fileItem.filename,
@@ -204,7 +207,9 @@ class StartNewRun extends Component {
 		    this.setState({
 			fastaREData: newFastaREData
 		    }, () => {
-			console.log("fastaREData: ", this.state.fastaREData);
+			if (verbose) {
+			    console.log("fastaREData: ", this.state.fastaREData);
+			}
 		    });
 		}		
 	    }
@@ -220,7 +225,11 @@ class StartNewRun extends Component {
 		}
 	    });
 	    this.setState({ fastaREData: newFastaREData },
-			  () => { console.log(this.state.fastaREData); });
+			  () => {
+			      if (verbose) {
+				  console.log(this.state.fastaREData);
+			      }
+			  });
 	}
 	
         this.updateStateSettings(dest, files);
@@ -238,7 +247,9 @@ class StartNewRun extends Component {
 	if (event.target.value === "true" || event.target.value === "false") {
 	    val = parseBoolean(event.target.value)
 	} else if (!event.target.value && (event.target.checked === true || event.target.checked === false)) {
-	    console.log(event);
+	    if (verbose) {
+		console.log(event);
+	    }
 	    val = event.target.checked;
 	} else {
 	    val = event.target.value
@@ -308,7 +319,9 @@ class StartNewRun extends Component {
 		this.props.updateParentState("resData", res.data.stats);
 		this.props.updateParentState("showResults", true);
 		this.props.updateParentState("sessionName", res.data.data.name);
-		console.log(res.data.data.runParams);
+		if (verbose) {
+		    console.log(res.data.data.runParams);
+		}
 		this.props.updateParentState("runParams", res.data.data.runParams);
 		// Set session cookies.
 		this.props.setCookie({
@@ -341,7 +354,9 @@ class StartNewRun extends Component {
     }
     
     render () {
-	console.log("Render StartNewRun");
+	if (verbose) {
+	    console.log("Render StartNewRun");
+	}
         return (
 		<div>
 		<Grid container spacing={2}>		
