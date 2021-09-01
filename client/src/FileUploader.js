@@ -1,12 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import React, { Component, useRef, useEffect, useState } from "react";
 import axios from "axios";
-//import { FilePond, registerPlugin } from 'react-filepond';
 import { FilePond } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
-//import FilePondPluginFileRename from 'filepond-plugin-file-rename';
 import browser from './browser_config';
-//registerPlugin(FilePondPluginFileRename);
-
+import GenericDialog from './GenericDialog';
+import FileRenameAlert from './FileRenameAlert';
 
 /*
 This code is part of the bulk_plasmid_seq_web distribution
@@ -31,8 +29,20 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 const verbose = true;
 
 const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, updateParentState }) => {
+
+    // State variable to toggle alert dialog display.
+    const [showAlert, setAlert] = useState(false);
+
+    // Object to track renamed files.
+    const renamedFiles = {};
+    
     // Create a reference to watch for events in the filepond
     const pond = React.useRef(null);
+
+    // Listener for removeFile events. We need to override the
+    // default behavior of deleting the whole directory in which
+    // the file resides, since all files within a given pond are
+    // stored in a common directory in our implementation.
     React.useEffect(() => {
 	pond.current._pond.on('removefile', (error, file) => {
 	    axios.delete(browser.apiAddr + '/delete',
@@ -60,14 +70,20 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
        this probably should be addressed in future builds! */
     const loadDest = dest + 'Loaded';
     React.useEffect(() => {
+	// Disable the submit button on file init.
 	pond.current._pond.on('initfile', (file, error) => {
 	    if (error) {
 		console.log(error);
 	    }
+	    // If we don't change the parent state, there is no problem.
+	    // Therefore, it's likely that rerendering the parent component
+	    // triggers the behavior, though it's not clear why this would
+	    // happen.
 	    //updateParentState(loadDest, false);
         });
     });
     React.useEffect(() => {
+	// Enable the submit button once the file is processed.
 	pond.current._pond.on('processfiles', (error) => {
 	    if (error) {
 		console.log(error);
@@ -80,16 +96,16 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
        by appending '..._1...', '..._2...', etc., tags to the file
        name root. */
     React.useEffect(() => {
-        pond.current._pond.on('initfile', (file, error) => {
-            if (error) {
-                console.log(error);
+        pond.current._pond.on('processfile', (file, error) => {
+            if (error && verbose) {
+                //console.log(error);
             }
 	    // Check for duplicate file names and rename as needed.
 	    if (checkForDuplicates(pond.current._pond)) {
 		const files = pond.current._pond.getFiles();
 		let filenames = getFilenames(pond.current._pond);
-		files.map( (file, index) => {
-		    console.log(file.file.name);
+		files.forEach( (file, index) => {
+		    //console.log(file.file.name);
 		    if (filenames.lastIndexOf(file.filename) > filenames.indexOf(file.filename)) {
 			// File is a duplicate. Rename it.
 			const newFilename = createNewFilename(pond.current._pond, file.file.name);
@@ -119,8 +135,17 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 			server. This is sort of a hack, but seems to be the best we can
 			do for now.
 			*/
+
+			// Keep track of what we've renamed.
+			renamedFiles[newFilename] = file.file.name;
 		    }
 		});
+		console.log(renamedFiles);
+		if (Object.keys(renamedFiles).length > 0) {
+		    // This triggers a rerender, which, for some reason, triggers
+		    // deletion of one of the copied files.
+                    setAlert(true);
+		}
 	    }
         });
 	
@@ -130,6 +155,7 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 	console.log('Render FileUploader ' + dest)
     }
     return (
+	<div>
             <FilePond
                 allowMultiple={true}
                 files={files} 
@@ -143,6 +169,13 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 	            onFilesChange(fileItems, dest, allowedTypes);
 		}}
             />
+	    <GenericDialog
+                name={'Edit Restriction Enzymes'}
+                open={showAlert}
+                onClose={(event, reason) => { setAlert(false) }}
+                content={<FileRenameAlert data={renamedFiles} />}
+	    />
+	</div>
     );
 }
 
@@ -181,8 +214,8 @@ function checkForDuplicates(pond) {
     }
 }
 
-var renameFile = function renameFile(file, name) {
-    var renamedFile = file.slice(0, file.size, file.type);
+function renameFile(file, name) {
+    const renamedFile = file.slice(0, file.size, file.type);
     renamedFile.lastModifiedDate = file.lastModifiedDate;
     renamedFile.name = name;
     return renamedFile;
