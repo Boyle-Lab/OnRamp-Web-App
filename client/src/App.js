@@ -4,7 +4,7 @@ import React, { Component } from "react";
 
 import Dashboard from './Dashboard';
 import LoadAlertDialog from './LoadAlert';
-import StartNewRun from './StartNewRun';
+import StartRunWrapper from './StartRunWrapper';
 import ResultsDisplay from './Results';
 import Cookies from 'universal-cookie';
 import CachedSessionDialog from './CachedSessionDialog';
@@ -182,7 +182,7 @@ class App extends Component {
 			            runParams = {this.state.runParams}
 			        />
 		                :
-		                <StartNewRun
+		                <StartRunWrapper
 	                            dataIsLoaded={this.state.dataIsLoaded}
 	                            updateParentState={this.updateStateSettings}
 			            setCookie={this.setCookie}

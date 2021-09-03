@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import browser from './browser_config';
 import axios from "axios";
-import FileUploader from './FileUploader';
 import OptsTable from './OptsTable';
 import SharedOptsTable from './SharedOptsTable';
 import { ValidatorForm } from 'react-material-ui-form-validator';
@@ -13,6 +12,7 @@ import REOptsTable from './REOptsTable'
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ErrorContent from './ErrorContent';
+import FileRenameAlert from './FileRenameAlert';
 
 /*
 This code is part of the CGIMP distribution
@@ -53,12 +53,9 @@ class StartNewRun extends Component {
         super(props);
 	this.state = {
 	    medakaModels: [],
-	    readFiles: [],
-	    refFiles: [],
 	    name: "",
 	    mode: "medaka",
 	    medakaSelectedModel: "r941_min_high_g360",
-	    double: false,
 	    trim: false,
 	    nanofilt: false,
 	    maxLen: 1000000,
@@ -79,23 +76,15 @@ class StartNewRun extends Component {
 	    readFilesLoaded: false,
 	    showBinningOpts: false,
 	    showNanofiltOpts: false,
-	    showREOpts: false,
 	    fastaREData: {},
 	    processingErr: null,
 	    showErrorDialog: false
         };
-	this.handleFilesChange = this.handleFilesChange.bind(this);
-	this.processData = this.processData.bind(this);
-	this.updateStateSettings = this.updateStateSettings.bind(this);
-	this.handleChange = this.handleChange.bind(this);
-	this.getState = this.getState.bind(this);
     }
     
     componentDidMount() {
 	const name = adjectives[Math.floor(Math.random()*adjectives.length)] + '_' + nouns[Math.floor(Math.random()*nouns.length)];
 	this.updateStateSettings("name", name);
-	this.updateStateSettings("refServerId", Math.floor(1000000000 + Math.random() * 9000000000));
-	this.updateStateSettings("readServerId", Math.floor(1000000000 + Math.random() * 9000000000));
 	axios.post(browser.apiAddr + "/getMedakaModels",
 		   {
 		       contentType: "application/json",
@@ -128,15 +117,14 @@ class StartNewRun extends Component {
 	   works properly, but every other attempt after that fails with the
 	   same "delete" behavior and no upload requests. It's not clear why 
 	   this is the case and I don't have a solution at present! */
-	if ( (this.state.refFiles.length === nextState.refFiles.length &&
-	      this.state.refFilesLoaded !== nextState.refFilesLoaded) ||
-	     (this.state.readFiles.length === nextState.readFiles.length &&	
-              this.state.readFilesLoaded !== nextState.readFilesLoaded)) {
+	if ( (this.props.refFiles.length === nextProps.refFiles.length &&
+	      this.props.refFilesLoaded !== nextProps.refFilesLoaded) ||
+	     (this.props.readFiles.length === nextProps.readFiles.length &&	
+              this.props.readFilesLoaded !== nextProps.readFilesLoaded)) {
 	    return true;
 	} else if (this.state.mode !== nextState.mode ||
 		   this.state.medakaModels !== nextState.medakaModels ||
                    this.state.medakaSelectedModel !== nextState.medakaSelectedModel ||
-		   this.state.double !== nextState.double ||
 		   this.state.nanofilt !== nextState.nanofilt ||
 		   this.state.trim !== nextState.trim ||
 		   this.state.maxLen !== nextState.maxLen ||
@@ -151,20 +139,23 @@ class StartNewRun extends Component {
 		   this.state.contextMap !== nextState.contextMap ||
 		   this.state.fineMap !== nextState.fineMap ||
 		   this.state.maxRegions !== nextState.maxRegions ||
-		   this.state.refServerId !== nextState.refServerId ||
-		   this.state.readServerId !== nextState.readServerId ||
 		   this.state.name !== nextState.name ||
 		   this.state.showBinningOpts !== nextState.showBinningOpts ||
 		   this.state.showNanofiltOpts !== nextState.showNanofiltOpts ||
-		   this.state.showREOpts !== nextState.showREOpts ||
-		   this.state.showErrorDialog !== nextState.showErrorDialog
+		   this.state.showErrorDialog !== nextState.showErrorDialog ||
+
+		   this.props.refServerId !== nextProps.refServerId ||
+                   this.props.readServerId !== nextProps.readServerId ||
+		   this.props.showREOpts !== nextProps.showREOpts ||
+		   this.props.refFilesLoaded !== nextProps.refFilesLoaded ||
+		   this.props.readFilesLoaded !== nextProps.readFilesLoaded
 	    ) {
 	    return true;
 	} else {
 	    return false;
 	}
     }
-    
+
     componentWillUnmount() {
         // Clean up our area.
     }
@@ -173,71 +164,6 @@ class StartNewRun extends Component {
 	this.setState({ [name]: value }, () => { if (verbose) {console.log(name, this.state[name]) } });
     }
     
-    handleFilesChange = (fileItems, dest, allowedTypes) => {
-        const files = [];
-	const filesDict = {};
-        fileItems.map( (fileItem, index) => {
-	    //console.log(fileItem.filename, index);
-	    const filenameParts = fileItem.filename.split('.');
-	    let ext = filenameParts[filenameParts.length - 1];
-	    if (ext === 'gz' || ext === 'gzip') {
-		ext = filenameParts[filenameParts.length - 2]
-	    }
-	    if (allowedTypes.indexOf(ext) != -1) {
-		files.push(fileItem);
-	    } else {
-		let typesStr = allowedTypes.join(', ');
-		alert('Incorrect file type! Allowed types include: ' + typesStr + '. (Files may be compressed with gzip.)');
-		fileItem.abortLoad();
-	    }
-
-	    // Instantiate a record in the REOpts object for the given file.
-	    if (dest === 'refFiles') {
-		filesDict[fileItem.filename] = "";
-		if (!(fileItem.filename in this.state.fastaREData)) {
-		    //console.log('REInit: ', fileItem.filename, index);
-		    const newFastaREData = this.state.fastaREData;
-		    const newRec = {
-			fasta_filename: fileItem.filename,
-			enzyme: "",
-			cut_sites: [],
-			error: ""
-		    }
-		    newFastaREData[fileItem.filename] = newRec;
-		    this.setState({
-			fastaREData: newFastaREData
-		    }, () => {
-			if (verbose) {
-			    console.log("fastaREData: ", this.state.fastaREData);
-			}
-		    });
-		}		
-	    }
-	});
-	
-	// Make sure we don't have any fastREData objects for files no longer in the pond.
-	if (dest === 'refFiles' &&
-	    Object.keys(this.state.fastaREData).length !== files.length) {
-	    const newFastaREData = this.state.fastaREData;
-	    Object.keys(this.state.fastaREData).map((key, index) => {
-		if (!(key in filesDict)) {
-		    delete newFastaREData[key];
-		}
-	    });
-	    this.setState({ fastaREData: newFastaREData },
-			  () => {
-			      if (verbose) {
-				  console.log(this.state.fastaREData);
-			      }
-			  });
-	}
-	
-        this.updateStateSettings(dest, files);
-	if (!files.length) {
-            this.updateStateSettings(dest + 'Loaded', false);
-	}
-    }
-
     handleChange = name => event => {
 	event.preventDefault();
 	// Because we have some menus passing in booleans as strings, we need
@@ -255,10 +181,10 @@ class StartNewRun extends Component {
 	    val = event.target.value
 	}
 	this.updateStateSettings(name, val);
-    };
+    };    
 
-    
-
+    // Used by child components to retrieve a state from this component in lieu
+    // of providing it as a prop.
     getState = (name) => {
 	return(this.state[name])
     }
@@ -360,59 +286,8 @@ class StartNewRun extends Component {
         return (
 		<div>
 		<Grid container spacing={2}>		
-		<Grid item xs={3}>
-		<Tooltip title="Sequencing file(s) containing reads in fastq format (.fastq or .fq). May be comressed with gzip (.fastq.gz or .fq.gz).">
-		<Typography container="div">
-                Upload Read Data (fastq):
-	        </Typography>
-		</Tooltip>
-                <FileUploader
-	            onFilesChange={this.handleFilesChange}
-	            files={this.state.readFiles}
-	            dest="readFiles"
-	            serverId={this.state.readServerId}
-	            allowedTypes={['fq', 'fastq']}
-	            updateParentState={this.updateStateSettings}
-		/>
-		<Tooltip title="Plasmid reference sequence file(s) in fasta format (.fasta or .fa). May be compressed with gzip (.fasta.gz or .fa.gz).">
-		<Typography container="div">
-		Upload Plasmid Sequences (fasta):
-	        </Typography>
-		</Tooltip>
-                <FileUploader
-                    onFilesChange={this.handleFilesChange}
-                    files={this.state.refFiles}
-                    dest="refFiles"
-	            serverId={this.state.refServerId}
-	            allowedTypes={['fa', 'fasta']}
-                    updateParentState={this.updateStateSettings}
-                />
-		<Tooltip title="Enter or change restriction enzymes used to linearize plasmids for sequencing.">
-		<span>
-		<ActionButton
-	            variant="contained"
-	            disabled={!this.state.refFiles.length}
-	            disableRipple
-	            onClick={() => this.updateStateSettings("showREOpts", true)}
-		>
-		    Edit Restriction Enzymes
-	        </ActionButton>
-		</span>
-		</Tooltip>
-		<GenericDialog
-                    name={'Edit Restriction Enzymes'}
-                    open={this.state.showREOpts}
-                    onClose={(event, reason) => {
-			if (reason === "backdropClick") {
-			    return false;
-			}
-		        this.updateStateSettings("showREOpts", false)}
-		    }
-                    content=<REOptsTable data={this.state.fastaREData} updateParentState={this.updateStateSettings} serverId={this.state.refServerId}/>
-                />
-		</Grid>
 
-	    <Grid item xs={9}>
+		<Grid item xs={9}>
 		<ValidatorForm
                     ref="form"
                     onSubmit={this.processData}
@@ -442,11 +317,11 @@ class StartNewRun extends Component {
                     content=<NanofiltOpts handleChange={this.handleChange} getState={this.getState}/>
                 />
 		<Tooltip title="Start your analysis!">
-		<input type="submit" value="Submit" disabled={!(this.state.readFiles.length &&
-								this.state.refFiles.length &&
+		<input type="submit" value="Submit" disabled={!(this.props.readFiles.length &&
+								this.props.refFiles.length &&
 								this.props.dataIsLoaded &&
-								this.state.refFilesLoaded &&
-								this.state.readFilesLoaded
+								this.props.refFilesLoaded &&
+								this.props.readFilesLoaded
 							       )}
 		/>
 		</Tooltip>

@@ -30,9 +30,6 @@ const verbose = true;
 
 const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, updateParentState }) => {
 
-    // State variable to toggle alert dialog display.
-    const [showAlert, setAlert] = useState(false);
-
     // Object to track renamed files.
     const renamedFiles = {};
     
@@ -79,7 +76,7 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 	    // Therefore, it's likely that rerendering the parent component
 	    // triggers the behavior, though it's not clear why this would
 	    // happen.
-	    //updateParentState(loadDest, false);
+	    updateParentState(loadDest, false);
         });
     });
     React.useEffect(() => {
@@ -144,7 +141,7 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 		if (Object.keys(renamedFiles).length > 0) {
 		    // This triggers a rerender, which, for some reason, triggers
 		    // deletion of one of the copied files.
-                    setAlert(true);
+                    updateParentState("showRenameFilesAlert", true);
 		}
 	    }
         });
@@ -169,12 +166,6 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 	            onFilesChange(fileItems, dest, allowedTypes);
 		}}
             />
-	    <GenericDialog
-                name={'Edit Restriction Enzymes'}
-                open={showAlert}
-                onClose={(event, reason) => { setAlert(false) }}
-                content={<FileRenameAlert data={renamedFiles} />}
-	    />
 	</div>
     );
 }
