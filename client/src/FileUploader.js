@@ -57,14 +57,12 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
        button on the parent form to prevent form submission before
        files are finished uploading. However, the state changes
        trigger rerendering of the parent component, which prevents
-       proper loading of the filepond (for unknown reasons). This
-       is currently handled by controling the rerenders through
-       shouldComponentUpdate in the parent component. However,
-       this causes the ponds to behave strangely in that only
-       every other file addition proceeds normally, with the
-       intervening attempts triggering the 'removeFile' callback.
-       It's unclear why this happens and how to address it, but
-       this probably should be addressed in future builds! */
+       proper loading of the filepond (for unknown reasons). To
+       prevent this behavior, we have to wrap these components within
+       a static component. Mutable state variables, thus, need to be
+       passed up two levels. This includes the array of file objects,
+       the serverId, and variables controlling display of dialogs
+       related to file renaming and restriction enzyme sites. */
     const loadDest = dest + 'Loaded';
     React.useEffect(() => {
 	// Disable the submit button on file init.
@@ -72,10 +70,6 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 	    if (error) {
 		console.log(error);
 	    }
-	    // If we don't change the parent state, there is no problem.
-	    // Therefore, it's likely that rerendering the parent component
-	    // triggers the behavior, though it's not clear why this would
-	    // happen.
 	    updateParentState(loadDest, false);
         });
     });
@@ -141,6 +135,7 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 		if (Object.keys(renamedFiles).length > 0) {
 		    // This triggers a rerender, which, for some reason, triggers
 		    // deletion of one of the copied files.
+		    updateParentState("renamedFiles", renamedFiles);
                     updateParentState("showRenameFilesAlert", true);
 		}
 	    }

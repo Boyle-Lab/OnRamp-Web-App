@@ -34,10 +34,11 @@ const styles = theme => ({
 	width: '100%',
 	marginTop: theme.spacing(3),
 	overflowX: 'auto',
+	padding: '0px 0px 0px 0px'
     },
     table: {
 	minWidth: 700,
-    },
+    },    
 });
 
 
@@ -47,19 +48,14 @@ class FileRenameAlert extends Component {
 	super(props);
     }
 
-    componentDidMount() {
-    }
-
-    componentWillUnmount() {
-    }
-    
     render() {
 	const { classes, data } = this.props;
+	console.log("data:", data);
 	return (
-		<Grid container className={classes.root} spacing={0}>
+		<Grid container className={classes.root} spacing={2}>
 		    <Grid item xs={12}>
-		        <Typography container="div" align="left">
-		            We noticed you have uploaded duplicate files. All files must have unique names for the pipeline to run, so we have renamed the duplicates for you:
+		        <Typography container="div" align="center">
+		We noticed you have uploaded duplicate files. To ensure that the pipeline runs properly, we have renamed the affected files:
 	                </Typography>
 		    </Grid>
 
@@ -84,6 +80,11 @@ class FileRenameAlert extends Component {
 	                    </Table>
 	                </Paper>
 		    </Grid>
+                <Grid item xs={12}>
+		<Typography container="div" align="left">
+		** Please note that any previously-supplied restriction enzyme data for affected files must be reentered using the "Edit Restriction Enzymes" dialog.
+		 </Typography>
+	    </Grid>
 	        </Grid>
 	);
     }

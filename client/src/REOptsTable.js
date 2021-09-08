@@ -123,7 +123,7 @@ class REOptsTable extends Component {
 			  });
 	}
 	
-	this.props.updateParentState('fastaREData', newData);
+	this.props.updateWrapperState('fastaREData', newData);
     }
 
     processData = (event) => {
@@ -139,7 +139,8 @@ class REOptsTable extends Component {
             .then(res => {
                 // Display the results and update parent state.
 		const data = JSON.parse(res.data.data);
-		this.props.updateParentState('fastaREData', data);
+		//console.log("fastaREdata:", data);
+		this.props.updateWrapperState('fastaREData', data);
 		const offsets = {};
 		const errors = {};
 		let errorsExist = false;

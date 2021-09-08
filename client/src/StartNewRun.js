@@ -104,58 +104,6 @@ class StartNewRun extends Component {
             });
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-	/* This is here because updating the filesLoaded state triggers
-	   rerendering, which (for some reason) prevents files from loading
-	   in the ponds. I can't quite figure out why this happens, but
-	   preventing the rerenders addresses this problem. However, there
-	   is another problem in that file uploads to the pond are now glitchy.
-	   The first upload to either pond works fine. However, the second
-	   upload attempt does not proceed as expected: there is no upload
-	   request received by the server; instead, there are multiple delete
-	   requests for the (nonexistent) file on the server. The third attempt
-	   works properly, but every other attempt after that fails with the
-	   same "delete" behavior and no upload requests. It's not clear why 
-	   this is the case and I don't have a solution at present! */
-	if ( (this.props.refFiles.length === nextProps.refFiles.length &&
-	      this.props.refFilesLoaded !== nextProps.refFilesLoaded) ||
-	     (this.props.readFiles.length === nextProps.readFiles.length &&	
-              this.props.readFilesLoaded !== nextProps.readFilesLoaded)) {
-	    return true;
-	} else if (this.state.mode !== nextState.mode ||
-		   this.state.medakaModels !== nextState.medakaModels ||
-                   this.state.medakaSelectedModel !== nextState.medakaSelectedModel ||
-		   this.state.nanofilt !== nextState.nanofilt ||
-		   this.state.trim !== nextState.trim ||
-		   this.state.maxLen !== nextState.maxLen ||
-		   this.state.minLen !== nextState.minLen ||
-		   this.state.minQual !== nextState.minQual ||
-		   this.state.markerScore !== nextState.markerScore ||
-		   this.state.kmerLen !== nextState.kmerLen ||
-		   this.state.match !== nextState.match ||
-		   this.state.mismatch !== nextState.mismatch ||
-		   this.state.gapOpen !== nextState.gapOpen ||
-		   this.state.gapExtend !== nextState.gapExtend ||
-		   this.state.contextMap !== nextState.contextMap ||
-		   this.state.fineMap !== nextState.fineMap ||
-		   this.state.maxRegions !== nextState.maxRegions ||
-		   this.state.name !== nextState.name ||
-		   this.state.showBinningOpts !== nextState.showBinningOpts ||
-		   this.state.showNanofiltOpts !== nextState.showNanofiltOpts ||
-		   this.state.showErrorDialog !== nextState.showErrorDialog ||
-
-		   this.props.refServerId !== nextProps.refServerId ||
-                   this.props.readServerId !== nextProps.readServerId ||
-		   this.props.showREOpts !== nextProps.showREOpts ||
-		   this.props.refFilesLoaded !== nextProps.refFilesLoaded ||
-		   this.props.readFilesLoaded !== nextProps.readFilesLoaded
-	    ) {
-	    return true;
-	} else {
-	    return false;
-	}
-    }
-
     componentWillUnmount() {
         // Clean up our area.
     }
@@ -221,10 +169,10 @@ class StartNewRun extends Component {
 	// Server method only needs the file names and locations. Passing the full filepond
 	// object appears not to work, so pull out the necessary information here and pass
 	// in as text.
-	const readFiles = this.getFilenamesFromPond(this.state.readFiles);
-	const readServerId = this.state.readFiles[0].serverId;
-	const refFiles = this.getFilenamesFromPond(this.state.refFiles);
-	const refServerId = this.state.refFiles[0].serverId;
+	const readFiles = this.getFilenamesFromPond(this.props.readFiles);
+	const readServerId = this.props.readFiles[0].serverId;
+	const refFiles = this.getFilenamesFromPond(this.props.refFiles);
+	const refServerId = this.props.refFiles[0].serverId;
 
 	// Call the server method to launch the analysis. Location of results is returned.
 	axios.post(browser.apiAddr + "/processData",
@@ -283,11 +231,13 @@ class StartNewRun extends Component {
 	if (verbose) {
 	    console.log("Render StartNewRun");
 	}
+	console.log(this.props.refFiles);
+	console.log(this.props.readFiles);
         return (
 		<div>
 		<Grid container spacing={2}>		
 
-		<Grid item xs={9}>
+		<Grid item xs={12}>
 		<ValidatorForm
                     ref="form"
                     onSubmit={this.processData}

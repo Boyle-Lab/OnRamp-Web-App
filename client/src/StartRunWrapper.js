@@ -8,6 +8,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import FileRenameAlert from './FileRenameAlert';
 import StartNewRun from './StartNewRun';
+import FileUploadWrapper from './FileUploadWrapper';
+import REOpts from './REOpts';
 
 /*
 This code is part of the CGIMP distribution
@@ -38,23 +40,19 @@ class StartRunWrapper extends Component {
 	this.state = {
 	    readFiles: [],
 	    refFiles: [],
+	    refServerId: null,
+	    readServerId: null,
 	    refFilesLoaded: false,
 	    readFilesLoaded: false,
 	    fastaREData: {},
 	    renamedFiles: {},
-	    showRenameFilesAlert: false,
-	    showREOpts: false
+	    showRenameFilesAlert: false
         };
     }
     
     componentDidMount() {
 	this.updateStateSettings("refServerId", Math.floor(1000000000 + Math.random() * 9000000000));
 	this.updateStateSettings("readServerId", Math.floor(1000000000 + Math.random() * 9000000000));
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-	// This is a static component
-	return false;
     }
     
     updateStateSettings = (name, value) => {
@@ -136,46 +134,42 @@ class StartRunWrapper extends Component {
 		<Grid container spacing={2}>
 		
 		<Grid item xs={3}>
-		<Tooltip title="Sequencing file(s) containing reads in fastq format (.fastq or .fq). May be comressed with gzip (.fastq.gz or .fq.gz).">
-		<Typography container="div">
-                Upload Read Data (fastq):
-	        </Typography>
-		</Tooltip>
-                <FileUploader
-	            onFilesChange={this.handleFilesChange}
-	            files={this.state.readFiles}
-	            dest="readFiles"
-	            serverId={this.state.readServerId}
-	            allowedTypes={['fq', 'fastq']}
+		{this.state.refServerId !== null &&
+		 this.state.readServerId !== null ?
+		 <FileUploadWrapper
+	            refServerId={this.state.refServerId}
+	            readServerId={this.state.readServerId}
+	            refFiles={this.state.refFiles}
+	            readFiles={this.state.readFiles}
+	            handleFilesChange={this.handleFilesChange}
+	            updateStateSettings={this.updateStateSettings}
+	         /> : ("") }
+		<REOpts
+	            fastaREData={this.state.fastaREData}
 	            updateParentState={this.updateStateSettings}
+	            refFiles={this.state.refFiles}
+	            refServerId={this.state.refServerId}
+	        />
+		<GenericDialog
+	            name={'Warning!'}
+	            open={this.state.showRenameFilesAlert}
+	            onClose={() => this.updateStateSettings("showRenameFilesAlert", false)}
+	            content=<FileRenameAlert data={this.state.renamedFiles}/>
 		/>
-		<Tooltip title="Plasmid reference sequence file(s) in fasta format (.fasta or .fa). May be compressed with gzip (.fasta.gz or .fa.gz).">
-		<Typography container="div">
-		Upload Plasmid Sequences (fasta):
-	        </Typography>
-		</Tooltip>
-                <FileUploader
-                    onFilesChange={this.handleFilesChange}
-                    files={this.state.refFiles}
-                    dest="refFiles"
-	            serverId={this.state.refServerId}
-	            allowedTypes={['fa', 'fasta']}
-                    updateParentState={this.updateStateSettings}
-                />
 		</Grid>
 
 	        <Grid item xs={9}>
 		<StartNewRun
-            dataIsLoaded={this.props.dataIsLoaded}
-            updateParentState={this.props.updateStateSettings}
-            setCookie={this.props.setCookie}
-	    readServerId={this.state.readServerId}
-	    refServerId={this.state.refServerId}
-	    readFiles={this.state.readFiles}
-	    refFiles={this.state.refFiles}
-	    readFilesLoaded={this.state.readFilesLoaded}
-	    refFilesLoaded={this.state.refFilesLoaded}
-	    showRenameFilesAlert={this.state.showRenameFilesAlert}
+                    dataIsLoaded={this.props.dataIsLoaded}
+                    updateParentState={this.props.updateParentState}
+                    setCookie={this.props.setCookie}
+	            readServerId={this.state.readServerId}
+	            refServerId={this.state.refServerId}
+	            readFiles={this.state.readFiles}
+	            refFiles={this.state.refFiles}
+	            readFilesLoaded={this.state.readFilesLoaded}
+	            refFilesLoaded={this.state.refFilesLoaded}
+	            showRenameFilesAlert={this.state.showRenameFilesAlert}
                 />
 	    
 	    </Grid>
