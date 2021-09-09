@@ -175,7 +175,7 @@ router.post('/getMedakaModels', (req, res) => {
 	    PythonShell.run('getMedakaModels.py', options, function (err, results) {
 		if (err) {
 		    console.log(err)
-		    res.status(500).json({ message: 'error getting medaka models:' + err });
+		    res.status(500).json({ message: 'error getting medaka models: ' + err });
 		}
 		// Cache the modes for future use.
 		fs.writeFile("medakaModels.json", results, (err) => {
@@ -191,7 +191,7 @@ router.post('/getMedakaModels', (req, res) => {
 
 // This method processes user inputs to launch the analysis pipeline.
 router.post('/processData', (req, res) => {
-    const { readFiles, readServerId, refFiles, refServerId, options } = req.body; // files contains sequence (fastq/fast5) and reference (fasta) file objects from Filepond. options contains the rest of the form data with run options and params.
+    const { readFiles, readServerId, refFiles, refServerId, renamedFiles, options } = req.body; // files contains sequence (fastq/fast5) and reference (fasta) file objects from Filepond. options contains the rest of the form data with run options and params.
 
     // Get locations of data on the server.
     const readPath = '/tmp/' + readServerId + '/';
@@ -200,7 +200,7 @@ router.post('/processData', (req, res) => {
     // Check for gzipped files. (the pipeline cannot handle these directly at present!)
     const _refFiles = handleGzipped(refFiles, refPath);
     const _readFiles = handleGzipped(readFiles, readPath);
-    
+
     // Create a directory for output.
     const serverId = Math.floor(1000000000 + Math.random() * 9000000000);
     const outPath = '/tmp/' + serverId + '/';
@@ -388,61 +388,7 @@ router.post('/processData', (req, res) => {
 
     // Proceed with the analysis.
     console.log(cmdArgs.join(' '));
-
-    let pipelineOptions = {
-	mode: 'text',
-	pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
-	pythonOptions: ['-u'],
-	args: cmdArgs
-    }
-    
-    PythonShell.run('/usr/local/bulkPlasmidSeq/bulkPlasmidSeq.py', pipelineOptions, function (err, resStats) {
-	if (err) {
-	    console.log(err);
-	    // For biobin mode, we sometimes get no results due to zero mapped
-	    // reads being assigned to any plasmids. We need to handle this
-	    // gracefully.
-	    if (options.mode === 'biobin') {
-		// The inconvenient thing is that you can't directly look at the stderr
-		// output originating from the python script. err.stack contains this
-		// output, but as part of a larger unstructured string. We will need to
-		// parse out the actual error to verify that there were no assigned reads.
-		const stackTrace = err.stack.split('\n');
-		if (stackTrace[0] === 'Error: No reads were assigned to any plasmid!') {
-		    return res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
-		}
-	    } else {
-		res.status(400).json({ message: 'Runtime error:' + err });
-	    }
-	} else {
-	    // Clean up input files, since these are not neeeded any more.
-	    /*
-	    fs.remove(readPath, { recursive: true }, (err) => {
-		console.log(err);
-	    });
-	    fs.remove(refPath, { recursive: true }, (err) => {
-		console.log(err);
-	    });
-	    */
-	    //console.log("done")
-
-	    // Gather up stats on the results.
-	    pipelineOptions = {
-		mode: 'text',
-		pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
-		pythonOptions: ['-u'],
-		args: [refPath, outPath + 'consensus_sequences', outPath + 'filtered_alignment.bam']
-	    }
-	    PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
-		if (err) {
-		    console.log(err)
-		    res.status(400).json({ message: 'Runtime error:' + err });
-		} else {
-		    return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
-		}
-	    });
-	}
-    });
+    runAnalysis(res, cmdArgs, options.mode, refPath, outPath, resData, renamedFiles);
 });
 
 // This method retrieves existing data from the server for a session run
@@ -489,11 +435,35 @@ router.post('/processCachedData', (req, res) => {
     });    
 });
 
+// This method finds restriction enzyme offsets based on user inputs and fasta files in a directory.
+router.post('/findREOffsets', (req, res) => {
+    const { serverId, fastaREStr } = req.body;
+    let options = {
+        mode: 'text',
+        pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
+        pythonOptions: ['-u'],
+        args: [ '/tmp/' + serverId, fastaREStr ]
+    };
+    PythonShell.run('findCutSites.py', options, function (err, results) {
+        if (err) {
+            console.log(err)
+            res.status(400).json({ message: 'error finding offsets:' + err });
+        }
+        //console.log(results);
+	return res.json({ success: true, data: results[0] });
+    });
+});
+
+
 // append /api for our http requests
 app.use("/api", router);
 
 // launch our backend into a port
 app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
+
+
+/******************************************************************************************************/
+// Helper functions
 
 handleGzipped = function (files, path) {
     // Unzip any gzipped files found in array.
@@ -505,8 +475,12 @@ handleGzipped = function (files, path) {
         let fnameParts = filename.split('.');
         let ext	= fnameParts[fnameParts.length-1];
         if (ext === 'gz' || ext === 'gzip') {
-            _cmdArgs.push(path + filename);
-            _outfiles.push(fnameParts.slice(0,-1).join('.'));
+	    if (fs.access(path + filename)) {
+		// If fs.access returns false, file either does not exist or
+		// has already been unzipped.
+		_cmdArgs.push(path + filename);
+		_outfiles.push(fnameParts.slice(0,-1).join('.'));
+	    }
         } else {
             _outfiles.push(filename);
 	}
@@ -523,21 +497,111 @@ handleGzipped = function (files, path) {
     return _outfiles
 }
 
-// This method finds restriction enzyme offsets based on user inputs and fasta files in a directory.
-router.post('/findREOffsets', (req, res) => {
-    const { serverId, fastaREStr } = req.body;
+handleRenamed = function(renamedFiles, path) {
+    // Handle fasta record names within renamed files.
+    // Returns a promise.
+    let cmdArgs = [path, JSON.stringify(renamedFiles)]
     let options = {
-	mode: 'text',
-	pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
+        mode: 'text',
+        pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
         pythonOptions: ['-u'],
-	args: [ '/tmp/' + serverId, fastaREStr ]
-    };
-    PythonShell.run('findCutSites.py', options, function (err, results) {
-        if (err) {
-            console.log(err)
-            res.status(400).json({ message: 'error finding offsets:' + err });
-        }
-	//console.log(results);
-        return res.json({ success: true, data: results[0] });
+        args: cmdArgs
+    }
+    return new Promise((resolve, reject) => {
+	PythonShell.run('renameSeqs.py', options, function (err, results) {
+            if (err) {
+		reject(err);
+            } else {
+		resolve(results);
+            }
+	});
     });
-});
+}
+
+runPlasmidSeq = function(cmdArgs) {
+    // Run the bulkPlasmidSeq pipeline with given options.
+    let options = {
+        mode: 'text',
+        pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
+        pythonOptions: ['-u'],
+        args: cmdArgs
+    }
+    
+    return new Promise((resolve, reject) => {
+	PythonShell.run('/usr/local/bulkPlasmidSeq/bulkPlasmidSeq.py', options, function (err, resData) {
+            if (err) {
+		reject(err);
+	    } else {
+		resolve();
+	    }
+	});
+    });		       
+}
+
+runProcessResults = function(refPath, outPath) {
+    let options = {
+        mode: 'text',
+        pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
+        pythonOptions: ['-u'],
+        args: [refPath, outPath + 'consensus_sequences', outPath + 'filtered_alignment.bam']
+    }
+
+    return new Promise((resolve, reject) => {
+	PythonShell.run('processResults.py', options, function (err, resStats) {
+            if (err) {
+		reject(err);
+	    } else {
+		resolve(resStats);
+            }
+	});
+    });
+}
+
+// async function to run the python-based pipeline steps sequentially.
+runAnalysis = async function(res, cmdArgs, mode, refPath, outPath, resData, renamedFiles) {
+    // First we need to handle the sequence names in any renamed (duplicate) files.
+    if (Object.keys(renamedFiles).length > 0) {
+	console.log("Processing renamed files...");
+        try {
+            await handleRenamed(renamedFiles, refPath);
+        } catch(err) {
+	    console.log(err);
+            res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
+        }
+	console.log('Renamed files processed.');
+    }
+
+    // Next we'll run the main pipeline.
+    console.log("Running the analysis pipeline...");
+    try {
+        await runPlasmidSeq(cmdArgs);
+    } catch(err) {
+	// For biobin mode, we sometimes get no results due to zero mapped
+        // reads being assigned to any plasmids. We need to handle this
+        // gracefully.
+        if (mode === 'biobin') {
+            // We have to parse the actual error message out of the stack trace...
+            const stackTrace = err.stack.split('\n');
+            if (stackTrace[0] === 'Error: No reads were assigned to any plasmid!') {
+                return res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
+            }
+	} else {
+            res.status(400).json({ message: 'Runtime error: ' + err });
+        }
+    }
+    console.log("Analysis pipeline finished.");
+    
+    // Finally, gather up stats from the analysis and return the results.
+    console.log("Processing results...");
+    let resStats = {};
+    try {
+	resStats = await runProcessResults(refPath, outPath);
+    } catch(err) {
+	console.log(err)
+	res.status(400).json({ message: 'Runtime error:' + err });
+    }
+    console.log("Results processed.");
+
+    // Return the results if all went well.
+    return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+}

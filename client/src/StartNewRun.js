@@ -175,11 +175,13 @@ class StartNewRun extends Component {
 	const refServerId = this.props.refFiles[0].serverId;
 
 	// Call the server method to launch the analysis. Location of results is returned.
+	//console.log(this.props.renamedFiles);
 	axios.post(browser.apiAddr + "/processData",
                    { readFiles: readFiles,
 		     readServerId: readServerId,
 		     refFiles: refFiles,
 		     refServerId: refServerId,
+		     renamedFiles: this.props.renamedFiles,
                      options: opts
                    }
                   )
