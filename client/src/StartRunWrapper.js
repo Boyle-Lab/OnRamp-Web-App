@@ -171,6 +171,7 @@ class StartRunWrapper extends Component {
 	            refFilesLoaded={this.state.refFilesLoaded}
 	            showRenameFilesAlert={this.state.showRenameFilesAlert}
 	            renamedFiles={this.state.renamedFiles}
+	            fastaREData={this.state.fastaREData}
                 />
 	    
 	    </Grid>

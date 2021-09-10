@@ -76,7 +76,6 @@ class StartNewRun extends Component {
 	    readFilesLoaded: false,
 	    showBinningOpts: false,
 	    showNanofiltOpts: false,
-	    fastaREData: {},
 	    processingErr: null,
 	    showErrorDialog: false
         };
@@ -162,7 +161,6 @@ class StartNewRun extends Component {
 	    fineMap: this.state.fineMap,
 	    maxRegions: this.state.maxRegions,
 	    name: this.state.name,
-	    fastaREData: this.state.fastaREData,
 	    trim: this.state.trim
 	}
 
@@ -182,6 +180,7 @@ class StartNewRun extends Component {
 		     refFiles: refFiles,
 		     refServerId: refServerId,
 		     renamedFiles: this.props.renamedFiles,
+		     fastaREData: this.props.fastaREData,
                      options: opts
                    }
                   )

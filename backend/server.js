@@ -191,7 +191,7 @@ router.post('/getMedakaModels', (req, res) => {
 
 // This method processes user inputs to launch the analysis pipeline.
 router.post('/processData', (req, res) => {
-    const { readFiles, readServerId, refFiles, refServerId, renamedFiles, options } = req.body; // files contains sequence (fastq/fast5) and reference (fasta) file objects from Filepond. options contains the rest of the form data with run options and params.
+    const { readFiles, readServerId, refFiles, refServerId, renamedFiles, fastaREData, options } = req.body; // files contains sequence (fastq/fast5) and reference (fasta) file objects from Filepond. options contains the rest of the form data with run options and params.
 
     // Get locations of data on the server.
     const readPath = '/tmp/' + readServerId + '/';
@@ -222,7 +222,8 @@ router.post('/processData', (req, res) => {
     // Process restriction enzyme offsets into a yaml file to supply the
     // --restriction_enzyme_table option.
     const yamlData = {};
-    Object.keys(options.fastaREData).map( (key, index) => {
+    console.log(fastaREData);
+    Object.keys(fastaREData).map( (key, index) => {
 	let fnameParts = key.split('.');
 	let offset = 1;
 	let ext = fnameParts[fnameParts.length - offset];
@@ -232,17 +233,17 @@ router.post('/processData', (req, res) => {
 	const newKey = fnameParts.slice(0, fnameParts.length - offset).join('.');
 
 	yamlData[newKey] = { fileName: key };
-	if (options.fastaREData[key].cut_sites.length == 1) {
-	    yamlData[newKey]["cut-site"] = options.fastaREData[key].cut_sites[0];
+	if (fastaREData[key].cut_sites.length == 1) {
+	    yamlData[newKey]["cut-site"] = fastaREData[key].cut_sites[0];
 	} else {
-	    if (options.fastaREData[key].cut_sites.length == 0) {
+	    if (fastaREData[key].cut_sites.length == 0) {
 		yamlData[newKey]["cut-site"] = 0;
 	    } else {
-		return res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + options.fastaREData[key].enxyme + ' in ' + key + '!' });
+		return res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + fastaREData[key].enxyme + ' in ' + key + '!' });
 	    }
 	}
-	if (options.fastaREData[key].enzyme !== "") {
-	    yamlData[newKey]["enzyme"] = options.fastaREData[key].enzyme;
+	if (fastaREData[key].enzyme !== "") {
+	    yamlData[newKey]["enzyme"] = fastaREData[key].enzyme;
 	}
     });
     fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
