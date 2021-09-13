@@ -92,10 +92,10 @@ class ResultsDisplay extends Component {
 	            resServerId={this.props.resServerId}
 		/>
 		<GenericDialog
-            name="Run Parameters"
-            open={this.state.showRunParams}
-            onClose={this.handleClick("showRunParams")}
-            content={<RunParams runParams={this.props.runParams}/>}
+                    name="Run Parameters"
+                    open={this.state.showRunParams}
+                    onClose={this.handleClick("showRunParams")}
+                    content={<RunParams runParams={this.props.runParams}/>}
                 />
 		{this.state.showIgv ?
 		 <Tooltip title="Hide the IGV Browser dialog.">
