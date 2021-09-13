@@ -232,7 +232,7 @@ router.post('/processCachedData', (req, res) => {
 	PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
             if (err) {
 		console.log(err)
-		res.status(500).json({ message: 'Runtime error:' + err });
+		res.status(500).json({ message: err });
             } else {
 		return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
             }
@@ -270,29 +270,67 @@ app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
 /******************************************************************************************************/
 // Helper functions
 
-handleGzipped = function (files, path) {
+findGzipped = async function (resolve, reject, files, path, _cmdArgs, i) {
+    // Locate gzipped files at the given path.
+    filename = files[i];
+    //console.log(filename);
+    let fnameParts = filename.split('.');
+    let ext = fnameParts[fnameParts.length-1];
+    if (ext === 'gz' || ext === 'gzip') {
+	//console.log('GZfile: ', filename);
+	await fs.access(path + filename, fs.constants.F_OK, (err) => {
+	    if (err) {
+		// File does not exist or was already inflated: do nothing.
+		//console.log('File not found.');
+		i++;
+		if (i < files.length) {
+                    findGzipped(resolve, reject, files, path, _cmdArgs, i);
+                } else {
+                    //console.log("289:", _cmdArgs);
+                    return resolve(_cmdArgs);
+                }
+	    } else {
+		//console.log('File was found');
+		_cmdArgs.push(path + filename);
+		i++;
+		if (i < files.length) {
+		    findGzipped(resolve, reject, files, path, _cmdArgs, i);
+		} else {
+		    //console.log("299:", _cmdArgs);
+		    return resolve(_cmdArgs);
+		}
+	    }
+	});
+    } else {
+	i++;
+        if (i < files.length) {
+            findGzipped(resolve, reject, files, path, _cmdArgs, i);
+        } else {
+            //console.log("309:", _cmdArgs);
+            return resolve(_cmdArgs);
+        }
+    }
+}
+
+handleGzipped = async function (files, path) {
     // Unzip any gzipped files found in array.
     const _outfiles = [];
 
     // Check each file for gzip/gz extension
-    let	 _cmdArgs = ['gunzip'];
     files.forEach(function (filename) {
         let fnameParts = filename.split('.');
         let ext	= fnameParts[fnameParts.length-1];
         if (ext === 'gz' || ext === 'gzip') {
-	    fs.access(path + filename, fs.constants.F_OK, (err) => {
-		if (err) {
-		    // File does not exist or was already inflated: do nothing.
-		} else {
-		    _cmdArgs.push(path + filename);
-		}
-	    });
 	    _outfiles.push(fnameParts.slice(0,-1).join('.'));
         } else {
             _outfiles.push(filename);
 	}
     });
 
+    let _cmdArgs = ["gunzip"];
+    await new Promise((r, j) => findGzipped(r, j, files, path, _cmdArgs, 0));
+
+    //console.log("333:", _cmdArgs.length);
     // Unzip all gzipped files found.
     if (_cmdArgs.length === 1) {
 	// There are no gzipped files.
@@ -302,12 +340,13 @@ handleGzipped = function (files, path) {
 	    }, 1);
 	});
     } else {
+	console.log("aesfre");
 	return new Promise((resolve, reject) => {
 	    exec(_cmdArgs.join(' '), (error, stdout, stderr) => {
 		if (error) {
 		    reject(error);
 		} else {
-		    resolve(_outFiles);
+		    resolve(_outfiles);
 		}
 	    });
 	});
@@ -390,6 +429,10 @@ runProcessResults = function(refPath, outPath) {
     return new Promise((resolve, reject) => {
 	PythonShell.run('processResults.py', options, function (err, resStats) {
             if (err) {
+		const keyErr = err.stack.match(/(KeyError:\s+\S+)/);
+		if (keyErr.length > 0 ) {
+		    err = 'Error: One or more reference sequences was not found in the alignment! Did you forget to supply restriction enzyme(s) for any duplicated reference sequence files? ' + keyErr[0];
+		}
 		reject(err);
 	    } else {
 		resolve(resStats);
@@ -621,7 +664,7 @@ runAnalysis = async function(req, res) {
                 return res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
             }
 	} else {
-            res.status(400).json({ message: 'Runtime error: ' + err });
+            res.status(400).json({ message: err });
         }
     }
     //console.log("Analysis pipeline finished.");
@@ -633,7 +676,7 @@ runAnalysis = async function(req, res) {
 	resStats = await runProcessResults(refPath, outPath);
     } catch(err) {
 	console.log(err)
-	res.status(400).json({ message: 'Runtime error:' + err });
+	res.status(400).json({ message: err });
     }
     //console.log("Results processed.");
 
