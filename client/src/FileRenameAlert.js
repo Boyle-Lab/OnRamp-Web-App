@@ -38,7 +38,14 @@ const styles = theme => ({
     },
     table: {
 	minWidth: 700,
-    },    
+    },
+    bold: {
+	fontWeight: 'bold'
+    },
+    superScript: {
+	verticalAlign: 'super',
+	fontSize: '80%'
+    }
 });
 
 
@@ -54,8 +61,18 @@ class FileRenameAlert extends Component {
 	return (
 		<Grid container className={classes.root} spacing={2}>
 		    <Grid item xs={12}>
+		        <Typography container="div" align="center" className={classes.bold}>
+		            We noticed you have uploaded duplicate reference sequence files...
+		        </Typography>
+		    </Grid>
+		    <Grid item xs={12}>
 		        <Typography container="div" align="center">
-		We noticed you have uploaded duplicate files. To ensure that the pipeline runs properly, we have renamed the affected files:
+		            Duplicated reference sequences will be omitted from results unless they were linearized with different restriction enzymes. Please make sure you provide accurate restriction enzyme information for these files!**
+	                </Typography>
+		    </Grid>
+		    <Grid item xs={12}>
+	                <Typography container="div" align="center">
+	                    To ensure that the pipeline runs properly, we have renamed the affected files:
 	                </Typography>
 		    </Grid>
 
