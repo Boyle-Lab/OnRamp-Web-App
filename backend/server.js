@@ -191,205 +191,9 @@ router.post('/getMedakaModels', (req, res) => {
 
 // This method processes user inputs to launch the analysis pipeline.
 router.post('/processData', (req, res) => {
-    const { readFiles, readServerId, refFiles, refServerId, renamedFiles, fastaREData, options } = req.body; // files contains sequence (fastq/fast5) and reference (fasta) file objects from Filepond. options contains the rest of the form data with run options and params.
-
-    // Get locations of data on the server.
-    const readPath = '/tmp/' + readServerId + '/';
-    const refPath = '/tmp/' + refServerId + '/';
-
-    // Check for gzipped files. (the pipeline cannot handle these directly at present!)
-    const _refFiles = handleGzipped(refFiles, refPath);
-    const _readFiles = handleGzipped(readFiles, readPath);
-
-    // Create a directory for output.
-    const serverId = Math.floor(1000000000 + Math.random() * 9000000000);
-    const outPath = '/tmp/' + serverId + '/';
-    fs.mkdir(outPath);
-
-    // JSON object for storage of run params. This will be stored as part of
-    // the resData object and be written to disk so it is included in results
-    // downloads.
-    const runParams = {};
-    
-    // Container for results locations.
-    const resData = { algnFile: "filtered_alignment.bam",
-                      refServerId: refServerId,
-                      resServerId: serverId,
-		      origRefFiles: refFiles,
-		      runParams: runParams
-		    };
-
-    // Process restriction enzyme offsets into a yaml file to supply the
-    // --restriction_enzyme_table option.
-    const yamlData = {};
-    console.log(fastaREData);
-    Object.keys(fastaREData).map( (key, index) => {
-	let fnameParts = key.split('.');
-	let offset = 1;
-	let ext = fnameParts[fnameParts.length - offset];
-        if (ext === 'gz' || ext === 'gzip') {
-	    offset++;
-	}
-	const newKey = fnameParts.slice(0, fnameParts.length - offset).join('.');
-
-	yamlData[newKey] = { fileName: key };
-	if (fastaREData[key].cut_sites.length == 1) {
-	    yamlData[newKey]["cut-site"] = fastaREData[key].cut_sites[0];
-	} else {
-	    if (fastaREData[key].cut_sites.length == 0) {
-		yamlData[newKey]["cut-site"] = 0;
-	    } else {
-		return res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + fastaREData[key].enxyme + ' in ' + key + '!' });
-	    }
-	}
-	if (fastaREData[key].enzyme !== "") {
-	    yamlData[newKey]["enzyme"] = fastaREData[key].enzyme;
-	}
-    });
-    fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
-	if (err) {
-	    return res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
-	}
-    });
-    // Store this as part of the run params too.
-    runParams["plasmidEnzymeData"] = yamlData;
-    
-    // Process the options.
-    //const cmdArgs = ['/usr/local/bin/bulkPlasmidSeq/bulkPlasmidSeq.py'];
-    const cmdArgs = [];
-    cmdArgs.push(options.mode); // Analysis mode is the first arg.
-    runParams["mode"] = options.mode
-	
-    // Read file/directory is next
-    cmdArgs.push('-i');
-    if (_readFiles.length > 1) {
-	cmdArgs.push(readPath);
-    } else {
-	cmdArgs.push(readPath + _readFiles[0]);
-    }
-    runParams["sequencingReadFiles"] = readFiles;
-
-    // Ref file/directory is next
-    cmdArgs.push('-r');
-    if (_refFiles.length > 0) {
-        cmdArgs.push(refPath)
-	// Need to combine ref files into a single fasta for display when there are multiples.
-	const filesToCat = ["cat"];
-	// Append the refPath to all files.
-	_refFiles.map(function (filename) {
-	    filesToCat.push(refPath + filename);
-	});
-	// Add a redirect to the combined output fasta. This must go into the results
-	// directory or it will crash medaka!
-	filesToCat.push('>');
-	filesToCat.push(outPath + 'combined_ref_seqs.fasta');
-	// Combine files with cat.
-	exec(filesToCat.join(' '), (error, stdout, stderr) => {
-	    if (error) {
-		console.log(error);
-		return res.status(500).json({ message: 'Error combining reference files: ' + error });
-	    }
-	    //console.log("Ref files combined.");
-	});
-	//resData["refServerId"] = serverId;
-	resData["refFile"] = 'combined_ref_seqs.fasta';
-    } else {
-	cmdArgs.push(refPath + _refFiles[0]);
-	resData["refFile"] = _refFiles[0];
-    }
-    runParams["plasmidReferenceFiles"] = refFiles;
-
-    // Store the run name and date
-    resData["name"] = options.name;
-    resData["date"] = Date().toString();
-    runParams["name"] = options.name;
-    runParams["date"] = resData["date"];
-
-    // Handle the medaka consensus model
-    cmdArgs.push('--model');
-    cmdArgs.push(options.medakaModel);
-    runParams["medakaConsensusModel"] = options.medakaModel;
-
-    // Handle the double arg
-    if (options.double) {
-	cmdArgs.push('--double');
-	runParams["double"] = true;
-    }
-
-    // Handle the trim arg
-    if (options.trim) {
-        cmdArgs.push('--trim');
-	runParams["trim"] = true;
-    }
-
-    // Handle the --restriction_enzyme_table option
-    cmdArgs.push('--restriction_enzyme_table');
-    cmdArgs.push(outPath + 'restriction_enzyme_cut_sites.yaml');
-
-    // Next we'll handle the command-specific options
-    // biobin options
-    if (options.mode === "biobin") {
-	runParams["biobinOptions"] = {};
-	cmdArgs.push('--marker_score');
-	cmdArgs.push(options.markerScore);
-	runParams["biobinOptions"]["marker_score"] = options.markerScore;
-	cmdArgs.push('--kmer_length');
-	cmdArgs.push(options.kmerLen);
-	runParams["biobinOptions"]["kmer_length"] = options.kmerLen;
-	cmdArgs.push('--match');
-	cmdArgs.push(options.match);
-	runParams["biobinOptions"]["match"] = options.match;
-	cmdArgs.push('--mismatch');
-	cmdArgs.push(options.mismatch);
-	runParams["biobinOptions"]["mismatch"] = options.mismatch;
-	cmdArgs.push('--gap_open');
-	cmdArgs.push(options.gapOpen);
-	runParams["biobinOptions"]["gap_open"] = options.gapOpen;
-	cmdArgs.push('--gap_extend');
-	cmdArgs.push(options.gapExtend);
-	runParams["biobinOptions"]["gap_extend"] = options.gapExtend;
-	cmdArgs.push('--context_map');
-	cmdArgs.push(options.contextMap);
-	runParams["biobinOptions"]["context_map"] = options.contextMap;
-	cmdArgs.push('--fine_map');
-	cmdArgs.push(options.fineMap);
-	runParams["biobinOptions"]["fine_map"] = options.fineMap;
-	cmdArgs.push('--max_regions');
-	cmdArgs.push(options.maxRegions);
-	runParams["biobinOptions"]["max_regions"] = options.maxRegions;
-    }
-        
-    // nanofilt options
-    if (options.filter) {
-	cmdArgs.push('--filter');
-	runParams["filter"] = true;
-	runParams["nanofiltOptions"] = {};
-	cmdArgs.push('--max_length');
-	cmdArgs.push(options.maxLen);
-	runParams["nanofiltOptions"]["max_length"] = options.maxLen;
-	cmdArgs.push('--min_length');
-	cmdArgs.push(options.minLen);
-	runParams["nanofiltOptions"]["min_length"] = options.minLen;
-	cmdArgs.push('--min_quality');
-	cmdArgs.push(options.minQual);
-	runParams["nanofiltOptions"]["min_quality"] = options.minQual;
-    }
-
-    // Add the output directory
-    cmdArgs.push('-o');
-    cmdArgs.push(outPath);
-
-    // Write the run params to the output directory as JSON.
-    fs.writeFile(outPath + 'run_params.json', JSON.stringify(runParams), (err) => {
-	if (err) {
-	    // File not written. Return an error.
-	    return res.status(500).json({ message: "Could not write params file." });
-	}
-    });
-
-    // Proceed with the analysis.
-    console.log(cmdArgs.join(' '));
-    runAnalysis(res, cmdArgs, options.mode, refPath, outPath, resData, renamedFiles);
+    // The analysis needs to be run within an async function in order to force
+    // sequential execution of external scripts.
+    runAnalysis(req, res);
 });
 
 // This method retrieves existing data from the server for a session run
@@ -472,30 +276,42 @@ handleGzipped = function (files, path) {
 
     // Check each file for gzip/gz extension
     let	 _cmdArgs = ['gunzip'];
-    files.map(function (filename) {
+    files.forEach(function (filename) {
         let fnameParts = filename.split('.');
         let ext	= fnameParts[fnameParts.length-1];
         if (ext === 'gz' || ext === 'gzip') {
-	    if (fs.access(path + filename)) {
-		// If fs.access returns false, file either does not exist or
-		// has already been unzipped.
-		_cmdArgs.push(path + filename);
-		_outfiles.push(fnameParts.slice(0,-1).join('.'));
-	    }
+	    fs.access(path + filename, fs.constants.F_OK, (err) => {
+		if (err) {
+		    // File does not exist or was already inflated: do nothing.
+		} else {
+		    _cmdArgs.push(path + filename);
+		}
+	    });
+	    _outfiles.push(fnameParts.slice(0,-1).join('.'));
         } else {
             _outfiles.push(filename);
 	}
     });
 
     // Unzip all gzipped files found.
-    exec(_cmdArgs.join(' '), (error, stdout, stderr) => {
-	if (error) {
-	    console.log(error);
-	}
-    });
-
-    // Return array of new file names, with gz/gzip extensions dropped.
-    return _outfiles
+    if (_cmdArgs.length === 1) {
+	// There are no gzipped files.
+	return new Promise((resolve, reject) => {
+	    setTimeout(() => {
+		resolve(_outfiles);
+	    }, 1);
+	});
+    } else {
+	return new Promise((resolve, reject) => {
+	    exec(_cmdArgs.join(' '), (error, stdout, stderr) => {
+		if (error) {
+		    reject(error);
+		} else {
+		    resolve(_outFiles);
+		}
+	    });
+	});
+    }
 }
 
 handleRenamed = function(renamedFiles, path) {
@@ -515,6 +331,30 @@ handleRenamed = function(renamedFiles, path) {
             } else {
 		resolve(results);
             }
+	});
+    });
+}
+
+catFastaFiles = function(_refFiles, refPath, outPath) {
+    // Combine reference sequence files into a single fasta for display
+    // in the IGV component.
+    const filesToCat = ["cat"];
+    // Append the refPath to all files.
+    _refFiles.forEach(function (filename) {
+        filesToCat.push(refPath + filename);
+    });
+    // Add a redirect to the combined output fasta. This must go into the results
+    // directory or it will crash medaka!
+    filesToCat.push('>');
+    filesToCat.push(outPath + 'combined_ref_seqs.fasta');
+    // Combine files with cat.
+    return new Promise((resolve, reject) => {
+	exec(filesToCat.join(' '), (error, stdout, stderr) => {
+            if (error) {
+		reject(error);
+            } else {
+		resolve();
+	    }
 	});
     });
 }
@@ -559,28 +399,222 @@ runProcessResults = function(refPath, outPath) {
 }
 
 // async function to run the python-based pipeline steps sequentially.
-runAnalysis = async function(res, cmdArgs, mode, refPath, outPath, resData, renamedFiles) {
-    // First we need to handle the sequence names in any renamed (duplicate) files.
+runAnalysis = async function(req, res) {
+    const { readFiles, readServerId, refFiles, refServerId, renamedFiles, fastaREData, options } = req.body;
+
+    // Get locations of data on the server.
+    const readPath = '/tmp/' + readServerId + '/';
+    const refPath = '/tmp/' + refServerId + '/';
+
+    // Create a directory for output.
+    const serverId = Math.floor(1000000000 + Math.random() * 9000000000);
+    const outPath = '/tmp/' + serverId + '/';
+    try {
+	await fs.mkdir(outPath);
+    } catch(err) {
+	console.log(err);
+    }
+
+    // JSON object for storage of run params. This will be stored as part of
+    // the resData object and be written to disk so it is included in results
+    // downloads.
+    const runParams = {};
+
+    // Container for results locations.
+    const resData = { algnFile: "filtered_alignment.bam",
+                      refServerId: refServerId,
+                      resServerId: serverId,
+                      origRefFiles: refFiles,
+                      runParams: runParams
+                    };
+
+    // Process restriction enzyme offsets into a yaml file to supply the
+    // --restriction_enzyme_table option.
+    const yamlData = {};
+    Object.keys(fastaREData).map( (key, index) => {
+        let fnameParts = key.split('.');
+        let offset = 1;
+        let ext = fnameParts[fnameParts.length - offset];
+        if (ext === 'gz' || ext === 'gzip') {
+            offset++;
+        }
+        const newKey = fnameParts.slice(0, fnameParts.length - offset).join('.');
+
+        yamlData[newKey] = { fileName: key };
+        if (fastaREData[key].cut_sites.length == 1) {
+            yamlData[newKey]["cut-site"] = fastaREData[key].cut_sites[0];
+        } else {
+            if (fastaREData[key].cut_sites.length == 0) {
+                yamlData[newKey]["cut-site"] = 0;
+            } else {
+                return res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + fastaREData[key].enxyme + ' in ' + key + '!' });
+            }
+        }
+        if (fastaREData[key].enzyme !== "") {
+            yamlData[newKey]["enzyme"] = fastaREData[key].enzyme;
+        }
+    });
+    fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
+        }
+    });
+    // Store this as part of the run params.
+    runParams["plasmidEnzymeData"] = yamlData;
+    
+    // Deal with any gzipped files.
+    let _refFiles = [];
+    try {
+	_refFiles = await handleGzipped(refFiles, refPath);
+    } catch(err) {
+	console.log(err);
+	return res.status(500).json({ message: 'Error inflating gzipped reference files: ' + err });
+    }
+    
+    let _readFiles = [];
+    try{
+	_readFiles = await handleGzipped(readFiles, readPath);
+    } catch(err) {
+	console.log(err);
+	return res.status(500).json({ message: 'Error inflating gzipped read files: ' + err });
+    }
+
+    // Build the array of command-line args using the options object.
+    const cmdArgs = [];
+
+    // Analysis mode comes first.
+    cmdArgs.push(options.mode);
+    runParams["mode"] = options.mode;
+
+    // Read file/directory is next
+    cmdArgs.push('-i');
+    cmdArgs.push(readPath);
+    runParams["sequencingReadFiles"] = readFiles;
+
+    // Ref file/directory is next.
+    cmdArgs.push('-r');
+    cmdArgs.push(refPath);
+    runParams["plasmidReferenceFiles"] = refFiles;
+
+    // Store the run name and date.
+    resData["name"] = options.name;
+    resData["date"] = Date().toString();
+    runParams["name"] = options.name;
+    runParams["date"] = resData["date"];
+    
+    // Handle the medaka consensus model.
+    cmdArgs.push('--model');
+    cmdArgs.push(options.medakaModel);
+    runParams["medakaConsensusModel"] = options.medakaModel;
+    
+    // Handle the trim arg.
+    if (options.trim) {
+        cmdArgs.push('--trim');
+        runParams["trim"] = true;
+    }
+
+    // Handle the --restriction_enzyme_table option.
+    cmdArgs.push('--restriction_enzyme_table');
+    cmdArgs.push(outPath + 'restriction_enzyme_cut_sites.yaml');
+    
+    // Next we'll handle options specific to biobin mode.
+    if (options.mode === "biobin") {
+	runParams["biobinOptions"] = {};
+        cmdArgs.push('--marker_score');
+        cmdArgs.push(options.markerScore);
+        runParams["biobinOptions"]["marker_score"] = options.markerScore;
+	cmdArgs.push('--kmer_length');
+        cmdArgs.push(options.kmerLen);
+	runParams["biobinOptions"]["kmer_length"] = options.kmerLen;
+        cmdArgs.push('--match');
+        cmdArgs.push(options.match);
+        runParams["biobinOptions"]["match"] = options.match;
+        cmdArgs.push('--mismatch');
+        cmdArgs.push(options.mismatch);
+        runParams["biobinOptions"]["mismatch"] = options.mismatch;
+        cmdArgs.push('--gap_open');
+        cmdArgs.push(options.gapOpen);
+        runParams["biobinOptions"]["gap_open"] = options.gapOpen;
+        cmdArgs.push('--gap_extend');
+        cmdArgs.push(options.gapExtend);
+        runParams["biobinOptions"]["gap_extend"] = options.gapExtend;
+        cmdArgs.push('--context_map');
+        cmdArgs.push(options.contextMap);
+        runParams["biobinOptions"]["context_map"] = options.contextMap;
+        cmdArgs.push('--fine_map');
+        cmdArgs.push(options.fineMap);
+        runParams["biobinOptions"]["fine_map"] = options.fineMap;
+        cmdArgs.push('--max_regions');
+        cmdArgs.push(options.maxRegions);
+        runParams["biobinOptions"]["max_regions"] = options.maxRegions;
+    }
+
+    // Handle options specific to nanofilt.
+    if (options.filter) {
+        cmdArgs.push('--filter');
+        runParams["filter"] = true;
+        runParams["nanofiltOptions"] = {};
+        cmdArgs.push('--max_length');
+        cmdArgs.push(options.maxLen);
+        runParams["nanofiltOptions"]["max_length"] = options.maxLen;
+        cmdArgs.push('--min_length');
+        cmdArgs.push(options.minLen);
+        runParams["nanofiltOptions"]["min_length"] = options.minLen;
+        cmdArgs.push('--min_quality');
+        cmdArgs.push(options.minQual);
+        runParams["nanofiltOptions"]["min_quality"] = options.minQual;
+    }
+
+    // Add the output directory.
+    cmdArgs.push('-o');
+    cmdArgs.push(outPath);
+
+    // Write the run params to the output directory as JSON (can be done
+    // asynchronously since these are not used directly by the pipeline).
+    fs.writeFile(outPath + 'run_params.json', JSON.stringify(runParams), (err) => {
+        if (err) {
+            // File not written. Return an error.
+            return res.status(500).json({ message: "Could not write params file." });
+        }
+    });
+
+    // Write params to console for debug purposes.
+    console.log(cmdArgs);
+    
+    // Update the sequence names within any renamed (duplicate) files.
     if (Object.keys(renamedFiles).length > 0) {
-	console.log("Processing renamed files...");
+	//console.log("Processing renamed files...");
         try {
             await handleRenamed(renamedFiles, refPath);
         } catch(err) {
 	    console.log(err);
             res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
         }
-	console.log('Renamed files processed.');
+	//console.log('Renamed files processed.');
     }
 
+    // After handling renamed files, we need to assemble the combined fasta file
+    // for the IGV component. This can run asynchronously since the combined
+    // file is not used unless someone opens the IGV component in their results.
+    //console.log('Combining reference fasta files...');
+    try {
+	catFastaFiles(_refFiles, refPath, outPath);
+    } catch(err) {
+	console.log(err);
+	return res.status(500).json({ message: 'Error combining reference files: ' + error });
+    }
+    //console.log('Reference fasta files combined.');
+    resData["refFile"] = 'combined_ref_seqs.fasta';
+    
     // Next we'll run the main pipeline.
-    console.log("Running the analysis pipeline...");
+    //console.log("Running the analysis pipeline...");
     try {
         await runPlasmidSeq(cmdArgs);
     } catch(err) {
 	// For biobin mode, we sometimes get no results due to zero mapped
         // reads being assigned to any plasmids. We need to handle this
         // gracefully.
-        if (mode === 'biobin') {
+        if (options.mode === 'biobin') {
             // We have to parse the actual error message out of the stack trace...
             const stackTrace = err.stack.split('\n');
             if (stackTrace[0] === 'Error: No reads were assigned to any plasmid!') {
@@ -590,10 +624,10 @@ runAnalysis = async function(res, cmdArgs, mode, refPath, outPath, resData, rena
             res.status(400).json({ message: 'Runtime error: ' + err });
         }
     }
-    console.log("Analysis pipeline finished.");
+    //console.log("Analysis pipeline finished.");
     
     // Finally, gather up stats from the analysis and return the results.
-    console.log("Processing results...");
+    //console.log("Processing results...");
     let resStats = {};
     try {
 	resStats = await runProcessResults(refPath, outPath);
@@ -601,7 +635,7 @@ runAnalysis = async function(res, cmdArgs, mode, refPath, outPath, resData, rena
 	console.log(err)
 	res.status(400).json({ message: 'Runtime error:' + err });
     }
-    console.log("Results processed.");
+    //console.log("Results processed.");
 
     // Return the results if all went well.
     return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
