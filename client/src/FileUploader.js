@@ -26,7 +26,7 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
 // Set to true to nable debugging messages.
-const verbose = true;
+const verbose = false;
 
 const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, updateParentState }) => {
 

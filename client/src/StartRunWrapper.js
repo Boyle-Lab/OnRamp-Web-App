@@ -32,7 +32,7 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 
 
 // This toggles several console.log messages for dubugging purposes.
-const verbose = true;
+const verbose = false;
 
 class StartRunWrapper extends Component {
     constructor(props) {
