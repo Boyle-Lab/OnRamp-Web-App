@@ -1,7 +1,7 @@
 // /client/App.js
 
 import React, { Component } from "react";
-import IgvDialog from './IgvDialog';
+import IgvBrowser from './IgvBrowser';
 import Downloader from './Downloader';
 import ResultsTable from './ResultsTable';
 import InfoDialog from './InfoDialog';
@@ -45,7 +45,7 @@ class ResultsDisplay extends Component {
     }
 
     componentDidMount() {
-	console.log(this.props.runParams);
+	//console.log(this.props.runParams);
     }
 
     componentWillUnmount() {
@@ -84,12 +84,15 @@ class ResultsDisplay extends Component {
 	            name={this.state.infoDialogName}
 	            content={this.state.infoDialogContent}
 		/>
-		<IgvDialog
+		<GenericDialog
+	            name="IGV Browser"
 	            open={this.state.showIgv}
-	            onClose={() => this.handleClick("showIgv")}
-	            refFile={this.props.refFile}
-	            algnFile={this.props.algnFile}
-	            resServerId={this.props.resServerId}
+	            onClose={this.handleClick("showIgv")}
+	            content={<IgvBrowser
+			         refFile={this.props.refFile}
+			         algnFile={this.props.algnFile}
+			         resServerId={this.props.resServerId}
+			     />}
 		/>
 		<GenericDialog
                     name="Run Parameters"
