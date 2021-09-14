@@ -170,7 +170,7 @@ class REOptsTable extends Component {
 
     render() {
 	const { classes } = this.props;
-	console.log('Render REOptsTable');
+	//console.log('Render REOptsTable');
 	return (
 		<Paper className={classes.root}>
 		<ValidatorForm

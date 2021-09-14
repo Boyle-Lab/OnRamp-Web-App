@@ -51,7 +51,7 @@ class REOpts extends Component {
     }
     
     render () {
-	console.log(this.props);
+	//console.log(this.props);
         return (
 		<div>
 		<Tooltip title="Enter or change restriction enzymes used to linearize plasmids for sequencing.">

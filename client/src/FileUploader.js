@@ -131,7 +131,7 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 			renamedFiles[newFilename] = file.file.name;
 		    }
 		});
-		console.log(renamedFiles);
+		//console.log(renamedFiles);
 		if (Object.keys(renamedFiles).length > 0) {
 		    // This triggers a rerender, which, for some reason, triggers
 		    // deletion of one of the copied files.

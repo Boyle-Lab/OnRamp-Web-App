@@ -53,7 +53,7 @@ class IgvBrowser extends Component {
 	    };
 	igv.createBrowser(igvDiv, options)
 	.then(function (browser) {
-            console.log("Created IGV browser");
+            //console.log("Created IGV browser");
 	});
     }
     

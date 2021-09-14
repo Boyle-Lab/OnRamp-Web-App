@@ -232,9 +232,7 @@ class StartNewRun extends Component {
 	if (verbose) {
 	    console.log("Render StartNewRun");
 	}
-	console.log(this.props.refFiles);
-	console.log(this.props.readFiles);
-        return (
+	return (
 		<div>
 		<Grid container spacing={2}>		
 

@@ -57,7 +57,7 @@ class FileRenameAlert extends Component {
 
     render() {
 	const { classes, data } = this.props;
-	console.log("data:", data);
+	//console.log("data:", data);
 	return (
 		<Grid container className={classes.root} spacing={2}>
 		    <Grid item xs={12}>
