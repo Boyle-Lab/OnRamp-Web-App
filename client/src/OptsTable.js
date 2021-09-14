@@ -42,15 +42,6 @@ const styles = theme => ({
 function OptsTable(props) {
     const { classes, names, rows, handleChange, getState } = props;
 
-    const isError = (value, type) => {
-	//console.log(value, type);
-	if (typeof(value) === type) {
-	    return false;
-	}
-	//console.log(value);
-	return true;
-    }
-
     return (
 	    <Paper className={classes.root}>
 	    <Table className={classes.table}>

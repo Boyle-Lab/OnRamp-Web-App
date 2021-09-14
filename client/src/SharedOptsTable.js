@@ -77,7 +77,7 @@ const styles = theme => ({
 });
 
 function SharedOptsTable(props) {
-    const { classes, names, rows, medakaModels, selectedModel, handleChange, handleSettings, analysisModes, selectedMode, getState } = props;
+    const { classes, medakaModels, selectedModel, handleChange, handleSettings, selectedMode, getState } = props;
 
     const [showBinningOpts, setBinningOpts] = useState(false);
     const [showNanofiltOpts, setNanofiltOpts] = useState(false);
@@ -301,13 +301,6 @@ function SharedOptsTable(props) {
 		</Grid>
 
 		<Grid item xs={1} className={classes.leftAlignedSwitchLabel}>
-                    {/* <IconButton
-			color="inherit"
-			onClick={ (event) => handleSettingsClick(event, "showNanofiltOpts") }
-			disabled={!showNanofiltOpts}
-                    >
-                    <SettingsIcon/> 
-                    </IconButton> */}
                 </Grid>
 
                 <Grid item xs={5} className={classes.leftAligned}>

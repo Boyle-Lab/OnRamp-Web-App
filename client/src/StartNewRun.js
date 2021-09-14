@@ -113,13 +113,9 @@ class StartNewRun extends Component {
     
     handleChange = name => event => {
 	event.preventDefault();
-	// Because we have some menus passing in booleans as strings, we need
-	// to pre-process values to make sure they are stored as the correct
-	// type in state.
+	// Some of the events use event.target.value and some use event.target.checked...
 	let val;
-	if (event.target.value === "true" || event.target.value === "false") {
-	    val = parseBoolean(event.target.value)
-	} else if (!event.target.value && (event.target.checked === true || event.target.checked === false)) {
+	if (!event.target.value && (event.target.checked === true || event.target.checked === false)) {
 	    if (verbose) {
 		console.log(event);
 	    }
@@ -243,13 +239,10 @@ class StartNewRun extends Component {
                     onError={errors => console.log(errors)}
 		>
 		<SharedOptsTable
-                    names={optsHeader}
-                    rows={sharedOpts}
                     medakaModels={this.state.medakaModels}
                     selectedModel={this.state.medakaSelectedModel}
                     handleChange={this.handleChange}
                     handleSettings={this.updateStateSettings}
-                    analysisModes={modes}
                     selectedMode={this.state.mode}
                     getState={this.getState}
 		/>
@@ -300,15 +293,6 @@ const NanofiltOpts = ({handleChange, getState}) => (
 	<OptsTable names={optsHeader} rows={nanofiltOpts} handleChange={handleChange} getState={getState}/>
 )
 
-const sharedOpts = [
-    {id: 1, values: ["Run Name", "", "Run identifier for retrieving saved sessions.", "name", null]},
-    {id: 2, values: ["Analysis Mode", "medaka", "Analysis mode to use.", "mode", null]},
-    {id: 3, values: ["Medaka Model", "", "Medaka consensus model, Pore/Guppy version.", "medakaSelectedModel", null]},
-    {id: 4, values: ["Double the reference genome", "false", "Double the reference genome, great for visualization, less for consensus generation.", "double", null]},
-    {id: 5, values: ["Use Nanofilt", "false", "Filter reads with nanofilt.", "nanofilt", null]},
-    {id: 6, values: ["Trim adapters with Porechop", "false", "Trim adapters from reads with Porechop.", "trim", null]},
-];
-
 const binningOpts = [
     {id: 1, values: ["marker_score", "95", "Percent score for longest unique region.", "markerScore", "number"]},
     {id: 2, values: ["kmer_length", "12", "Kmer length to use.", "kmerLen", "number"]},
@@ -324,13 +308,6 @@ const binningOpts = [
 const BinningOpts = ({handleChange, getState}) => (
 	<OptsTable names={optsHeader} rows={binningOpts} handleChange={handleChange} getState={getState}/>
 )
-
-function parseBoolean(string) {
-    if (string === "true") {
-	return true
-    }
-    return false
-}
 
 const adjectives = ['extreme', 'orange', 'green', 'blue', 'indigo', 'violet', 'violent', 'belligerent', 'victorious', 'meek', 'deliberate', 'swift', 'undulating', 'cantankerous', 'zygomorphic', 'fancy', 'dull', 'shifty', 'mistaken', 'childish', 'manly', 'huge', 'miniscule', 'gorgeous', 'sandy', 'gritty', 'smooth', 'wispy', 'florrid', 'vegetal', 'animalistic', 'unprotected', 'fervent', 'insufferble', 'bulbous', 'pendulous', 'bullish', 'horrifying', 'mystical', 'lemony', 'fruity', 'brutish', 'fantastic', 'horrible', 'cheesy', 'horrendous', "mauve", "pink", "puce", "stinky", "fabulous", "reverent", "irreverent", "illogical", "logical", "reasonable", "unreasonable", "lugubrious", "masterful", "demanding", "fabricated", 'knobby', 'restful', 'serene', 'bustling', 'bellicose', 'burgeoning', 'bumbling', 'icy', 'fragile', 'chubby', 'squeamish', 'loving', 'confident', 'selfish', 'handy', 'comfortable', 'hissing', 'sick', 'didactic', 'classy', 'equal', 'terrific', 'sincere', 'daffy', 'macabre', 'dull', 'dependent', 'psychedelic', 'medical', 'nippy', 'nasty', 'crabby', 'complex', 'rabid', 'wasteful', 'painful', 'certain', 'roomy', 'bored', 'uptight', 'keen', 'descriptive', 'tedious', 'wrathful', 'faithful', 'safe', 'thankful', 'soggy', 'ugliest', 'puny', 'daily', 'truthful', 'honorable', 'frightened', 'super', 'oceanic', 'homeless', 'barbarous', 'inquisitive', 'jaded', 'youthful', 'every', 'near', 'unbiased', 'callous', 'dynamic', 'horrible', 'tasteful', 'untidy', 'strange', 'many', 'mental', 'abortive', 'exclusive', 'impressive', 'bawdy', 'smiling', 'wiry', 'tender', 'adjoining', 'exuberant', 'squealing', 'questionable', 'enchanting', 'sticky', 'short', 'second', 'simplistic', 'fearless', 'abundant', 'filthy', 'picayune', 'sturdy', 'acid', 'faithful', 'succinct', 'gentle', 'apathetic', 'squeamish', 'unhappy', 'disgusting', 'southern', 'foregoing', 'accessible', 'mute', 'long-term', 'mixed', 'innocent', 'sudden', 'sloppy', 'uptight', 'different', 'brave', 'exuberant', 'harmonious', 'tranquil', 'thankful', 'rigid', 'sable', 'living', 'sharp', 'mellow', 'uninterested', 'rebel', 'mean', 'teeny', 'wide', 'temporary', 'nosy', 'humdrum', 'hushed', 'dreary', 'decisive', 'sassy', 'recondite', 'internal', 'unusual', 'many', 'scandalous', 'simplistic', 'resonant', 'easy', 'well-made', 'puny', 'ill-informed', 'clean', 'scrawny', 'shallow', 'wealthy', 'permissible'];
 
