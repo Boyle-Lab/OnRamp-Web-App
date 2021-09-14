@@ -113,13 +113,9 @@ class StartNewRun extends Component {
     
     handleChange = name => event => {
 	event.preventDefault();
-	// Some of the events use event.target.value and some use event.target.checked...
 	let val;
-	if (!event.target.value && (event.target.checked === true || event.target.checked === false)) {
-	    if (verbose) {
-		console.log(event);
-	    }
-	    val = event.target.checked;
+	if (!event.target.value) {
+	    val = null;
 	} else {
 	    val = event.target.value
 	}
