@@ -340,7 +340,6 @@ handleGzipped = async function (files, path) {
 	    }, 1);
 	});
     } else {
-	console.log("aesfre");
 	return new Promise((resolve, reject) => {
 	    exec(_cmdArgs.join(' '), (error, stdout, stderr) => {
 		if (error) {
@@ -622,7 +621,7 @@ runAnalysis = async function(req, res) {
     });
 
     // Write params to console for debug purposes.
-    console.log(cmdArgs);
+    console.log(cmdArgs.join(' '));
     
     // Update the sequence names within any renamed (duplicate) files.
     if (Object.keys(renamedFiles).length > 0) {
