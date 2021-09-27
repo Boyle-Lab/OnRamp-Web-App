@@ -40,14 +40,12 @@ user@be51d9bd99b2:/$ exit
 
 7. Log in ot the docker container as root and fire up the server.
 ```
-$ docker exec -it cgimp bash
+$ docker exec -it bulk_plasmid_seq_web bash
 root@be51d9bd99b2:/$ cd home/node/bulk_plasmid_seq_web
 root@be51d9bd99b2:/$ npm start
 ```
 
-8. Open a web browser and go to the address:port you configured in step 4. Note that the browser will take more time to load the first time it is accessed because the data must be indexed for the search engine. Subsequent loads will be faster.
-
-Note: If you run into browser errors (timeouts, etc.), or if search facets fail to appear, waiting a few minutes and reloading the page usually fixes things. If errors persist, try restarting the server (step 7).
+8. Open a web browser and go to the address:port you configured in step 4.
 
 
 ## Citation
