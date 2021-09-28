@@ -343,6 +343,7 @@ handleGzipped = async function (files, path) {
 	return new Promise((resolve, reject) => {
 	    exec(_cmdArgs.join(' '), (error, stdout, stderr) => {
 		if (error) {
+		    console.log(err);
 		    reject(error);
 		} else {
 		    resolve(_outfiles);
@@ -365,6 +366,7 @@ handleRenamed = function(renamedFiles, path) {
     return new Promise((resolve, reject) => {
 	PythonShell.run('renameSeqs.py', options, function (err, results) {
             if (err) {
+		console.log(err);
 		reject(err);
             } else {
 		resolve(results);
@@ -389,6 +391,7 @@ catFastaFiles = function(_refFiles, refPath, outPath) {
     return new Promise((resolve, reject) => {
 	exec(filesToCat.join(' '), (error, stdout, stderr) => {
             if (error) {
+		console.log(err);
 		reject(error);
             } else {
 		resolve();
@@ -406,9 +409,10 @@ runPlasmidSeq = function(cmdArgs) {
         args: cmdArgs
     }
     
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {	
 	PythonShell.run('/usr/local/bulkPlasmidSeq/bulkPlasmidSeq.py', options, function (err, resData) {
             if (err) {
+		console.log(err);
 		reject(err);
 	    } else {
 		resolve();
@@ -428,8 +432,9 @@ runProcessResults = function(refPath, outPath) {
     return new Promise((resolve, reject) => {
 	PythonShell.run('processResults.py', options, function (err, resStats) {
             if (err) {
+		console.log(err);
 		const keyErr = err.stack.match(/(KeyError:\s+\S+)/);
-		if (keyErr.length > 0 ) {
+		if (keyErr &&  keyErr.length > 0) {
 		    err = 'Error: One or more reference sequences was not found in the alignment! Did you forget to supply restriction enzyme(s) for any duplicated reference sequence files? ' + keyErr[0];
 		}
 		reject(err);
@@ -638,20 +643,20 @@ runAnalysis = async function(req, res) {
     // After handling renamed files, we need to assemble the combined fasta file
     // for the IGV component. This can run asynchronously since the combined
     // file is not used unless someone opens the IGV component in their results.
-    //console.log('Combining reference fasta files...');
+    console.log('Combining reference fasta files...');
     try {
 	catFastaFiles(_refFiles, refPath, outPath);
+	console.log('Reference fasta files combined.');
     } catch(err) {
-	console.log(err);
 	return res.status(500).json({ message: 'Error combining reference files: ' + error });
     }
-    //console.log('Reference fasta files combined.');
     resData["refFile"] = 'combined_ref_seqs.fasta';
     
     // Next we'll run the main pipeline.
     //console.log("Running the analysis pipeline...");
     try {
         await runPlasmidSeq(cmdArgs);
+	//console.log("Analysis pipeline finished.");
     } catch(err) {
 	// For biobin mode, we sometimes get no results due to zero mapped
         // reads being assigned to any plasmids. We need to handle this
@@ -663,21 +668,20 @@ runAnalysis = async function(req, res) {
                 return res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
             }
 	} else {
-            res.status(400).json({ message: err });
+            return res.status(400).json({ message: err });
         }
     }
-    //console.log("Analysis pipeline finished.");
     
     // Finally, gather up stats from the analysis and return the results.
     //console.log("Processing results...");
     let resStats = {};
     try {
 	resStats = await runProcessResults(refPath, outPath);
+	//console.log("Results processed.");
     } catch(err) {
 	console.log(err)
-	res.status(400).json({ message: err });
+	return res.status(400).json({ message: err });
     }
-    //console.log("Results processed.");
 
     // Return the results if all went well.
     return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
