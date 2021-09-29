@@ -180,6 +180,7 @@ router.post('/getMedakaModels', (req, res) => {
 		// Cache the modes for future use.
 		fs.writeFile("medakaModels.json", results, (err) => {
 		    // File could not be written.
+		    console.log(err);
 		});
 		return res.json({ success: true, data: results });
 	    });
