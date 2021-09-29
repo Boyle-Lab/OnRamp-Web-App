@@ -7,6 +7,7 @@ npm install -g n
 n stable
 
 # Install node packages
+cd /home/node/bulk_plasmid_seq_web
 npm install
 cd client && npm install
 cd ../backend && npm install
@@ -33,3 +34,15 @@ ln -s $(pwd)/emboss/needle /usr/local/bin/
 # Install biopython
 pip install biopython
 
+# Set up cron job to delete tmp folders older than 24 hours.
+CRON_FILE="/var/spool/cron/crontabs/root"
+if [ ! -f $CRON_FILE ]; then
+    echo "cron file for root does not exist, creating..."
+    touch $CRON_FILE
+    /usr/bin/crontab $CRON_FILE
+fi
+grep -qi "find /tmp/ -maxdepth 1 -mmin +1440 -exec rm -rf" $CRON_FILE
+if [ $? != 0 ]; then
+    echo "Updating cron job for cleaning temporary files..."
+    echo "0 0 * * * find /tmp/ -maxdepth 1 -mmin +1440 -exec rm -rf {} \;" >> $CRON_FILE
+fi

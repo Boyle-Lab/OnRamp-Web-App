@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"cd backend && node --max_old_space_size=8000 server.js\" \"cd client && npm start\""
+    "start": "concurrently \"cd backend && node --max_old_space_size=8000 server.js\" \"cd client && npm start\" 1>&2 2>/var/log/bulk_plasmid_seq_web.log &"
   },
   "keywords": [],
   "author": "",

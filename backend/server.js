@@ -643,10 +643,10 @@ runAnalysis = async function(req, res) {
     // After handling renamed files, we need to assemble the combined fasta file
     // for the IGV component. This can run asynchronously since the combined
     // file is not used unless someone opens the IGV component in their results.
-    console.log('Combining reference fasta files...');
+    //console.log('Combining reference fasta files...');
     try {
 	catFastaFiles(_refFiles, refPath, outPath);
-	console.log('Reference fasta files combined.');
+	//console.log('Reference fasta files combined.');
     } catch(err) {
 	return res.status(500).json({ message: 'Error combining reference files: ' + error });
     }
