@@ -178,7 +178,7 @@ router.post('/getMedakaModels', (req, res) => {
 		    res.status(500).json({ message: 'error getting medaka models: ' + err });
 		}
 		// Cache the modes for future use.
-		fs.writeFile("medakaModels.json", results, (err) => {
+		fs.writeFile("medakaModels.json", JSON.stringify(results), (err) => {
 		    // File could not be written.
 		    console.log(err);
 		});
