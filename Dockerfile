@@ -52,4 +52,4 @@ RUN cd /root && bash configure.sh
 
 # The container should run npm start from the root directory of the app wihtin the medaka conda env.
 COPY bootstrap_server.sh /usr/local/bin
-CMD bootstrap_server.sh ; /bin/bash
+CMD bootstrap_server.sh
