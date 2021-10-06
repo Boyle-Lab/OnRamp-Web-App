@@ -33,6 +33,9 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
+const host = "http://" + window.location.host;
+const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+
 const ActionButton = withStyles({
   root: {
       boxShadow: 'none',
@@ -84,7 +87,7 @@ class StartNewRun extends Component {
     componentDidMount() {
 	const name = adjectives[Math.floor(Math.random()*adjectives.length)] + '_' + nouns[Math.floor(Math.random()*nouns.length)];
 	this.updateStateSettings("name", name);
-	axios.post(browser.apiAddr + "/getMedakaModels",
+	axios.post(apiHost + "/getMedakaModels",
 		   {
 		       contentType: "application/json",
 		       encodingType: "utf8"
@@ -166,7 +169,7 @@ class StartNewRun extends Component {
 
 	// Call the server method to launch the analysis. Location of results is returned.
 	//console.log(this.props.renamedFiles);
-	axios.post(browser.apiAddr + "/processData",
+	axios.post(apiHost + "/processData",
                    { readFiles: readFiles,
 		     readServerId: readServerId,
 		     refFiles: refFiles,

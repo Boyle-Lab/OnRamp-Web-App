@@ -1,7 +1,7 @@
 // /client/App.js
 
 import React, { Component } from "react";
-import browser from './browser_config';
+//import browser from './browser_config';
 import axios from "axios";
 
 /*
@@ -23,6 +23,9 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
 
+const host = "http://" + window.location.host;
+const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+
 class IgvBrowser extends Component {
     // initialize our state
     constructor(props) {
@@ -37,7 +40,7 @@ class IgvBrowser extends Component {
 	    {
 		reference: {
 		    name: this.props.refFile,
-		    fastaURL: browser.apiAddr + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.refFile + '&contentType=text/plain&encodingType=utf8',
+		    fastaURL: apiHost + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.refFile + '&contentType=text/plain&encodingType=utf8',
 		    indexed: false
 		},
 		tracks: [
@@ -46,8 +49,8 @@ class IgvBrowser extends Component {
 			type: "alignment",
 			format: "bam",
 			sourceType: "file",
-			url: browser.apiAddr + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.algnFile + '&contentType=application/octet-stream',
-			indexURL: browser.apiAddr + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.algnFile + '.bai' + '&contentType=application/octet-stream'
+			url: apiHost + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.algnFile + '&contentType=application/octet-stream',
+			indexURL: apiHost + '/getResult?serverId=' + this.props.resServerId + "&fileName=" + this.props.algnFile + '.bai' + '&contentType=application/octet-stream'
 		    }
 		]
 	    };

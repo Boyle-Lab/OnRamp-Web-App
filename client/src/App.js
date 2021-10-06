@@ -1,5 +1,4 @@
 // /client/App.js
-
 import React, { Component } from "react";
 
 import Dashboard from './Dashboard';
@@ -12,7 +11,7 @@ import AcceptCookiesDialog from './AcceptCookiesDialog';
 import GenericDialog from './GenericDialog';
 import HelpContent from './HelpContent';
 
-import browser from './browser_config';
+//import { host, apiHost } from './browser_config';
 import axios from "axios";
 
 /*
@@ -37,6 +36,9 @@ const _cookies = new Cookies();
 
 // To enable debugging messages, set this to true.
 const verbose = false;
+
+const host = "http://" + window.location.host;
+const apiHost = "http:" + host.split(':')[1] + ':3001/api';
 
 class App extends Component {
     // initialize our state
@@ -69,6 +71,7 @@ class App extends Component {
 	} else {
 	    this.setState({ 'enableSessionsButton': true });
 	}
+	console.log(host, apiHost);
     }
 
     componentWillUnmount() {
@@ -134,7 +137,7 @@ class App extends Component {
 
     // Get a cached result set from the server.
     getCachedResults = (resServerId, refServerId, refFile, sessionName) => {
-	axios.post(browser.apiAddr + "/processCachedData",
+	axios.post(apiHost + "/processCachedData",
                    {resServerId: resServerId,
 		    refServerId: refServerId,
 		    refFile: refFile,

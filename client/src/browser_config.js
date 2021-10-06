@@ -5,9 +5,13 @@ Configuration:
 3) Edit moduleDataFile and nodeDataFile to match the names of your data files.
 4) Edit the mapDim field to reflect the shape of your input data. This dictates the number of columns and rows in the map display. Format is [NCOLS,NROWS]
 */
+
+export const host = "http://" + window.location.host;
+export const apiHost = "http:" + host.split(':')[0] + ':3001/api';
+
 const browser = {
-    webAddr: "http://172.17.8.53:3000",
-    apiAddr: "http://172.17.8.53:3001/api",
+    webAddr: host,
+    apiAddr: apiHost
 }
 
 export default browser;

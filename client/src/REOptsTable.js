@@ -33,6 +33,9 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
+const host = "http://" + window.location.host;
+const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+
 const styles = theme => ({
     root: {
 	width: '100%',
@@ -130,7 +133,7 @@ class REOptsTable extends Component {
 	event.preventDefault();
 	const REStr = JSON.stringify(this.state.enzymes);
 	//console.log(REStr);
-	        axios.post(browser.apiAddr + "/findREOffsets",
+	        axios.post(apiHost + "/findREOffsets",
 			   {
 			       serverId: this.props.serverId,
 			       fastaREStr: REStr

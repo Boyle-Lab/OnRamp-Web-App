@@ -2,7 +2,7 @@ import React, { Component, useRef, useEffect, useState } from "react";
 import axios from "axios";
 import { FilePond } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
-import browser from './browser_config';
+//import { host, apiHost, browser } from './browser_config';
 import GenericDialog from './GenericDialog';
 import FileRenameAlert from './FileRenameAlert';
 
@@ -28,6 +28,9 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 // Set to true to nable debugging messages.
 const verbose = false;
 
+const host = "http://" + window.location.host;
+const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+
 const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, updateParentState }) => {
 
     // Object to track renamed files.
@@ -42,7 +45,7 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
     // stored in a common directory in our implementation.
     React.useEffect(() => {
 	pond.current._pond.on('removefile', (error, file) => {
-	    axios.delete(browser.apiAddr + '/delete',
+	    axios.delete(apiHost + '/delete',
                          {
 			     params: {
 				 serverId: serverId,
@@ -154,7 +157,7 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
                 ref={pond}
                 credits={false}
                 server={{
-		    url: browser.apiAddr,
+		    url: apiHost,
 	            process: "/upload?serverId=" + serverId,
 		}}
                 onupdatefiles = { (fileItems) => {
