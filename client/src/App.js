@@ -10,6 +10,7 @@ import CachedSessionDialog from './CachedSessionDialog';
 import AcceptCookiesDialog from './AcceptCookiesDialog';
 import GenericDialog from './GenericDialog';
 import HelpContent from './HelpContent';
+import LandingPage from './LandingPage';
 
 //import { host, apiHost } from './browser_config';
 import axios from "axios";
@@ -46,7 +47,7 @@ class App extends Component {
 	super(props);
 	this.state = {
 	    mainTitle: "Bulk Plasmid Sequencing Web Tool",
-	    dataIsLoaded: false,
+	    dataIsLoaded: true,
 	    showResults: false,
 	    refServerId: null,
 	    resServerId: null,
@@ -60,7 +61,8 @@ class App extends Component {
 	    showCachedDialog: false,
 	    showAcceptCookiesDialog: false,
 	    enableSessionsButton: false,
-	    showHelpDialog: false
+	    showHelpDialog: false,
+	    showLandingPage: true
 	};
     }
 
@@ -155,7 +157,8 @@ class App extends Component {
 		    "resData": res.data.stats,
 		    "showResults": true,
 		    "sessionName": res.data.data.name,
-		    "runParams": res.data.data.runParams
+		    "runParams": res.data.data.runParams,
+		    "showLandingPage": false
 		});
             })
             .catch(error => {
@@ -174,7 +177,9 @@ class App extends Component {
 		<Dashboard
 	           title={this.state.mainTitle}
 	           controls={<div></div>}
-	           content={this.state.showResults ?
+	    content={this.state.showLandingPage ?
+		     <LandingPage updateParentState={this.updateStateSettings}/>
+		     : this.state.showResults ?
 		                <ResultsDisplay
                                     updateParentState={this.updateStateSettings}
 			            resServerId={this.state.resServerId}
