@@ -11,6 +11,11 @@ import StartNewRun from './StartNewRun';
 import FileUploadWrapper from './FileUploadWrapper';
 import REOpts from './REOpts';
 
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import classNames from 'classnames';
+import Paper from '@material-ui/core/Paper';
+
 /*
 This code is part of the CGIMP distribution
 (https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
@@ -33,6 +38,16 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 
 // This toggles several console.log messages for dubugging purposes.
 const verbose = false;
+
+const styles = theme => ({
+    root: {
+        width: '100%',
+        marginTop: theme.spacing(3),
+        overflowX: 'auto',
+    },
+    appBarSpacer: theme.mixins.toolbar,
+});
+
 
 class StartRunWrapper extends Component {
     constructor(props) {
@@ -126,14 +141,15 @@ class StartRunWrapper extends Component {
 
     
     render () {
+	const { classes } = this.props;
 	if (verbose) {
 	    console.log("Render StartNewRun");
 	}
         return (
 		<div>
 		<Grid container spacing={2}>
-		
 		<Grid item xs={3}>
+		<div className={classes.appBarSpacer} />
 		{this.state.refServerId !== null &&
 		 this.state.readServerId !== null ?
 		 <FileUploadWrapper
@@ -173,8 +189,7 @@ class StartRunWrapper extends Component {
 	            renamedFiles={this.state.renamedFiles}
 	            fastaREData={this.state.fastaREData}
                 />
-	    
-	    </Grid>
+	        </Grid>
 
 		</Grid>
 	    </div>
@@ -182,5 +197,8 @@ class StartRunWrapper extends Component {
     }
 }
 
+StartRunWrapper.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
 
-export default StartRunWrapper;
+export default withStyles(styles)(StartRunWrapper);

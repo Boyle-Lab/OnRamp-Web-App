@@ -3,6 +3,10 @@ import FileUploader from './FileUploader';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import { withStyles } from '@material-ui/core/styles';
+//import Paper from '@material-ui/core/Paper';
 
 /*
 This code is part of the CGIMP distribution
@@ -27,6 +31,15 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 // This toggles several console.log messages for dubugging purposes.
 const verbose = false;
 
+const styles = theme => ({
+    root: {
+        width: '100%',
+        marginTop: theme.spacing(3),
+        overflowX: 'auto',
+    },
+});
+
+
 class FileUploadWrapper extends Component {
     constructor(props) {
         super(props);
@@ -38,13 +51,13 @@ class FileUploadWrapper extends Component {
     }
     
     render () {
+	const { classes } = this.props;
 	if (verbose) {
 	    console.log("Render FileUploadWrapper");
 	}
         return (
 		<div>
 		<Grid container spacing={2}>
-		
 		<Grid item xs={12}>
 		<Tooltip title="Sequencing file(s) containing reads in fastq format (.fastq or .fq). May be comressed with gzip (.fastq.gz or .fq.gz).">
 		<Typography container="div">
@@ -73,12 +86,14 @@ class FileUploadWrapper extends Component {
                     updateParentState={this.props.updateStateSettings}
                 />
 		</Grid>
-
 		</Grid>
 	    </div>
         );
     }
 }
 
+FileUploadWrapper.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
 
-export default FileUploadWrapper;
+export default withStyles(styles)(FileUploadWrapper);
