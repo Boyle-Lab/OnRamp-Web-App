@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+//import classNames from 'classnames';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -44,38 +44,37 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 const drawerWidth = 200;
 
 const styles = theme => ({
-  root: {
-      display: 'flex',
-  },
-  toolbar: {
-      paddingRight: 24, // keep right padding when drawer closed
-      background: '#414042',
-      //backgroundImage: 'linear-gradient(to right, #1FA74A 0%, #66C1D6 25%, #F57E20 75%, #72479B 100%)',
-  },
-  toolbarIcon: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'flex-end',
-      padding: '0 8px',
-      ...theme.mixins.toolbar,
-  },
-  appBar: {
-      zIndex: theme.zIndex.drawer + 1,
-      transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  title: {
-    flexGrow: 1,
-  },
-  appBarSpacer: theme.mixins.toolbar,
-  content: {
-      flexGrow: 1,
-      padding: theme.spacing(3),
-      height: '100vh',
-      overflow: 'auto',
-  },
+    root: {
+	display: 'flex',
+    },
+    toolbar: {
+	paddingRight: 24, // keep right padding when drawer closed
+	background: '#414042',
+    },
+    toolbarIcon: {
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'flex-end',
+	padding: '0 8px',
+	...theme.mixins.toolbar,
+    },
+    appBar: {
+	zIndex: theme.zIndex.drawer + 1,
+	transition: theme.transitions.create(['width', 'margin'], {
+	    easing: theme.transitions.easing.sharp,
+	    duration: theme.transitions.duration.leavingScreen,
+	}),
+    },
+    title: {
+	flexGrow: 1,
+    },
+    appBarSpacer: theme.mixins.toolbar,
+    content: {
+	flexGrow: 1,
+	padding: theme.spacing(3),
+	height: '100vh',
+	overflow: 'auto',
+    },
     colorBar: {
 	display: 'table',
 	width: '100%',
