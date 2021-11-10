@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"cd backend && node --max_old_space_size=8000 server.js\" \"cd client && npm start\" 1>&2 2>/var/log/bulk_plasmid_seq_web.log &"
+    "start": "concurrently \"cd backend && node --max_old_space_size=8000 server.js\" \"cd client && npm start\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@emotion/react": "^11.5.0",
+    "@emotion/styled": "^11.3.0",
     "concurrently": "^6.2.0",
     "d3": "^7.0.0",
     "monk": "^7.3.4"
