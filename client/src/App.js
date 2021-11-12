@@ -1,5 +1,4 @@
 // /client/App.js
-
 import React, { Component } from "react";
 
 import Dashboard from './Dashboard';
@@ -11,8 +10,8 @@ import CachedSessionDialog from './CachedSessionDialog';
 import AcceptCookiesDialog from './AcceptCookiesDialog';
 import GenericDialog from './GenericDialog';
 import HelpContent from './HelpContent';
+import LandingPage from './LandingPage';
 
-import browser from './browser_config';
 import axios from "axios";
 
 /*
@@ -38,13 +37,16 @@ const _cookies = new Cookies();
 // To enable debugging messages, set this to true.
 const verbose = false;
 
+const host = "http://" + window.location.host;
+const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+
 class App extends Component {
     // initialize our state
     constructor(props) {
 	super(props);
 	this.state = {
 	    mainTitle: "Bulk Plasmid Sequencing Web Tool",
-	    dataIsLoaded: false,
+	    dataIsLoaded: true,
 	    showResults: false,
 	    refServerId: null,
 	    resServerId: null,
@@ -58,7 +60,8 @@ class App extends Component {
 	    showCachedDialog: false,
 	    showAcceptCookiesDialog: false,
 	    enableSessionsButton: false,
-	    showHelpDialog: false
+	    showHelpDialog: false,
+	    showLandingPage: true
 	};
     }
 
@@ -69,6 +72,7 @@ class App extends Component {
 	} else {
 	    this.setState({ 'enableSessionsButton': true });
 	}
+	console.log(host, apiHost);
     }
 
     componentWillUnmount() {
@@ -134,7 +138,7 @@ class App extends Component {
 
     // Get a cached result set from the server.
     getCachedResults = (resServerId, refServerId, refFile, sessionName) => {
-	axios.post(browser.apiAddr + "/processCachedData",
+	axios.post(apiHost + "/processCachedData",
                    {resServerId: resServerId,
 		    refServerId: refServerId,
 		    refFile: refFile,
@@ -152,7 +156,8 @@ class App extends Component {
 		    "resData": res.data.stats,
 		    "showResults": true,
 		    "sessionName": res.data.data.name,
-		    "runParams": res.data.data.runParams
+		    "runParams": res.data.data.runParams,
+		    "showLandingPage": false
 		});
             })
             .catch(error => {
@@ -171,7 +176,9 @@ class App extends Component {
 		<Dashboard
 	           title={this.state.mainTitle}
 	           controls={<div></div>}
-	           content={this.state.showResults ?
+	    content={this.state.showLandingPage ?
+		     <LandingPage updateParentState={this.updateStateSettings}/>
+		     : this.state.showResults ?
 		                <ResultsDisplay
                                     updateParentState={this.updateStateSettings}
 			            resServerId={this.state.resServerId}

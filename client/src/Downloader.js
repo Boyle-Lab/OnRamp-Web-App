@@ -4,7 +4,6 @@ import React, { Component } from "react";
 import LoadAlertDialog from './LoadAlert';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import browser from './browser_config';
 import axios from "axios";
 
 /*
@@ -26,6 +25,9 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
 
+const host = window.location.host;
+const apiHost = host.split(':')[0] + ':3001';
+
 class Downloader extends Component {
     constructor(props) {
         super(props);
@@ -36,12 +38,12 @@ class Downloader extends Component {
     
     downloadResults = () => {
 	this.setState({ working: true });
-	axios.post(browser.apiAddr + '/prepareResults',
+	axios.post(apiHost + '/prepareResults',
 		   { serverId: this.props.serverId }
 		  )
 	    .then( response => {
 		this.setState({ working: false });
-		const downloadURL = browser.apiAddr + '/downloadResults' +
+		const downloadURL = apiHost + '/downloadResults' +
 		      '?serverId=' + response.data.data.serverId +
 		      '&fileName=' + response.data.data.fileName
 		window.location.href = downloadURL;
