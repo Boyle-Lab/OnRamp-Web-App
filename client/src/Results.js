@@ -12,7 +12,6 @@ import RunParams from './RunParams';
 import PropTypes from 'prop-types';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 
-import browser from './browser_config';
 import axios from "axios";
 
 /*

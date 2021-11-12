@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import browser from './browser_config';
 import axios from "axios";
 import OptsTable from './OptsTable';
 import SharedOptsTable from './SharedOptsTable';

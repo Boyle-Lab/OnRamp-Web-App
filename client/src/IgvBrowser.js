@@ -1,7 +1,6 @@
 // /client/App.js
 
 import React, { Component } from "react";
-//import browser from './browser_config';
 import axios from "axios";
 
 /*

@@ -2,7 +2,6 @@ import React, { Component, useRef, useEffect, useState } from "react";
 import axios from "axios";
 import { FilePond } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
-//import { host, apiHost, browser } from './browser_config';
 import GenericDialog from './GenericDialog';
 import FileRenameAlert from './FileRenameAlert';
 

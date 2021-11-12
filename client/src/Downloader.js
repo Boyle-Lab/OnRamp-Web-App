@@ -4,7 +4,6 @@ import React, { Component } from "react";
 import LoadAlertDialog from './LoadAlert';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import browser from './browser_config';
 import axios from "axios";
 
 /*

@@ -12,7 +12,6 @@ import GenericDialog from './GenericDialog';
 import HelpContent from './HelpContent';
 import LandingPage from './LandingPage';
 
-//import { host, apiHost } from './browser_config';
 import axios from "axios";
 
 /*
