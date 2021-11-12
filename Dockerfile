@@ -32,7 +32,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
 #ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # We need to install conda and pybedtools packages to enable on-the-fly intersections.
-RUN apt-get update && apt-get -y --no-install-recommends install python-setuptools python-dev build-essential python-pip
+RUN apt-get update && apt-get -y --no-install-recommends install python-setuptools python-dev build-essential python3-pip
 RUN pip install --upgrade virtualenv
 
 # Add an editor and text viewer, because they're handy to have.
