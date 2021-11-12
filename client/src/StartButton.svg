@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+<defs>
+<style>
+.cls-1{fill:#1fa74a;stroke:#5e5f5f;stroke-miterlimit:10;stroke-width:3px;transform-origin:center;}
+</style>
+</defs>
+<circle class="cls-1" cx="25" cy="25" r="16">
+<animateTransform
+	id="op"
+	attributeName="transform"
+        attributeType="XML"
+        type="scale"
+        dur="2s"
+	begin="10s;op.end+8s"
+	values="1;1.25;1"
+/>
+<animate
+	id="c1"
+        attributeName="fill"
+        attributeType="XML"
+        dur="10s"
+	values="#1FA74A; #66C1D6; #F57E20; #72479B; #1FA74A"
+	repeatCount="indefinite"
+/>
+</circle>
+</svg>
