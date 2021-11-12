@@ -10,43 +10,23 @@ A unix-like system with the following prerequisites:
 
 1. Clone the repository
 
-3. Navigate to ./client/src and edit browser_config.js to reflect your local network configuration, data file locations/names, and map dimensions, following the directions within the file on which fields to edit. Make sure port mappings match the host ports set up in step 5!
-```
-$ cd ./client/src
-$ vim browser_config.js
-# ...
-$ cd ../../
-```
-
-4. Navigate to the root directory and build the Docker container:
+2. Navigate to the root directory and build the Docker container:
 ```
 $ docker build -t bulk_plasmid_seq_web .
 ```
 
-5. Run the Docker container with a mount to the working directory and appropriate port mappings. Ports are specified with '-p XXXX:YYYY', where XXXX is the host machine port and YYYY is the port on the docker container.
+3. Run the Docker container with appropriate port mappings. Ports are specified with '-p XXXX:YYYY', where XXXX is the host machine port and YYYY is the port on the docker container.
 ```
-$ docker run -it --name bulk_plasmid_seq_web -v $(pwd):/home/node/$(basename $(pwd)) -p 3000:3000 -p 3001:3001 -e LOCAL_USER_ID=`id -u $USER` -e LOCAL_GROUP_ID=`id -g $USER` -e LOCAL_USER_NAME=`id -un` -e LOCAL_GROUP_NAME=`id -gn` bulk_plasmid_seq_web bash
-root@be51d9bd99b2:/$ exit
+$ docker run -it --name bulk_plasmid_seq_web -p 3000:3000 -p 3001:3001 bulk_plasmid_seq_web bash
 ```
+The node.js server should be running on the container and can now be accessed at http://127.0.0.1:3000
 
-6. Log in to the docker container with your own user account to install node.js dependencies.
-```
-$ docker start bulk_plasmid_seq_web
-$ docker exec -it bulk_plasmid_seq_web gosu <your username> bash
-user@be51d9bd99b2:/$ cd home/node/bulk_plasmid_seq_web
-user@be51d9bd99b2:/$ ./configure.sh
-user@be51d9bd99b2:/$ exit
-```
-
-7. Log in ot the docker container as root and fire up the server.
+The server can be stopped/started by logging into the container, as below, or simply by stopping and restarting the container.
 ```
 $ docker exec -it bulk_plasmid_seq_web bash
-root@be51d9bd99b2:/$ cd home/node/bulk_plasmid_seq_web
+root@be51d9bd99b2:/$ cd /home/node/bulk_plasmid_seq_web
 root@be51d9bd99b2:/$ npm start
 ```
-
-8. Open a web browser and go to the address:port you configured in step 4.
-
 
 ## Citation
 

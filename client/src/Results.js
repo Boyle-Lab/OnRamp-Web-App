@@ -9,7 +9,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import GenericDialog from './GenericDialog';
 import RunParams from './RunParams';
 
-import browser from './browser_config';
+import PropTypes from 'prop-types';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
+
 import axios from "axios";
 
 /*
@@ -30,6 +32,12 @@ GNU General Public License for more details.
 
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
+
+const styles = theme => ({
+    appBarSpacer: theme.mixins.toolbar,
+});
+
+    
 
 class ResultsDisplay extends Component {
     // initialize our state
@@ -70,8 +78,11 @@ class ResultsDisplay extends Component {
 
     // Render the UI.
     render() {
+	const { classes } = this.props;
+	
 	return (
 		<div>
+		<div className={classes.appBarSpacer} />
 		<ResultsTable
 	            names={["Plasmid Reference Fasta", "Quality Metrics", "Consensus Sequence", "Pairwise Alignment"]}
 	            rows={this.props.resData}
@@ -119,9 +130,15 @@ class ResultsDisplay extends Component {
 		<Downloader
 	            serverId={this.props.resServerId}
 		/>
+		<div className={classes.appBarSpacer} />
+		<div className={classes.appBarSpacer} />
 		</div>
 	);
     }
 }
 
-export default ResultsDisplay;
+ResultsDisplay.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(ResultsDisplay);
