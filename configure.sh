@@ -6,11 +6,13 @@ npm cache clean -f
 npm install -g n
 n stable
 
-# Install node packages
+# Install node packages.
 cd /home/node/bulk_plasmid_seq_web
 npm install
-cd client && npm install
-cd ../backend && npm install
+# Using --force here to address package incompatibilities that seem
+# refractory to correction in the 'proper' way
+cd client && npm install --force
+cd ../backend && npm install --force
 
 # Install miniconda
 cd /usr/local && wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
