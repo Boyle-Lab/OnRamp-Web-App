@@ -187,7 +187,7 @@ router.post('/getMedakaModels', (req, res) => {
 		return res.json({ success: true, data: results });
 	    });
 	} else {
-	    return res.json({ success: true, data: data });
+	    return res.json({ success: true, data: JSON.parse(data) });
 	}
     })
 });
