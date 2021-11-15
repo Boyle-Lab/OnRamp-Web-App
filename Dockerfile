@@ -32,11 +32,17 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
 #ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # We need to install conda and pybedtools packages to enable on-the-fly intersections.
-RUN apt-get update && apt-get -y --no-install-recommends install python-setuptools python-dev build-essential python3-pip
-RUN pip install --upgrade virtualenv
+RUN apt-get update && apt-get -y --no-install-recommends install \
+    python-setuptools \
+    python-dev \
+    build-essential \
+    python3-pip
+RUN pip3 install --upgrade virtualenv
 
 # Add an editor and text viewer, because they're handy to have.
-RUN apt-get update && apt-get -y --no-install-recommends install emacs less
+RUN apt-get update && apt-get -y --no-install-recommends install \
+    emacs \
+    less
 
 # Install and enable cron
 RUN apt-get update && apt-get -y --no-install-recommends install cron
