@@ -75,7 +75,7 @@ class AcceptCookiesDialog extends React.Component {
                     <Button
 	                onClick={this.handleAccept}
 	                color="primary"
-	                autofocus
+	                autoFocus
 		    >
                         Accept Cookies
                     </Button>
