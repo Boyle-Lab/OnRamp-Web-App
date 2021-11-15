@@ -75,7 +75,7 @@ class LandingPage extends Component {
 		</Grid>
 		<Grid item xs={12}>
 		<Typography variant="h5">
-		<span class='bold'>On-Ramp (Oxford-Nanopore based Rapid Analysis of Multiplexed Plasmids)</span> is your one-stop shop for rapid analysis of plasmid sequencing data. Just upload your files, choose your options, and submit your analysis to the cloud! Results for most datasets are ready in seconds, including key quality metrics such as sequencing coverage, gaps, and mismatch counts, and you can dive deep into your data with access to sequence alignments and an integrated IGV Browser view at your fingertips. With features like these, it's no wonder On-Ramp is quickly becoming the cloud's most popular plasmid sequencing app. <span class='bold'>Click the animated circle to join the revolution!</span>
+		<span className='bold'>On-Ramp (Oxford-Nanopore based Rapid Analysis of Multiplexed Plasmids)</span> is your one-stop shop for rapid analysis of plasmid sequencing data. Just upload your files, choose your options, and submit your analysis to the cloud! Results for most datasets are ready in seconds, including key quality metrics such as sequencing coverage, gaps, and mismatch counts, and you can dive deep into your data with access to sequence alignments and an integrated IGV Browser view at your fingertips. With features like these, it's no wonder On-Ramp is quickly becoming the cloud's most popular plasmid sequencing app. <span className='bold'>Click the animated circle to join the revolution!</span>
 	    </Typography>
 	    </Grid>
 		</Grid>

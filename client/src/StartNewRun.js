@@ -100,7 +100,7 @@ class StartNewRun extends Component {
 		this.props.updateParentState("dataIsLoaded", true);
             })
             .catch(error => {
-                console.log(error.response);
+                console.log(error);
                 // Handle the error
             });
     }
