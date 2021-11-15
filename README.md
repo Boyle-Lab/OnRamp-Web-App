@@ -17,7 +17,7 @@ docker build -t bulk_plasmid_seq_web .
 
 3. Run the Docker container with appropriate port mappings. Ports are specified with '-p XXXX:YYYY', where XXXX is the host machine port and YYYY is the port on the docker container.
 ```
-docker run -it --name bulk_plasmid_seq_web -p 3000:3000 -p 3001:3001 bulk_plasmid_seq_web
+docker run -t --name bulk_plasmid_seq_web -p 3000:3000 -p 3001:3001 bulk_plasmid_seq_web
 ```
 The node.js server should be running on the container and can now be accessed at http://127.0.0.1:3000
 Note that this command will not return you to the command prompt. However, you can CTRL-C out and restart using the docker start command, which will spin the container up in the background:
