@@ -102,3 +102,17 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Anything with a .# or ._ prefix
+.#*
+._*
+
+# Emacs autosave files
+*~
+
+# various lock files
+package-lock.json
+yarn.lock
+
+# web app cache files
+backend/medakaModels.json
