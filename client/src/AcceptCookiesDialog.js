@@ -72,10 +72,17 @@ class AcceptCookiesDialog extends React.Component {
 	            </DialogContentText>
                   </DialogContent>
 		  <DialogActions>
-                    <Button onClick={this.handleAccept} color="primary">
+                    <Button
+	                onClick={this.handleAccept}
+	                color="primary"
+	                autofocus
+		    >
                         Accept Cookies
                     </Button>
-                    <Button onClick={this.handleDeny} color="primary" autoFocus>
+                <Button
+	    onClick={this.handleDeny}
+	    color="primary"
+		>
                         Disable Cookies
                     </Button>
                   </DialogActions>
