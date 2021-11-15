@@ -12,7 +12,7 @@ A unix-like system with the following prerequisites:
 
 2. Navigate to the root directory and build the Docker container:
 ```
-$ docker build -t bulk_plasmid_seq_web .
+docker build -t bulk_plasmid_seq_web .
 ```
 
 3. Run the Docker container with appropriate port mappings. Ports are specified with '-p XXXX:YYYY', where XXXX is the host machine port and YYYY is the port on the docker container.
@@ -23,9 +23,10 @@ The node.js server should be running on the container and can now be accessed at
 
 The server can be stopped/started by logging into the container, as below, or simply by stopping and restarting the container.
 ```
-$ docker exec -it bulk_plasmid_seq_web bash
-root@be51d9bd99b2:/$ cd /home/node/bulk_plasmid_seq_web
-root@be51d9bd99b2:/$ npm start
+docker exec -it bulk_plasmid_seq_web bash
+# Now on the docker container...
+cd /home/node/bulk_plasmid_seq_web
+npm start
 ```
 
 ## Citation
