@@ -25,8 +25,8 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
 
-const host = window.location.host;
-const apiHost = host.split(':')[0] + ':3001';
+const host = window.location.protocol + "//" + window.location.host;
+const apiHost = window.location.protocol + host.split(':')[1] + ':3001/api';
 
 class Downloader extends Component {
     constructor(props) {

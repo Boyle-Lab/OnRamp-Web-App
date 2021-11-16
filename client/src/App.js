@@ -37,8 +37,8 @@ const _cookies = new Cookies();
 // To enable debugging messages, set this to true.
 const verbose = false;
 
-const host = "http://" + window.location.host;
-const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+const host = window.location.protocol + "//" + window.location.host;
+const apiHost = window.location.protocol + host.split(':')[1] + ':3001/api';
 
 class App extends Component {
     // initialize our state
