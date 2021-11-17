@@ -82,6 +82,8 @@ class LandingPage extends Component {
 	    </Typography>
 	    </Grid>
 		</Grid>
+		<div className={classes.appBarSpacer} />
+		<div className={classes.appBarSpacer} />
 	    </div>
         );
     }
