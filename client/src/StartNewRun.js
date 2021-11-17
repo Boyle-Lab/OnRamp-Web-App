@@ -33,7 +33,7 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
 const host = window.location.protocol + "//" + window.location.host;
-const apiHost = window.location.protocol + host.split(':')[1] + ':3001/api';
+const apiHost = host + '/api';
 
 const ActionButton = withStyles({
   root: {
