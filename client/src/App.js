@@ -38,7 +38,7 @@ const _cookies = new Cookies();
 const verbose = false;
 
 const host = window.location.protocol + "//" + window.location.host;
-const apiHost = window.location.protocol + host.split(':')[1] + ':3001/api';
+const apiHost = window.location.protocol + host.split(':')[1] + '/api';
 
 class App extends Component {
     // initialize our state
