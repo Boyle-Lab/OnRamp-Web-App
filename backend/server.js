@@ -65,17 +65,20 @@ router.post('/upload', (req, res) => {
 	    res.set('Content-Type', 'application/json');
 	    res.status(500).json({ message: err });
 	    return;
-	};
-    });
-    req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
-	if (err) {
-	    console.log(err);
-	    res.set('Content-Type', 'application/json');
-	    res.status(500).json({ message: err });
-	    return;
 	}
-	res.status(200).send(serverId.toString());
-	return;
+
+	// await won't work here so we have to put this inside the
+	// callback to avoid send errors.
+	req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
+	    if (err) {
+		console.log(err);
+		res.set('Content-Type', 'application/json');
+		res.status(500).json({ message: err });
+		return;
+	    }
+	    res.status(200).send(serverId.toString());
+	    return;
+	});
     });
 });
 
@@ -325,7 +328,7 @@ app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
 
 /******************************************************************************************************/
 // Helper functions
-
+    
 findGzipped = async function (resolve, reject, files, path, _cmdArgs, i) {
     // Locate gzipped files at the given path.
     filename = files[i];
