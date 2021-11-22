@@ -54,15 +54,22 @@ app.use(fileUpload());
 router.post('/upload', (req, res) => {
     res.set('Content-Type', 'text/plain');
     if (Object.keys(req.files).length == 0) {
+	res.set('Content-Type', 'application/json');
 	return res.status(400).json({ message: 'No files were uploaded.' });
     }
     const serverId = req.query.serverId;
     fs.mkdir('/tmp/' + serverId, { recursive: true }, (err) => {
-	if (err) { return res.status(500).json({ message: err }); };
+	if (err) {
+	    console.log(err);
+	    res.set('Content-Type', 'application/json');
+	    return res.status(500).json({ message: err });
+	};
     });
     req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
 	if (err) {
-	    return res.status(500).send(err);
+	    console.log(err);
+	    res.set('Content-Type', 'application/json');
+	    return res.status(500).json({ message: err });
 	}
 	return res.status(200).send(serverId.toString());
     });
@@ -70,6 +77,7 @@ router.post('/upload', (req, res) => {
 
 // This is our user file delete method.
 router.delete('/delete', (req, res) => {
+    res.set('Content-Type', 'text/plain');
     const { serverId, fileName } = req.query;
     let _filePath = '/tmp/' + serverId;
     if (fileName) {
@@ -86,7 +94,6 @@ router.delete('/delete', (req, res) => {
 	    });  
 	}
     });
-    res.set('Content-Type', 'text/plain');
     return res.status(200).send('Deleted');
 });
 
@@ -102,6 +109,8 @@ router.post("/getFile", (req, res) => {
     res.set('Content-Type', contentType);
     fs.readFile(fileName, encodingType, (err, data) => {
         if (err) {
+	    console.log(err);
+	    res.set('Content-Type', 'application/json');
             return res.json({ success: false, error: err });
         }
         return res.json({ success: true, data: data });
@@ -114,12 +123,17 @@ router.post('/writeJson', (req, res) => {
     if (index.length == 0) {
         return res.status(400).json({ message: 'No content.' });
     }
-    fs.writeFile(fileName, JSON.stringify(index), (err) => { return });
+    fs.writeFile(fileName, JSON.stringify(index), (err) => {
+	console.log(err);
+	res.set('Content-Type', 'application/json');
+        return res.status(500).json({ message: err });
+    });
     return res.status(200).send('Success');
 });
 
 // This method is used to retrieve analysis results for display in IGV.
 router.get("/getResult", (req, res) => {
+    res.set('Content-Type', 'application/json');
     const { serverId, fileName, contentType, encodingType } = req.query;
     const filePath = '/tmp/' + serverId + '/' + fileName;
     res.set('Content-Type', contentType);
@@ -139,6 +153,8 @@ router.get("/downloadResults", (req, res) => {
 	     'Content-Disposition': 'attachment; filename=' + fileName});
     fs.readFile(filePath, null, (err, data) => {
         if (err) {
+	    console.log(err);
+	    res.set('Content-Type', 'application/json');
             return res.status(400).json({ message: err });
         }
         return res.status(200).send(data);
@@ -147,6 +163,8 @@ router.get("/downloadResults", (req, res) => {
 
 // This method retrieves analysis results for download by the user.
 router.post("/prepareResults", (req, res) => {
+    res.set('Content-Type', 'application/json');
+
     const { serverId } = req.body;
     const resultsPath = '/tmp/' + serverId + '/';
 
@@ -162,13 +180,13 @@ router.post("/prepareResults", (req, res) => {
 	    console.log(err);
 	    return res.status(400).json({ message: 'Results retrieval failed: ' + err });
 	}
-	res.set('Content-Type', 'text/plain');
 	return res.json({success: true, data: {serverId: resServerId, fileName: outFile} });
     });
 });
 
 // This method retrieves the available medaka models and returns the result as an array.
 router.post('/getMedakaModels', (req, res) => {
+    res.set('Content-Type', 'application/json');
     // First check to see if we have a cached json file.
     fs.readFile("medakaModels.json", "utf8", (err,data) => {
 	if (err) {
@@ -204,6 +222,8 @@ router.post('/processData', (req, res) => {
 // This method retrieves existing data from the server for a session run
 // within the last 24 hours. (session data stored in a cookie)
 router.post('/processCachedData', (req, res) => {
+    res.set('Content-Type', 'application/json');
+
     const { resServerId, refServerId, refFile, name } = req.body;
 
     // Get locations of data on the server.
@@ -247,6 +267,8 @@ router.post('/processCachedData', (req, res) => {
 
 // This method finds restriction enzyme offsets based on user inputs and fasta files in a directory.
 router.post('/findREOffsets', (req, res) => {
+    res.set('Content-Type', 'application/json');
+
     const { serverId, fastaREStr } = req.body;
     let options = {
         mode: 'text',
