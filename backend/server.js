@@ -55,23 +55,27 @@ router.post('/upload', (req, res) => {
     res.set('Content-Type', 'text/plain');
     if (Object.keys(req.files).length == 0) {
 	res.set('Content-Type', 'application/json');
-	return res.status(400).json({ message: 'No files were uploaded.' });
+	res.status(400).json({ message: 'No files were uploaded.' });
+	return;
     }
     const serverId = req.query.serverId;
     fs.mkdir('/tmp/' + serverId, { recursive: true }, (err) => {
 	if (err) {
 	    console.log(err);
 	    res.set('Content-Type', 'application/json');
-	    return res.status(500).json({ message: err });
+	    res.status(500).json({ message: err });
+	    return;
 	};
     });
     req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
 	if (err) {
 	    console.log(err);
 	    res.set('Content-Type', 'application/json');
-	    return res.status(500).json({ message: err });
+	    res.status(500).json({ message: err });
+	    return;
 	}
-	return res.status(200).send(serverId.toString());
+	res.status(200).send(serverId.toString());
+	return;
     });
 });
 
@@ -88,19 +92,24 @@ router.delete('/delete', (req, res) => {
 	    console.log(err);
 	} else {
 	    fs.remove(_filePath, (err) => {
-		if (err) { console.log(err);
-			   //return res.status(500).send(err);
-			 }
+		if (err) {
+		    console.log(err);
+		    res.set('Content-Type', 'application/json');
+		    res.status(500).json({ message: err });
+		    return;
+		}
 	    });  
 	}
     });
-    return res.status(200).send('Deleted');
+    res.status(200).send('Deleted');
+    return;
 });
 
 // This is a dummy endpoint for empty delete requests that happen
 // as a result of the FilePond module.
 router.delete('', (req, res) => {
-    return res.status(200);
+    res.status(200);
+    return;
 });
 
 // Retrieve a local file from the given path.
@@ -111,9 +120,11 @@ router.post("/getFile", (req, res) => {
         if (err) {
 	    console.log(err);
 	    res.set('Content-Type', 'application/json');
-            return res.json({ success: false, error: err });
+            res.json({ success: false, error: err });
+	    return;
         }
-        return res.json({ success: true, data: data });
+        res.status(200).json({ success: true, data: data });
+	return;
     });
 });
 
@@ -121,14 +132,17 @@ router.post("/getFile", (req, res) => {
 router.post('/writeJson', (req, res) => {
     const { fileName, index } = req.body;
     if (index.length == 0) {
-        return res.status(400).json({ message: 'No content.' });
+        res.status(400).json({ message: 'No content.' });
+	return;
     }
     fs.writeFile(fileName, JSON.stringify(index), (err) => {
 	console.log(err);
 	res.set('Content-Type', 'application/json');
-        return res.status(500).json({ message: err });
+        res.status(500).json({ message: err });
+	return;
     });
-    return res.status(200).send('Success');
+    res.status(200).send('Success');
+    return;
 });
 
 // This method is used to retrieve analysis results for display in IGV.
@@ -139,9 +153,12 @@ router.get("/getResult", (req, res) => {
     res.set('Content-Type', contentType);
     fs.readFile(filePath, encodingType, (err, data) => {
         if (err) {
-            return res.status(400).json({ message: err });
+	    console.log(err);	    
+            res.status(400).json({ message: err });
+	    return;
         }
-        return res.status(200).send(data);
+        res.status(200).send(data);
+	return;
     });
 });
 
@@ -155,9 +172,11 @@ router.get("/downloadResults", (req, res) => {
         if (err) {
 	    console.log(err);
 	    res.set('Content-Type', 'application/json');
-            return res.status(400).json({ message: err });
+            res.status(400).json({ message: err });
+	    return;
         }
-        return res.status(200).send(data);
+        res.status(200).send(data);
+	return;
     });
 });
 
@@ -178,9 +197,11 @@ router.post("/prepareResults", (req, res) => {
     exec('tar -czf ' + destPath + outFile + ' ' + resultsPath + '*', (err, stdout, stderr) => {
 	if (err) {
 	    console.log(err);
-	    return res.status(400).json({ message: 'Results retrieval failed: ' + err });
+	    res.status(400).json({ message: 'Results retrieval failed: ' + err });
+	    return;
 	}
-	return res.json({success: true, data: {serverId: resServerId, fileName: outFile} });
+	res.status(200).json({success: true, data: {serverId: resServerId, fileName: outFile} });
+	return;
     });
 });
 
@@ -196,6 +217,7 @@ router.post('/getMedakaModels', (req, res) => {
 		if (err) {
 		    console.log(err)
 		    res.status(500).json({ message: 'error getting medaka models: ' + err });
+		    return;
 		}
 		// Cache the modes for future use.
 		fs.writeFile("medakaModels.json", JSON.stringify(results), (err) => {
@@ -204,10 +226,12 @@ router.post('/getMedakaModels', (req, res) => {
 			console.log(err);
 		    }
 		});
-		return res.json({ success: true, data: results });
+		res.status(200).json({ success: true, data: results });
+		return;
 	    });
 	} else {
-	    return res.json({ success: true, data: JSON.parse(data) });
+	    res.status(200).json({ success: true, data: JSON.parse(data) });
+	    return;
 	}
     })
 });
@@ -235,6 +259,7 @@ router.post('/processCachedData', (req, res) => {
 	if (err) {
 	    console.log(err);
             res.status(500).json({ message: 'Cannot restore session:' + err });
+	    return;
 	}
     
 	// Container for results locations.
@@ -258,8 +283,10 @@ router.post('/processCachedData', (req, res) => {
             if (err) {
 		console.log(err)
 		res.status(500).json({ message: err });
+		return;
             } else {
-		return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+		res.status(200).json({ success: true, data: resData, stats: JSON.parse(resStats) });
+		return;
             }
 	});
     });    
@@ -280,9 +307,11 @@ router.post('/findREOffsets', (req, res) => {
         if (err) {
             console.log(err)
             res.status(400).json({ message: 'error finding offsets:' + err });
+	    return;
         }
         //console.log(results);
-	return res.json({ success: true, data: results[0] });
+	res.status(200).json({ success: true, data: results[0] });
+	return;
     });
 });
 
@@ -521,7 +550,8 @@ runAnalysis = async function(req, res) {
             if (fastaREData[key].cut_sites.length == 0) {
                 yamlData[newKey]["cut-site"] = 0;
             } else {
-                return res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + fastaREData[key].enxyme + ' in ' + key + '!' });
+                res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + fastaREData[key].enxyme + ' in ' + key + '!' });
+		return;
             }
         }
         if (fastaREData[key].enzyme !== "") {
@@ -530,7 +560,9 @@ runAnalysis = async function(req, res) {
     });
     fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
         if (err) {
-            return res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
+	    console.log(err);
+            res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
+	    return;
         }
     });
     // Store this as part of the run params.
@@ -542,7 +574,8 @@ runAnalysis = async function(req, res) {
 	_refFiles = await handleGzipped(refFiles, refPath);
     } catch(err) {
 	console.log(err);
-	return res.status(500).json({ message: 'Error inflating gzipped reference files: ' + err });
+	res.status(500).json({ message: 'Error inflating gzipped reference files: ' + err });
+	return;
     }
     
     let _readFiles = [];
@@ -550,7 +583,8 @@ runAnalysis = async function(req, res) {
 	_readFiles = await handleGzipped(readFiles, readPath);
     } catch(err) {
 	console.log(err);
-	return res.status(500).json({ message: 'Error inflating gzipped read files: ' + err });
+	res.status(500).json({ message: 'Error inflating gzipped read files: ' + err });
+	return;
     }
 
     // Build the array of command-line args using the options object.
@@ -648,7 +682,9 @@ runAnalysis = async function(req, res) {
     fs.writeFile(outPath + 'run_params.json', JSON.stringify(runParams), (err) => {
         if (err) {
             // File not written. Return an error.
-            return res.status(500).json({ message: "Could not write params file." });
+	    console.log(err);
+            res.status(500).json({ message: "Could not write params file." });
+	    return;
         }
     });
 
@@ -663,6 +699,7 @@ runAnalysis = async function(req, res) {
         } catch(err) {
 	    console.log(err);
             res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
+	    return;
         }
 	//console.log('Renamed files processed.');
     }
@@ -675,7 +712,8 @@ runAnalysis = async function(req, res) {
 	catFastaFiles(_refFiles, refPath, outPath);
 	//console.log('Reference fasta files combined.');
     } catch(err) {
-	return res.status(500).json({ message: 'Error combining reference files: ' + error });
+	res.status(500).json({ message: 'Error combining reference files: ' + error });
+	return;
     }
     resData["refFile"] = 'combined_ref_seqs.fasta';
     
@@ -692,10 +730,12 @@ runAnalysis = async function(req, res) {
             // We have to parse the actual error message out of the stack trace...
             const stackTrace = err.stack.split('\n');
             if (stackTrace[0] === 'Error: No reads were assigned to any plasmid!') {
-                return res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
+                res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
+		return;
             }
 	} else {
-            return res.status(400).json({ message: err });
+            res.status(400).json({ message: err });
+	    return
         }
     }
     
@@ -707,9 +747,11 @@ runAnalysis = async function(req, res) {
 	//console.log("Results processed.");
     } catch(err) {
 	console.log(err)
-	return res.status(400).json({ message: err });
+	res.status(400).json({ message: err });
+	return;
     }
 
     // Return the results if all went well.
-    return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+    res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+    return;
 }
