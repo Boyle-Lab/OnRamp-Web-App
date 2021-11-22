@@ -52,6 +52,7 @@ app.use(fileUpload());
 
 // This is our file upload method.
 router.post('/upload', (req, res) => {
+    res.set('Content-Type', 'text/plain');
     if (Object.keys(req.files).length == 0) {
 	return res.status(400).json({ message: 'No files were uploaded.' });
     }
@@ -60,8 +61,9 @@ router.post('/upload', (req, res) => {
 	if (err) { return res.status(500).json({ message: err }); };
     });
     req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
-	if (err) { return res.status(500).send(err); }
-	res.set('Content-Type', 'text/plain');
+	if (err) {
+	    return res.status(500).send(err);
+	}
 	return res.status(200).send(serverId.toString());
     });
 });
@@ -81,7 +83,7 @@ router.delete('/delete', (req, res) => {
 		if (err) { console.log(err);
 			   //return res.status(500).send(err);
 			 }
-	    });		     
+	    });  
 	}
     });
     res.set('Content-Type', 'text/plain');
