@@ -116,3 +116,6 @@ yarn.lock
 
 # web app cache files
 backend/medakaModels.json
+
+# Directory used to monitor dev run resource usage, etc.
+run_stats

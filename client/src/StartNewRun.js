@@ -6,12 +6,14 @@ import { ValidatorForm } from 'react-material-ui-form-validator';
 import Grid from '@material-ui/core/Grid';
 import GenericDialog from './GenericDialog';
 import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core/styles';
 import REOptsTable from './REOptsTable'
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ErrorContent from './ErrorContent';
 import FileRenameAlert from './FileRenameAlert';
+
+import PropTypes from 'prop-types';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 
 /*
 This code is part of the CGIMP distribution
@@ -34,6 +36,10 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 
 const host = window.location.protocol + "//" + window.location.host;
 const apiHost = host + '/api';
+
+const styles = theme => ({
+    appBarSpacer: theme.mixins.toolbar,
+});
 
 const ActionButton = withStyles({
   root: {
@@ -202,7 +208,7 @@ class StartNewRun extends Component {
 		});
 	    })
 	    .catch(error => {
-		//console.log(error.response);
+		console.log(error.response);
 		this.props.updateParentState("dataIsLoaded", true);
                 this.setState({
                     processingErr: error.response.data.message,
@@ -223,6 +229,7 @@ class StartNewRun extends Component {
     }
     
     render () {
+	const { classes } = this.props;
 	if (verbose) {
 	    console.log("Render StartNewRun");
 	}
@@ -279,6 +286,10 @@ class StartNewRun extends Component {
     }
 }
 
+StartNewRun.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
 const optsHeader = ["Option", "Value", "Description"];
 
 const nanofiltOpts = [
@@ -312,4 +323,4 @@ const adjectives = ['extreme', 'orange', 'green', 'blue', 'indigo', 'violet', 'v
 const nouns = ['pants', 'shoe', 'channel', 'hamburger', 'bar', 'fish', 'trout', 'gazelle', 'macintosh', 'davenport', 'shill', 'fabricator', 'dingbat', 'cow', 'goat', 'parakeet', 'dishwasher', 'sausage', 'taco', 'automobile', 'chicken', 'doorbell', 'dumbell', 'lifter', 'hammer', 'pliers', 'window', 'pacifier', 'baseball', 'filbert', 'sandwich', 'box', 'scrimshaw', 'yearbook', 'horse', 'methamphetamine', 'sanitizer', 'vaccine', 'plague', 'handlebar', 'mystic', 'president', 'minister', 'bellwether', 'cheesemaker', 'cobbler', 'whale', 'hunchback', 'chair', 'hamburger', 'child', 'camel', 'llama', 'screwdriver', 'micropipette', 'centrifuge', 'freezer', 'gearshift', 'knob', 'guitar', 'violin', 'piano', 'harpsichord', 'tuba', 'trombone', 'saxophone', 'triangle', 'square', 'rectangle', 'parallellogram', 'rhombus', 'serenity', 'filter', 'funnel', 'trilobite', 'dinosaur', 'bracken', 'bracket', 'racket', 'rack', 'shack', 'lever', 'octogon', 'hexagon', 'pentagon', 'trapezoid', 'sine', 'cosine', 'tangent', 'cotangent', 'secant', 'gravel', 'garden', 'tomato', 'potato', 'pepper', 'corvid', 'tube', 'slacks', 'trousers', 'suspenders', 'undershirt', 'flannel', 'kilt', 'lemon', 'lime', 'grapefruit', 'orange', 'satsuma', 'tatsoi', 'celery', 'carrot', 'beans', 'hydroxychloroquine', 'operation', 'student', 'community', 'wood', 'bonus', 'beer', 'error', 'investment', 'math', 'analysis', 'ability', 'person', 'classroom', 'nation', 'soup', 'policy', 'perception', 'environment', 'historian', 'penalty', 'negotiation', 'movie', 'feedback', 'industry', 'restaurant', 'power', 'arrival', 'pie', 'priority', 'dealer', 'understanding', 'scene', 'month', 'salad', 'possession', 'surgery', 'hall', 'analyst', 'situation', 'ear', 'area', 'society', 'communication', 'president', 'police', 'hearing', 'dinner', 'difficulty', 'mall', 'family', 'church', 'development', 'health', 'fishing', 'leadership', 'independence', 'problem', 'law', 'throat', 'reality', 'coffee', 'celebration', 'appearance', 'baseball', 'fortune', 'dinner', 'editor', 'agency', 'selection', 'president', 'student', 'analysis', 'classroom', 'manager', 'complaint', 'supermarket', 'negotiation', 'confusion', 'importance', 'refrigerator', 'employee', 'height', 'soup', 'tale', 'way', 'conversation', 'role', 'uncle', 'sister', 'technology', 'leader', 'argument', 'food', 'virus', 'energy', 'science', 'owner', 'intention', 'camera', 'insurance', 'ivermectin'];
 
 
-export default StartNewRun;
+export default withStyles(styles)(StartNewRun);
