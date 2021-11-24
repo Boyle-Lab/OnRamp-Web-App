@@ -6,12 +6,14 @@ import { ValidatorForm } from 'react-material-ui-form-validator';
 import Grid from '@material-ui/core/Grid';
 import GenericDialog from './GenericDialog';
 import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core/styles';
 import REOptsTable from './REOptsTable'
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ErrorContent from './ErrorContent';
 import FileRenameAlert from './FileRenameAlert';
+
+import PropTypes from 'prop-types';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 
 /*
 This code is part of the CGIMP distribution
@@ -32,8 +34,12 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
-const host = "http://" + window.location.host;
-const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+const host = window.location.protocol + "//" + window.location.host;
+const apiHost = host + '/api';
+
+const styles = theme => ({
+    appBarSpacer: theme.mixins.toolbar,
+});
 
 const ActionButton = withStyles({
   root: {
@@ -166,6 +172,11 @@ class StartNewRun extends Component {
 	const refFiles = this.getFilenamesFromPond(this.props.refFiles);
 	const refServerId = this.props.refFiles[0].serverId;
 
+	// Variables to keep track of the backgrounded pipeline
+	let pipelinePID = null;
+	let pipelineStatus = "idle";
+	let resServerId = null;
+	
 	// Call the server method to launch the analysis. Location of results is returned.
 	//console.log(this.props.renamedFiles);
 	axios.post(apiHost + "/processData",
@@ -184,10 +195,12 @@ class StartNewRun extends Component {
 		this.props.updateParentState("resServerId", res.data.data.resServerId);
 		this.props.updateParentState("refFile", res.data.data.refFile);
 		this.props.updateParentState("algnFile", res.data.data.algnFile);
-		this.props.updateParentState("dataIsLoaded", true);
-		this.props.updateParentState("resData", res.data.stats);
-		this.props.updateParentState("showResults", true);
+		//this.props.updateParentState("dataIsLoaded", true);
+		//this.props.updateParentState("resData", res.data.stats);
+		//this.props.updateParentState("showResults", true);
 		this.props.updateParentState("sessionName", res.data.data.name);
+		//this.props.updateParentState("serverPID", res.data.data.PID);
+		this.props.updateParentState("waitingForResults", true);		
 		if (verbose) {
 		    console.log(res.data.data.runParams);
 		}
@@ -200,15 +213,52 @@ class StartNewRun extends Component {
 		    "name": res.data.data.name,
 		    "date": res.data.data.date
 		});
+
+		pipelinePID = res.data.data.PID;
+		pipelineStatus = "running";
+		resServerId = res.data.data.resServerId;
 	    })
 	    .catch(error => {
-		//console.log(error.response);
+		console.log(error.response);
 		this.props.updateParentState("dataIsLoaded", true);
                 this.setState({
                     processingErr: error.response.data.message,
                     showErrorDialog: true
                 });
 	    });
+
+	// Periodically check to see if the pipeline has completed.
+	let iv = setInterval( () => {
+	    if (pipelineStatus === "running") {		
+		axios.post(apiHost + "/checkJob",
+			   {
+			       refServerId: refServerId,
+			       resServerId: resServerId,
+			       serverPID: pipelinePID
+			   }
+			  )
+		    .then(res => {
+			let status = res.data.pipelineStatus;
+			if (status === "running") {
+			    // Do nothing
+			    //console.log("still running");
+			} else if (status === "completed") {
+			    // Process results
+			    //console.log("done!");
+			    clearInterval(iv);
+			    this.props.updateParentState("dataIsLoaded", true);
+			    this.props.updateParentState("resData", res.data.stats);
+			    this.props.updateParentState("showResults", true);
+			} else {
+			    // Error
+			    clearInterval(iv);
+			}
+		    })
+		    .catch(error => {
+			console.log(error);
+		    });
+	    }
+	}, 15000);
 	
 	event.preventDefault();
     }
@@ -223,6 +273,7 @@ class StartNewRun extends Component {
     }
     
     render () {
+	const { classes } = this.props;
 	if (verbose) {
 	    console.log("Render StartNewRun");
 	}
@@ -279,6 +330,10 @@ class StartNewRun extends Component {
     }
 }
 
+StartNewRun.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
 const optsHeader = ["Option", "Value", "Description"];
 
 const nanofiltOpts = [
@@ -309,7 +364,7 @@ const BinningOpts = ({handleChange, getState}) => (
 
 const adjectives = ['extreme', 'orange', 'green', 'blue', 'indigo', 'violet', 'violent', 'belligerent', 'victorious', 'meek', 'deliberate', 'swift', 'undulating', 'cantankerous', 'zygomorphic', 'fancy', 'dull', 'shifty', 'mistaken', 'childish', 'manly', 'huge', 'miniscule', 'gorgeous', 'sandy', 'gritty', 'smooth', 'wispy', 'florrid', 'vegetal', 'animalistic', 'unprotected', 'fervent', 'insufferble', 'bulbous', 'pendulous', 'bullish', 'horrifying', 'mystical', 'lemony', 'fruity', 'brutish', 'fantastic', 'horrible', 'cheesy', 'horrendous', "mauve", "pink", "puce", "stinky", "fabulous", "reverent", "irreverent", "illogical", "logical", "reasonable", "unreasonable", "lugubrious", "masterful", "demanding", "fabricated", 'knobby', 'restful', 'serene', 'bustling', 'bellicose', 'burgeoning', 'bumbling', 'icy', 'fragile', 'chubby', 'squeamish', 'loving', 'confident', 'selfish', 'handy', 'comfortable', 'hissing', 'sick', 'didactic', 'classy', 'equal', 'terrific', 'sincere', 'daffy', 'macabre', 'dull', 'dependent', 'psychedelic', 'medical', 'nippy', 'nasty', 'crabby', 'complex', 'rabid', 'wasteful', 'painful', 'certain', 'roomy', 'bored', 'uptight', 'keen', 'descriptive', 'tedious', 'wrathful', 'faithful', 'safe', 'thankful', 'soggy', 'ugliest', 'puny', 'daily', 'truthful', 'honorable', 'frightened', 'super', 'oceanic', 'homeless', 'barbarous', 'inquisitive', 'jaded', 'youthful', 'every', 'near', 'unbiased', 'callous', 'dynamic', 'horrible', 'tasteful', 'untidy', 'strange', 'many', 'mental', 'abortive', 'exclusive', 'impressive', 'bawdy', 'smiling', 'wiry', 'tender', 'adjoining', 'exuberant', 'squealing', 'questionable', 'enchanting', 'sticky', 'short', 'second', 'simplistic', 'fearless', 'abundant', 'filthy', 'picayune', 'sturdy', 'acid', 'faithful', 'succinct', 'gentle', 'apathetic', 'squeamish', 'unhappy', 'disgusting', 'southern', 'foregoing', 'accessible', 'mute', 'long-term', 'mixed', 'innocent', 'sudden', 'sloppy', 'uptight', 'different', 'brave', 'exuberant', 'harmonious', 'tranquil', 'thankful', 'rigid', 'sable', 'living', 'sharp', 'mellow', 'uninterested', 'rebel', 'mean', 'teeny', 'wide', 'temporary', 'nosy', 'humdrum', 'hushed', 'dreary', 'decisive', 'sassy', 'recondite', 'internal', 'unusual', 'many', 'scandalous', 'simplistic', 'resonant', 'easy', 'well-made', 'puny', 'ill-informed', 'clean', 'scrawny', 'shallow', 'wealthy', 'permissible'];
 
-const nouns = ['pants', 'shoe', 'channel', 'hamburger', 'bar', 'fish', 'trout', 'gazelle', 'macintosh', 'davenport', 'shill', 'fabricator', 'dingbat', 'cow', 'goat', 'parakeet', 'dishwasher', 'sausage', 'taco', 'automobile', 'chicken', 'doorbell', 'dumbell', 'lifter', 'hammer', 'pliers', 'window', 'pacifier', 'baseball', 'filbert', 'sandwich', 'box', 'scrimshaw', 'yearbook', 'horse', 'methamphetamine', 'sanitizer', 'vaccine', 'plague', 'handlebar', 'mystic', 'president', 'minister', 'bellwether', 'cheesemaker', 'cobbler', 'whale', 'hunchback', 'chair', 'hamburger', 'child', 'camel', 'llama', 'screwdriver', 'micropipette', 'centrifuge', 'freezer', 'gearshift', 'knob', 'guitar', 'violin', 'piano', 'harpsichord', 'tuba', 'trombone', 'saxophone', 'triangle', 'square', 'rectangle', 'parallellogram', 'rhombus', 'serenity', 'filter', 'funnel', 'trilobite', 'dinosaur', 'bracken', 'bracket', 'racket', 'rack', 'shack', 'lever', 'octogon', 'hexagon', 'pentagon', 'trapezoid', 'sine', 'cosine', 'tangent', 'cotangent', 'secant', 'gravel', 'garden', 'tomato', 'potato', 'pepper', 'corvid', 'tube', 'slacks', 'trousers', 'suspenders', 'undershirt', 'flannel', 'kilt', 'lemon', 'lime', 'grapefruit', 'orange', 'satsuma', 'tatsoi', 'celery', 'carrot', 'beans', 'hydroxychloroquine', 'operation', 'student', 'community', 'wood', 'bonus', 'beer', 'error', 'investment', 'math', 'analysis', 'ability', 'person', 'classroom', 'nation', 'soup', 'policy', 'perception', 'environment', 'historian', 'penalty', 'negotiation', 'movie', 'feedback', 'industry', 'restaurant', 'power', 'arrival', 'pie', 'priority', 'dealer', 'understanding', 'scene', 'month', 'salad', 'possession', 'surgery', 'hall', 'analyst', 'situation', 'ear', 'area', 'society', 'communication', 'president', 'police', 'hearing', 'dinner', 'difficulty', 'mall', 'family', 'church', 'development', 'health', 'fishing', 'leadership', 'independence', 'problem', 'law', 'throat', 'reality', 'coffee', 'celebration', 'appearance', 'baseball', 'fortune', 'dinner', 'editor', 'agency', 'selection', 'president', 'student', 'analysis', 'classroom', 'manager', 'complaint', 'supermarket', 'negotiation', 'confusion', 'importance', 'refrigerator', 'employee', 'height', 'soup', 'tale', 'way', 'conversation', 'role', 'uncle', 'sister', 'technology', 'leader', 'argument', 'food', 'virus', 'energy', 'science', 'owner', 'intention', 'camera', 'insurance'];
+const nouns = ['pants', 'shoe', 'channel', 'hamburger', 'bar', 'fish', 'trout', 'gazelle', 'macintosh', 'davenport', 'shill', 'fabricator', 'dingbat', 'cow', 'goat', 'parakeet', 'dishwasher', 'sausage', 'taco', 'automobile', 'chicken', 'doorbell', 'dumbell', 'lifter', 'hammer', 'pliers', 'window', 'pacifier', 'baseball', 'filbert', 'sandwich', 'box', 'scrimshaw', 'yearbook', 'horse', 'methamphetamine', 'sanitizer', 'vaccine', 'plague', 'handlebar', 'mystic', 'president', 'minister', 'bellwether', 'cheesemaker', 'cobbler', 'whale', 'hunchback', 'chair', 'hamburger', 'child', 'camel', 'llama', 'screwdriver', 'micropipette', 'centrifuge', 'freezer', 'gearshift', 'knob', 'guitar', 'violin', 'piano', 'harpsichord', 'tuba', 'trombone', 'saxophone', 'triangle', 'square', 'rectangle', 'parallellogram', 'rhombus', 'serenity', 'filter', 'funnel', 'trilobite', 'dinosaur', 'bracken', 'bracket', 'racket', 'rack', 'shack', 'lever', 'octogon', 'hexagon', 'pentagon', 'trapezoid', 'sine', 'cosine', 'tangent', 'cotangent', 'secant', 'gravel', 'garden', 'tomato', 'potato', 'pepper', 'corvid', 'tube', 'slacks', 'trousers', 'suspenders', 'undershirt', 'flannel', 'kilt', 'lemon', 'lime', 'grapefruit', 'orange', 'satsuma', 'tatsoi', 'celery', 'carrot', 'beans', 'hydroxychloroquine', 'operation', 'student', 'community', 'wood', 'bonus', 'beer', 'error', 'investment', 'math', 'analysis', 'ability', 'person', 'classroom', 'nation', 'soup', 'policy', 'perception', 'environment', 'historian', 'penalty', 'negotiation', 'movie', 'feedback', 'industry', 'restaurant', 'power', 'arrival', 'pie', 'priority', 'dealer', 'understanding', 'scene', 'month', 'salad', 'possession', 'surgery', 'hall', 'analyst', 'situation', 'ear', 'area', 'society', 'communication', 'president', 'police', 'hearing', 'dinner', 'difficulty', 'mall', 'family', 'church', 'development', 'health', 'fishing', 'leadership', 'independence', 'problem', 'law', 'throat', 'reality', 'coffee', 'celebration', 'appearance', 'baseball', 'fortune', 'dinner', 'editor', 'agency', 'selection', 'president', 'student', 'analysis', 'classroom', 'manager', 'complaint', 'supermarket', 'negotiation', 'confusion', 'importance', 'refrigerator', 'employee', 'height', 'soup', 'tale', 'way', 'conversation', 'role', 'uncle', 'sister', 'technology', 'leader', 'argument', 'food', 'virus', 'energy', 'science', 'owner', 'intention', 'camera', 'insurance', 'ivermectin'];
 
 
-export default StartNewRun;
+export default withStyles(styles)(StartNewRun);

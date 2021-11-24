@@ -52,22 +52,39 @@ app.use(fileUpload());
 
 // This is our file upload method.
 router.post('/upload', (req, res) => {
+    res.set('Content-Type', 'text/plain');
     if (Object.keys(req.files).length == 0) {
-	return res.status(400).json({ message: 'No files were uploaded.' });
+	res.set('Content-Type', 'application/json');
+	res.status(400).json({ message: 'No files were uploaded.' });
+	return;
     }
     const serverId = req.query.serverId;
     fs.mkdir('/tmp/' + serverId, { recursive: true }, (err) => {
-	if (err) { return res.status(500).json({ message: err }); };
-    });
-    req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
-	if (err) { return res.status(500).send(err); }
-	res.set('Content-Type', 'text/plain');
-	return res.status(200).send(serverId.toString());
+	if (err) {
+	    console.log(err);
+	    res.set('Content-Type', 'application/json');
+	    res.status(500).json({ message: err });
+	    return;
+	}
+
+	// await won't work here so we have to put this inside the
+	// callback to avoid send errors.
+	req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
+	    if (err) {
+		console.log(err);
+		res.set('Content-Type', 'application/json');
+		res.status(500).json({ message: err });
+		return;
+	    }
+	    res.status(200).send(serverId.toString());
+	    return;
+	});
     });
 });
 
 // This is our user file delete method.
 router.delete('/delete', (req, res) => {
+    res.set('Content-Type', 'text/plain');
     const { serverId, fileName } = req.query;
     let _filePath = '/tmp/' + serverId;
     if (fileName) {
@@ -78,20 +95,24 @@ router.delete('/delete', (req, res) => {
 	    console.log(err);
 	} else {
 	    fs.remove(_filePath, (err) => {
-		if (err) { console.log(err);
-			   //return res.status(500).send(err);
-			 }
-	    });		     
+		if (err) {
+		    console.log(err);
+		    res.set('Content-Type', 'application/json');
+		    res.status(500).json({ message: err });
+		    return;
+		}
+	    });  
 	}
     });
-    res.set('Content-Type', 'text/plain');
-    return res.status(200).send('Deleted');
+    res.status(200).send('Deleted');
+    return;
 });
 
 // This is a dummy endpoint for empty delete requests that happen
 // as a result of the FilePond module.
 router.delete('', (req, res) => {
-    return res.status(200);
+    res.status(200);
+    return;
 });
 
 // Retrieve a local file from the given path.
@@ -100,9 +121,13 @@ router.post("/getFile", (req, res) => {
     res.set('Content-Type', contentType);
     fs.readFile(fileName, encodingType, (err, data) => {
         if (err) {
-            return res.json({ success: false, error: err });
+	    console.log(err);
+	    res.set('Content-Type', 'application/json');
+            res.json({ success: false, error: err });
+	    return;
         }
-        return res.json({ success: true, data: data });
+        res.status(200).json({ success: true, data: data });
+	return;
     });
 });
 
@@ -110,22 +135,33 @@ router.post("/getFile", (req, res) => {
 router.post('/writeJson', (req, res) => {
     const { fileName, index } = req.body;
     if (index.length == 0) {
-        return res.status(400).json({ message: 'No content.' });
+        res.status(400).json({ message: 'No content.' });
+	return;
     }
-    fs.writeFile(fileName, JSON.stringify(index), (err) => { return });
-    return res.status(200).send('Success');
+    fs.writeFile(fileName, JSON.stringify(index), (err) => {
+	console.log(err);
+	res.set('Content-Type', 'application/json');
+        res.status(500).json({ message: err });
+	return;
+    });
+    res.status(200).send('Success');
+    return;
 });
 
 // This method is used to retrieve analysis results for display in IGV.
 router.get("/getResult", (req, res) => {
+    res.set('Content-Type', 'application/json');
     const { serverId, fileName, contentType, encodingType } = req.query;
     const filePath = '/tmp/' + serverId + '/' + fileName;
     res.set('Content-Type', contentType);
     fs.readFile(filePath, encodingType, (err, data) => {
         if (err) {
-            return res.status(400).json({ message: err });
+	    console.log(err);	    
+            res.status(400).json({ message: err });
+	    return;
         }
-        return res.status(200).send(data);
+        res.status(200).send(data);
+	return;
     });
 });
 
@@ -137,14 +173,20 @@ router.get("/downloadResults", (req, res) => {
 	     'Content-Disposition': 'attachment; filename=' + fileName});
     fs.readFile(filePath, null, (err, data) => {
         if (err) {
-            return res.status(400).json({ message: err });
+	    console.log(err);
+	    res.set('Content-Type', 'application/json');
+            res.status(400).json({ message: err });
+	    return;
         }
-        return res.status(200).send(data);
+        res.status(200).send(data);
+	return;
     });
 });
 
 // This method retrieves analysis results for download by the user.
 router.post("/prepareResults", (req, res) => {
+    res.set('Content-Type', 'application/json');
+
     const { serverId } = req.body;
     const resultsPath = '/tmp/' + serverId + '/';
 
@@ -158,15 +200,17 @@ router.post("/prepareResults", (req, res) => {
     exec('tar -czf ' + destPath + outFile + ' ' + resultsPath + '*', (err, stdout, stderr) => {
 	if (err) {
 	    console.log(err);
-	    return res.status(400).json({ message: 'Results retrieval failed: ' + err });
+	    res.status(400).json({ message: 'Results retrieval failed: ' + err });
+	    return;
 	}
-	res.set('Content-Type', 'text/plain');
-	return res.json({success: true, data: {serverId: resServerId, fileName: outFile} });
+	res.status(200).json({success: true, data: {serverId: resServerId, fileName: outFile} });
+	return;
     });
 });
 
 // This method retrieves the available medaka models and returns the result as an array.
 router.post('/getMedakaModels', (req, res) => {
+    res.set('Content-Type', 'application/json');
     // First check to see if we have a cached json file.
     fs.readFile("medakaModels.json", "utf8", (err,data) => {
 	if (err) {
@@ -176,6 +220,7 @@ router.post('/getMedakaModels', (req, res) => {
 		if (err) {
 		    console.log(err)
 		    res.status(500).json({ message: 'error getting medaka models: ' + err });
+		    return;
 		}
 		// Cache the modes for future use.
 		fs.writeFile("medakaModels.json", JSON.stringify(results), (err) => {
@@ -184,10 +229,12 @@ router.post('/getMedakaModels', (req, res) => {
 			console.log(err);
 		    }
 		});
-		return res.json({ success: true, data: results });
+		res.status(200).json({ success: true, data: results });
+		return;
 	    });
 	} else {
-	    return res.json({ success: true, data: JSON.parse(data) });
+	    res.status(200).json({ success: true, data: JSON.parse(data) });
+	    return;
 	}
     })
 });
@@ -199,9 +246,30 @@ router.post('/processData', (req, res) => {
     runAnalysis(req, res);
 });
 
+// Check progress on a (running/completed/failed) pipeline job.
+router.post('/checkJob', (req, res) => {
+    res.set('Content-Type', 'application/json');
+    const { refServerId, resServerId, serverPID } = req.body;
+
+    // Check for the PID of the pipeline process.
+    try {
+	process.kill(serverPID, 0);
+	// If we've gotten this far, the process is still running.
+	// Resolve the request accordingly.
+	res.status(200).json({ pipelineStatus: "running" });	
+    } catch(err) {
+	// Process is not running. See if we have results or an error.
+	checkOutput(res, refServerId, resServerId);
+	//res.status(200).json({ pipelineStatus: "completed" });
+    }
+    
+});
+
 // This method retrieves existing data from the server for a session run
 // within the last 24 hours. (session data stored in a cookie)
 router.post('/processCachedData', (req, res) => {
+    res.set('Content-Type', 'application/json');
+
     const { resServerId, refServerId, refFile, name } = req.body;
 
     // Get locations of data on the server.
@@ -213,6 +281,7 @@ router.post('/processCachedData', (req, res) => {
 	if (err) {
 	    console.log(err);
             res.status(500).json({ message: 'Cannot restore session:' + err });
+	    return;
 	}
     
 	// Container for results locations.
@@ -236,8 +305,10 @@ router.post('/processCachedData', (req, res) => {
             if (err) {
 		console.log(err)
 		res.status(500).json({ message: err });
+		return;
             } else {
-		return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+		res.status(200).json({ success: true, data: resData, stats: JSON.parse(resStats) });
+		return;
             }
 	});
     });    
@@ -245,6 +316,8 @@ router.post('/processCachedData', (req, res) => {
 
 // This method finds restriction enzyme offsets based on user inputs and fasta files in a directory.
 router.post('/findREOffsets', (req, res) => {
+    res.set('Content-Type', 'application/json');
+
     const { serverId, fastaREStr } = req.body;
     let options = {
         mode: 'text',
@@ -256,9 +329,11 @@ router.post('/findREOffsets', (req, res) => {
         if (err) {
             console.log(err)
             res.status(400).json({ message: 'error finding offsets:' + err });
+	    return;
         }
         //console.log(results);
-	return res.json({ success: true, data: results[0] });
+	res.status(200).json({ success: true, data: results[0] });
+	return;
     });
 });
 
@@ -272,7 +347,7 @@ app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
 
 /******************************************************************************************************/
 // Helper functions
-
+    
 findGzipped = async function (resolve, reject, files, path, _cmdArgs, i) {
     // Locate gzipped files at the given path.
     filename = files[i];
@@ -412,13 +487,13 @@ runPlasmidSeq = function(cmdArgs) {
         args: cmdArgs
     }
     
-    return new Promise((resolve, reject) => {	
-	PythonShell.run('/usr/local/bulkPlasmidSeq/bulkPlasmidSeq.py', options, function (err, resData) {
-            if (err) {
-		console.log(err);
-		reject(err);
+    return new Promise((resolve, reject) => {
+	exec('./runPipelineBackground.sh ' + cmdArgs.join(' '), (error, stdout, stderr) => {
+            if (error) {
+		console.log(error);
+		reject(error);
 	    } else {
-		resolve();
+		resolve(stdout);
 	    }
 	});
     });		       
@@ -497,7 +572,8 @@ runAnalysis = async function(req, res) {
             if (fastaREData[key].cut_sites.length == 0) {
                 yamlData[newKey]["cut-site"] = 0;
             } else {
-                return res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + fastaREData[key].enxyme + ' in ' + key + '!' });
+                res.status(400).json({ message: 'Error in restriction offsets: Multiple cut sites found for ' + fastaREData[key].enxyme + ' in ' + key + '!' });
+		return;
             }
         }
         if (fastaREData[key].enzyme !== "") {
@@ -506,7 +582,9 @@ runAnalysis = async function(req, res) {
     });
     fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
         if (err) {
-            return res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
+	    console.log(err);
+            res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
+	    return;
         }
     });
     // Store this as part of the run params.
@@ -518,7 +596,8 @@ runAnalysis = async function(req, res) {
 	_refFiles = await handleGzipped(refFiles, refPath);
     } catch(err) {
 	console.log(err);
-	return res.status(500).json({ message: 'Error inflating gzipped reference files: ' + err });
+	res.status(500).json({ message: 'Error inflating gzipped reference files: ' + err });
+	return;
     }
     
     let _readFiles = [];
@@ -526,7 +605,8 @@ runAnalysis = async function(req, res) {
 	_readFiles = await handleGzipped(readFiles, readPath);
     } catch(err) {
 	console.log(err);
-	return res.status(500).json({ message: 'Error inflating gzipped read files: ' + err });
+	res.status(500).json({ message: 'Error inflating gzipped read files: ' + err });
+	return;
     }
 
     // Build the array of command-line args using the options object.
@@ -624,7 +704,9 @@ runAnalysis = async function(req, res) {
     fs.writeFile(outPath + 'run_params.json', JSON.stringify(runParams), (err) => {
         if (err) {
             // File not written. Return an error.
-            return res.status(500).json({ message: "Could not write params file." });
+	    console.log(err);
+            res.status(500).json({ message: "Could not write params file." });
+	    return;
         }
     });
 
@@ -639,6 +721,7 @@ runAnalysis = async function(req, res) {
         } catch(err) {
 	    console.log(err);
             res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
+	    return;
         }
 	//console.log('Renamed files processed.');
     }
@@ -651,14 +734,17 @@ runAnalysis = async function(req, res) {
 	catFastaFiles(_refFiles, refPath, outPath);
 	//console.log('Reference fasta files combined.');
     } catch(err) {
-	return res.status(500).json({ message: 'Error combining reference files: ' + error });
+	res.status(500).json({ message: 'Error combining reference files: ' + error });
+	return;
     }
     resData["refFile"] = 'combined_ref_seqs.fasta';
     
-    // Next we'll run the main pipeline.
+    // We'll run the main pipeline on the server as a background
+    // job, returning the process ID for monitoring purposes.
     //console.log("Running the analysis pipeline...");
     try {
-        await runPlasmidSeq(cmdArgs);
+	let pid_line = await runPlasmidSeq(cmdArgs);
+        resData["PID"] = pid_line.replace(/[\n\r]/g, '');
 	//console.log("Analysis pipeline finished.");
     } catch(err) {
 	// For biobin mode, we sometimes get no results due to zero mapped
@@ -668,24 +754,50 @@ runAnalysis = async function(req, res) {
             // We have to parse the actual error message out of the stack trace...
             const stackTrace = err.stack.split('\n');
             if (stackTrace[0] === 'Error: No reads were assigned to any plasmid!') {
-                return res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
+                res.status(400).json({ message: 'Biobin ' + stackTrace[0] });
+		return;
             }
 	} else {
-            return res.status(400).json({ message: err });
+            res.status(400).json({ message: err });
+	    return
         }
     }
     
-    // Finally, gather up stats from the analysis and return the results.
-    //console.log("Processing results...");
+    // Return data include server IDs for all data locations
+    // and the PID of the process running the analysis pipeline
+    // on the server.
+    res.status(200).json({ success: true, data: resData });
+    return;
+}
+
+// Check an outpath for results/errors and return processed data or error message.
+checkOutput = async function(res, refServerId, resServerId) {
+    // Get location of data on the server.
+    const refPath = '/tmp/' + refServerId + '/';
+    const resPath = '/tmp/' + resServerId + '/';
+
+    // Check for the final BAM alignment. If this is present, the analysis
+    // completed successfully and we can process and return results.
+    await fs.access(resPath + 'filtered_alignment.bam', fs.constants.F_OK, (err) => {
+	if (err) {
+	    // No BAM found. There was an error.
+
+	    // Process any stored error output and return it along with the json
+	    // ...
+	    res.status(500).json({ pipelineStatus: "error" });
+	    return;
+	}
+    });
+
     let resStats = {};
     try {
-	resStats = await runProcessResults(refPath, outPath);
-	//console.log("Results processed.");
+        resStats = await runProcessResults(refPath, resPath);
+        //console.log("Results processed.");                                                       
     } catch(err) {
 	console.log(err)
-	return res.status(400).json({ message: err });
+	res.status(400).json({ message: err });
+	return;
     }
-
-    // Return the results if all went well.
-    return res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+    res.status(200).json({ pipelineStatus: "completed", stats: JSON.parse(resStats) });
+    return;
 }

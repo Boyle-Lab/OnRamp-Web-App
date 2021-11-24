@@ -42,6 +42,9 @@ const styles = theme => ({
         overflowX: 'auto',
     },
     appBarSpacer: theme.mixins.toolbar,
+    icon: {
+	cursor: 'pointer',
+    }
 });
 
 
@@ -69,7 +72,7 @@ class LandingPage extends Component {
 		<Grid item xs={12}>
 		<Tooltip title="Get Started!">
 		<Link onClick={() => this.props.updateParentState('showLandingPage', false)}>
-		<img src={StartButton} width="100"/>
+		<img src={StartButton} width="100" className={classes.icon}/>
 		</Link>
                 </Tooltip>		
 		</Grid>
@@ -79,6 +82,8 @@ class LandingPage extends Component {
 	    </Typography>
 	    </Grid>
 		</Grid>
+		<div className={classes.appBarSpacer} />
+		<div className={classes.appBarSpacer} />
 	    </div>
         );
     }

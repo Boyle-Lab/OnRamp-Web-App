@@ -27,8 +27,8 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 // Set to true to nable debugging messages.
 const verbose = false;
 
-const host = "http://" + window.location.host;
-const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+const host = window.location.protocol + "//" + window.location.host;
+const apiHost = host + '/api';
 
 const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, updateParentState }) => {
 

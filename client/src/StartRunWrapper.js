@@ -191,7 +191,9 @@ class StartRunWrapper extends Component {
                 />
 	        </Grid>
 
-		</Grid>
+	    </Grid>
+		<div className={classes.appBarSpacer} />
+		<div className={classes.appBarSpacer} />
 	    </div>
         );
     }

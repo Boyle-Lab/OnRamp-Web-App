@@ -32,8 +32,8 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
-const host = "http://" + window.location.host;
-const apiHost = "http:" + host.split(':')[1] + ':3001/api';
+const host = window.location.protocol + "//" + window.location.host;
+const apiHost = host + '/api';
 
 const styles = theme => ({
     root: {
