@@ -172,6 +172,11 @@ class StartNewRun extends Component {
 	const refFiles = this.getFilenamesFromPond(this.props.refFiles);
 	const refServerId = this.props.refFiles[0].serverId;
 
+	// Variables to keep track of the backgrounded pipeline
+	let pipelinePID = null;
+	let pipelineStatus = "idle";
+	let resServerId = null;
+	
 	// Call the server method to launch the analysis. Location of results is returned.
 	//console.log(this.props.renamedFiles);
 	axios.post(apiHost + "/processData",
@@ -190,10 +195,12 @@ class StartNewRun extends Component {
 		this.props.updateParentState("resServerId", res.data.data.resServerId);
 		this.props.updateParentState("refFile", res.data.data.refFile);
 		this.props.updateParentState("algnFile", res.data.data.algnFile);
-		this.props.updateParentState("dataIsLoaded", true);
-		this.props.updateParentState("resData", res.data.stats);
-		this.props.updateParentState("showResults", true);
+		//this.props.updateParentState("dataIsLoaded", true);
+		//this.props.updateParentState("resData", res.data.stats);
+		//this.props.updateParentState("showResults", true);
 		this.props.updateParentState("sessionName", res.data.data.name);
+		//this.props.updateParentState("serverPID", res.data.data.PID);
+		this.props.updateParentState("waitingForResults", true);		
 		if (verbose) {
 		    console.log(res.data.data.runParams);
 		}
@@ -206,6 +213,10 @@ class StartNewRun extends Component {
 		    "name": res.data.data.name,
 		    "date": res.data.data.date
 		});
+
+		pipelinePID = res.data.data.PID;
+		pipelineStatus = "running";
+		resServerId = res.data.data.resServerId;
 	    })
 	    .catch(error => {
 		console.log(error.response);
@@ -215,6 +226,39 @@ class StartNewRun extends Component {
                     showErrorDialog: true
                 });
 	    });
+
+	// Periodically check to see if the pipeline has completed.
+	let iv = setInterval( () => {
+	    if (pipelineStatus === "running") {		
+		axios.post(apiHost + "/checkJob",
+			   {
+			       refServerId: refServerId,
+			       resServerId: resServerId,
+			       serverPID: pipelinePID
+			   }
+			  )
+		    .then(res => {
+			let status = res.data.pipelineStatus;
+			if (status === "running") {
+			    // Do nothing
+			    //console.log("still running");
+			} else if (status === "completed") {
+			    // Process results
+			    //console.log("done!");
+			    clearInterval(iv);
+			    this.props.updateParentState("dataIsLoaded", true);
+			    this.props.updateParentState("resData", res.data.stats);
+			    this.props.updateParentState("showResults", true);
+			} else {
+			    // Error
+			    clearInterval(iv);
+			}
+		    })
+		    .catch(error => {
+			console.log(error);
+		    });
+	    }
+	}, 15000);
 	
 	event.preventDefault();
     }

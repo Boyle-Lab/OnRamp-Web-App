@@ -11,6 +11,7 @@ import AcceptCookiesDialog from './AcceptCookiesDialog';
 import GenericDialog from './GenericDialog';
 import HelpContent from './HelpContent';
 import LandingPage from './LandingPage';
+import Tutorial from './Tutorial';
 
 import axios from "axios";
 
@@ -61,7 +62,8 @@ class App extends Component {
 	    showAcceptCookiesDialog: false,
 	    enableSessionsButton: false,
 	    showHelpDialog: false,
-	    showLandingPage: true
+	    showLandingPage: true,
+	    showTutorial: false
 	};
     }
 
@@ -72,7 +74,7 @@ class App extends Component {
 	} else {
 	    this.setState({ 'enableSessionsButton': true });
 	}
-	console.log(host, apiHost);
+	//console.log(host, apiHost);
     }
 
     componentWillUnmount() {
@@ -176,7 +178,7 @@ class App extends Component {
 		<Dashboard
 	           title={this.state.mainTitle}
 	           controls={<div></div>}
-	    content={this.state.showLandingPage ?
+ 	           content={this.state.showLandingPage ?
 		     <LandingPage updateParentState={this.updateStateSettings}/>
 		     : this.state.showResults ?
 		                <ResultsDisplay
@@ -188,7 +190,9 @@ class App extends Component {
 			            sessionName={this.state.sessionName}
 			            runParams = {this.state.runParams}
 			        />
-		                :
+		            : this.state.showTutorial ?
+			        <Tutorial />
+			    :
 		                <StartRunWrapper
 	                            dataIsLoaded={this.state.dataIsLoaded}
 	                            updateParentState={this.updateStateSettings}
