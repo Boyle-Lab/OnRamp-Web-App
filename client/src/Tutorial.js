@@ -65,7 +65,7 @@ class Tutorial extends Component {
 		        Nav Goes Here
 		    </Grid>
 		    <Grid item xs={10}>
-		        <Grid container spacing={2} alignItems='left'>
+		        <Grid container spacing={2} alignItems='flex-start'>
 		            <Grid item xs={12}>
 		               Content 1
 	                    </Grid>
