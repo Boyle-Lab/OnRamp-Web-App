@@ -246,6 +246,25 @@ router.post('/processData', (req, res) => {
     runAnalysis(req, res);
 });
 
+// Check progress on a (running/completed/failed) pipeline job.
+router.post('/checkJob', (req, res) => {
+    res.set('Content-Type', 'application/json');
+    const { refServerId, resServerId, serverPID } = req.body;
+
+    // Check for the PID of the pipeline process.
+    try {
+	process.kill(serverPID, 0);
+	// If we've gotten this far, the process is still running.
+	// Resolve the request accordingly.
+	res.status(200).json({ pipelineStatus: "running" });	
+    } catch(err) {
+	// Process is not running. See if we have results or an error.
+	checkOutput(res, refServerId, resServerId);
+	//res.status(200).json({ pipelineStatus: "completed" });
+    }
+    
+});
+
 // This method retrieves existing data from the server for a session run
 // within the last 24 hours. (session data stored in a cookie)
 router.post('/processCachedData', (req, res) => {
@@ -468,13 +487,13 @@ runPlasmidSeq = function(cmdArgs) {
         args: cmdArgs
     }
     
-    return new Promise((resolve, reject) => {	
-	PythonShell.run('/usr/local/bulkPlasmidSeq/bulkPlasmidSeq.py', options, function (err, resData) {
-            if (err) {
-		console.log(err);
-		reject(err);
+    return new Promise((resolve, reject) => {
+	exec('./runPipelineBackground.sh ' + cmdArgs.join(' '), (error, stdout, stderr) => {
+            if (error) {
+		console.log(error);
+		reject(error);
 	    } else {
-		resolve();
+		resolve(stdout);
 	    }
 	});
     });		       
@@ -720,10 +739,12 @@ runAnalysis = async function(req, res) {
     }
     resData["refFile"] = 'combined_ref_seqs.fasta';
     
-    // Next we'll run the main pipeline.
+    // We'll run the main pipeline on the server as a background
+    // job, returning the process ID for monitoring purposes.
     //console.log("Running the analysis pipeline...");
     try {
-        await runPlasmidSeq(cmdArgs);
+	let pid_line = await runPlasmidSeq(cmdArgs);
+        resData["PID"] = pid_line.replace(/[\n\r]/g, '');
 	//console.log("Analysis pipeline finished.");
     } catch(err) {
 	// For biobin mode, we sometimes get no results due to zero mapped
@@ -742,19 +763,41 @@ runAnalysis = async function(req, res) {
         }
     }
     
-    // Finally, gather up stats from the analysis and return the results.
-    //console.log("Processing results...");
+    // Return data include server IDs for all data locations
+    // and the PID of the process running the analysis pipeline
+    // on the server.
+    res.status(200).json({ success: true, data: resData });
+    return;
+}
+
+// Check an outpath for results/errors and return processed data or error message.
+checkOutput = async function(res, refServerId, resServerId) {
+    // Get location of data on the server.
+    const refPath = '/tmp/' + refServerId + '/';
+    const resPath = '/tmp/' + resServerId + '/';
+
+    // Check for the final BAM alignment. If this is present, the analysis
+    // completed successfully and we can process and return results.
+    await fs.access(resPath + 'filtered_alignment.bam', fs.constants.F_OK, (err) => {
+	if (err) {
+	    // No BAM found. There was an error.
+
+	    // Process any stored error output and return it along with the json
+	    // ...
+	    res.status(500).json({ pipelineStatus: "error" });
+	    return;
+	}
+    });
+
     let resStats = {};
     try {
-	resStats = await runProcessResults(refPath, outPath);
-	//console.log("Results processed.");
+        resStats = await runProcessResults(refPath, resPath);
+        //console.log("Results processed.");                                                       
     } catch(err) {
 	console.log(err)
 	res.status(400).json({ message: err });
 	return;
     }
-
-    // Return the results if all went well.
-    res.json({ success: true, data: resData, stats: JSON.parse(resStats) });
+    res.status(200).json({ pipelineStatus: "completed", stats: JSON.parse(resStats) });
     return;
 }
