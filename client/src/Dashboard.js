@@ -98,7 +98,9 @@ class Dashboard extends React.Component {
 
     handleHomeClick = () => {
 	this.props.handleChange({
-	    'showResults': false
+	    'showResults': false,
+	    'showTutorial': false,
+	    'showLandingPage': false
 	});
     }
 
