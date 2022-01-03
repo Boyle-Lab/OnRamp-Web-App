@@ -9,9 +9,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Link from '@material-ui/core/Link';
 
-import Page1 from './QuickStart/Page1';
-import Page2 from './QuickStart/Page2';
-
 /*
 This code is part of the CGIMP distribution
 (https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
@@ -48,11 +45,10 @@ const styles = theme => ({
 });
 
 
-class Tutorial extends Component {
+class Page2 extends Component {
     constructor(props) {
         super(props);
 	this.state = {
-	    showPage: 1
         };
     }
     
@@ -60,47 +56,23 @@ class Tutorial extends Component {
 	const { classes } = this.props;
         return (
 		<div>
-		<Grid container spacing={2}>
-		    <Grid item xs={2}>
-		        <Grid container spacing={0}>
+		<div className={classes.appBarSpacer} />
+		<Grid container spacing={2} alignItems='center'>
+		    <Grid item xs={12}>
+		        <Grid container spacing={2} alignItems='flex-start'>
 		            <Grid item xs={12}>
-		                <div className={classes.appBarSpacer} />
-		                <div className={classes.appBarSpacer} />
-	                    </Grid>
-		            <Grid item xs={12} style={{display: "flex", justifyContent: "flex-end"}}>
-		                <Link onClick={() => this.setState({'showPage': 1})}>
-		                    Quick Start
- 	                        </Link>
-                            </Grid>
-		            <Grid item xs={12} style={{display: "flex", justifyContent: "flex-end"}}>
-                                <Link onClick={() => this.setState({'showPage': 2})}>
-                                    Page 2
-                                </Link>
-		            </Grid>
-	                </Grid>
-		    </Grid>
-		    <Grid item xs={10}>
-		        <Grid container spacing={2}>
-		            <Grid item xs={12}>
-		{
-		    {		    
-		    	1: <Page1 />
-		    }[this.state.showPage]
-		    
-		}
+		               Page 2
 	                    </Grid>
 	                </Grid>
                     </Grid>
 		</Grid>
-		<div className={classes.appBarSpacer} />
-		<div className={classes.appBarSpacer} />
 	    </div>
         );
     }
 }
 
-Tutorial.propTypes = {
+Page2.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Tutorial);
+export default withStyles(styles)(Page2);

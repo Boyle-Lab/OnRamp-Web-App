@@ -11,8 +11,11 @@ import ContactSupportIcon from '@material-ui/icons/ContactSupport';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import BugReportIcon from '@material-ui/icons/BugReport';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
+import ClassIcon from '@material-ui/icons/Class';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
+import Link from '@material-ui/core/Link';
+
 import ErrorContent from './ErrorContent';
 
 /*
@@ -57,12 +60,46 @@ const styles = theme => ({
 });
 
 function HelpContent(props) {
-    const { classes } = props;
+    const { classes, handleChange } = props;
 
     return (
 	    
 	    <Paper className={classes.root}>
 	    <Grid container className={classes.root} spacing={0}>
+
+	{/* Tutorial Link */}
+        <Grid item xs={12}>
+            <Grid container alignItems="center">
+                <Grid item xs={2} className={classes.centerAligned}>
+                    <Tooltip title="View the tutorial.">
+                      <IconButton
+        color="inherit"
+	onClick={() => handleChange({ 'showTutorial': true,
+				      'showHelpDialog': false,
+				      'showLandingPage': false,
+				      'showResults': false })}
+                      >
+                          <ClassIcon fontSize="large"/>
+                      </IconButton>
+                    </Tooltip>
+                </Grid>
+                <Grid item xs={10} className={classes.leftAligned}>
+                    <Tooltip title="View the tutorial.">
+                        <Typography container="div" align="left">
+                            View the tutorial:<br/>
+                            <Link
+	                        onClick={() => handleChange({ 'showTutorial': true,
+							      'showHelpDialog': false,
+							      'showLandingPage': false,
+							      'showResults': false })}>
+	                        Click here!
+	                    </Link>
+                        </Typography>
+                    </Tooltip>
+                </Grid>
+            </Grid>
+          <Divider/>
+        </Grid>
 	    
 	{/* GitHub Link */}
 	<Grid item xs={12}>
