@@ -159,7 +159,8 @@ class App extends Component {
 		    "showResults": true,
 		    "sessionName": res.data.data.name,
 		    "runParams": res.data.data.runParams,
-		    "showLandingPage": false
+		    "showLandingPage": false,
+		    "showTutorial": false
 		});
             })
             .catch(error => {
@@ -220,7 +221,7 @@ class App extends Component {
 	            name={"How to Get Help"}
 	            open={this.state.showHelpDialog}
 	            onClose={() => this.updateStateSettings("showHelpDialog", false)}
-	            content=<HelpContent/>
+	            content=<HelpContent handleChange={this._updateStateSettings}/>
 		    maxWidth={'md'}
 	        />
 		</div>
