@@ -197,6 +197,7 @@ class App extends Component {
 		                <StartRunWrapper
 	                            dataIsLoaded={this.state.dataIsLoaded}
 	                            updateParentState={this.updateStateSettings}
+			            updateParentStates={this._updateStateSettings}
 			            setCookie={this.setCookie}
 			        />
 			   }
