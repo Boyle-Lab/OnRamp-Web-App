@@ -56,6 +56,9 @@ RUN cd /home/node && git clone https://github.com/Boyle-Lab/bulk_plasmid_seq_web
 COPY configure.sh /root/configure.sh
 RUN cd /root && bash configure.sh
 
+# Copy server health check script to /usr/local/bin
+COPY server_health_check.sh /usr/local/bin
+
 # The container should run npm start from the root directory of the app wihtin the medaka conda env.
 COPY bootstrap_server.sh /usr/local/bin
 CMD bootstrap_server.sh
