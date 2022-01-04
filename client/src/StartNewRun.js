@@ -103,7 +103,7 @@ class StartNewRun extends Component {
 		this.updateStateSettings("medakaModels", models.models);
 		// We will now use the default model indicated in the pipeline.
 		//this.updateStateSettings("medakaSelectedModel", models.default_model);
-		this.props.updateParentState("dataIsLoaded", true);
+		this.props.updateParentStates({ "dataIsLoaded": true });
             })
             .catch(error => {
                 console.log(error);
@@ -139,7 +139,7 @@ class StartNewRun extends Component {
     // This is where we call pybedtools to do the intersection.
     processData = (event) => {
 	//console.log(event);
-	this.props.updateParentState("dataIsLoaded", false)
+	this.props.updateParentStates({ "dataIsLoaded": false })
 
 	// We need to pass the two (lists of) files to the backend, along
 	// with all the options. Pack up options for convenience.
@@ -191,20 +191,16 @@ class StartNewRun extends Component {
                   )
             .then(res => {
 		// Display the results in the parent component.
-		this.props.updateParentState("refServerId", res.data.data.refServerId);
-		this.props.updateParentState("resServerId", res.data.data.resServerId);
-		this.props.updateParentState("refFile", res.data.data.refFile);
-		this.props.updateParentState("algnFile", res.data.data.algnFile);
-		//this.props.updateParentState("dataIsLoaded", true);
-		//this.props.updateParentState("resData", res.data.stats);
-		//this.props.updateParentState("showResults", true);
-		this.props.updateParentState("sessionName", res.data.data.name);
-		//this.props.updateParentState("serverPID", res.data.data.PID);
-		this.props.updateParentState("waitingForResults", true);		
+		this.props.updateParentStates({ "refServerId": res.data.data.refServerId,
+						"resServerId": res.data.data.resServerId,
+						"refFile": res.data.data.refFile,
+						"algnFile": res.data.data.algnFile,
+						"sessionName": res.data.data.name,
+						"waitingForResults": true });
 		if (verbose) {
 		    console.log(res.data.data.runParams);
 		}
-		this.props.updateParentState("runParams", res.data.data.runParams);
+		this.props.updateParentStates({ "runParams": res.data.data.runParams });
 		// Set session cookies.
 		this.props.setCookie({
 		    "refServerId": res.data.data.refServerId,
@@ -220,7 +216,7 @@ class StartNewRun extends Component {
 	    })
 	    .catch(error => {
 		console.log(error.response);
-		this.props.updateParentState("dataIsLoaded", true);
+		this.props.updateParentStates({ "dataIsLoaded": true });
                 this.setState({
                     processingErr: error.response.data.message,
                     showErrorDialog: true
@@ -246,9 +242,17 @@ class StartNewRun extends Component {
 			    // Process results
 			    //console.log("done!");
 			    clearInterval(iv);
-			    this.props.updateParentState("dataIsLoaded", true);
-			    this.props.updateParentState("resData", res.data.stats);
-			    this.props.updateParentState("showResults", true);
+			    this.props.updateParentStates({ "dataIsLoaded": true,
+							    "resData": res.data.stats,
+							    "showResults": true,
+							    "showLandingPage": false });
+			    // Delete the fastq input file(s) to free up server space.
+			    axios.delete(apiHost + '/delete',
+					 {
+					     params: {
+						 serverId: readServerId
+					     }
+					 });
 			} else {
 			    // Error
 			    clearInterval(iv);

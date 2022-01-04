@@ -177,7 +177,7 @@ class StartRunWrapper extends Component {
 	        <Grid item xs={9}>
 		<StartNewRun
                     dataIsLoaded={this.props.dataIsLoaded}
-                    updateParentState={this.props.updateParentState}
+                    updateParentStates={this.props.updateParentStates}
                     setCookie={this.props.setCookie}
 	            readServerId={this.state.readServerId}
 	            refServerId={this.state.refServerId}
