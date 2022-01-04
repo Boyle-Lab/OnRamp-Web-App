@@ -261,8 +261,7 @@ router.post('/checkJob', (req, res) => {
 	// Process is not running. See if we have results or an error.
 	checkOutput(res, refServerId, resServerId);
 	//res.status(200).json({ pipelineStatus: "completed" });
-    }
-    
+    }    
 });
 
 // This method retrieves existing data from the server for a session run
