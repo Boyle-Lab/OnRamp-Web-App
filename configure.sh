@@ -47,4 +47,6 @@ grep -qi "find /tmp/ -maxdepth 1 -mmin +1440 -exec rm -rf" $CRON_FILE
 if [ $? != 0 ]; then
     echo "Updating cron job for cleaning temporary files..."
     echo "0 0 * * * find /tmp/ -maxdepth 1 -mmin +1440 -exec rm -rf {} \;" >> $CRON_FILE
+    echo "Updating cron job for server health checks..."
+    echo "0 * * * * server_health_check.sh;" >> $CRON_FILE
 fi
