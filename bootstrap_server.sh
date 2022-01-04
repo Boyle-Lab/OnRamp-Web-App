@@ -12,5 +12,14 @@ else
 fi
 unset __conda_setup
 
+echo "Making sure cron service is running..."
+service cron status
+if [ $? -gt 0 ]; then
+    echo "No cron daemon found. Starting the cron service..."
+    service cron start;
+else
+    echo "Cron daemon is running.";
+fi
+
 echo "Starting the bulk_plasid_seq_web app..."
 cd /home/node/bulk_plasmid_seq_web && conda activate medaka && npm start 1>&2 2> /var/log/bulk_plasmid_seq_web.log
