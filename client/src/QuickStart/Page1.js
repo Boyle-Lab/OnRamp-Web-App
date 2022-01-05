@@ -74,9 +74,12 @@ class Page1 extends Component {
 		            Using On-Ramp is as easy as 1, 2, 3!<br /><br />
 	                </Typography>
 		        <Typography align='left' variant='h6'>
-		            <span className='bold'>1)</span> Upload your sequencing data and plasmid reference files in the drop zone...<br />
-	    <span className='bold'>2)</span> Customize your settings in the control panel, if desired...<br />
+		            <span className='bold'>1)</span> Upload your sequencing data and a reference fasta file for <span className='bold italic'>every plasmid sequenced</span><span className='superscript italic'>*</span> using the drop zone<span className='superscript'>**</span>...<br />
+	                    <span className='bold'>2)</span> Customize your settings in the control panel, if desired...<br />
                             <span className='bold'>3)</span> Click the "Submit" button to start your run!<br /><br />
+    
+                            <span className='small'>* It is <span className='bold italic'>critical</span> to upload a reference fasta file for <span className='bold italic'>all</span> plasmids included in the given sequencing results! Failing to do so will result in improperly mapped sequencing reads that artificially inflate gap and mismatch counts.<br />
+                            ** Sequencing files (<span className='bold italic'>fastq format only</span>) and reference sequences (<span className='bold italic'>fasta format only</span>) may be compressed with gzip to reduce upload times.<br /><br /></span>
                         </Typography>
                         <Typography align='left' variant='h5'>
                             Once your run is submitted, you can sit back and relax! Results will appear as soon as they are ready...
