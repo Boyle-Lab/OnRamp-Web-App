@@ -136,3 +136,15 @@ a:hover {
 	#72479B 100%,
     );
 }
+
+.superscript {
+    vertical-align: super;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.small {
+    font-size: 85%;
+}
