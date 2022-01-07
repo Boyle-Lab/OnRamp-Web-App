@@ -57,7 +57,7 @@ class Tutorial extends Component {
     }
     
     render () {
-	const { classes } = this.props;
+	const { classes, showExampleResults } = this.props;
         return (
 		<div>
 		<Grid container spacing={2}>
@@ -84,7 +84,7 @@ class Tutorial extends Component {
 		            <Grid item xs={12}>
 		{
 		    {		    
-		    	1: <Page1 />
+		    	1: <Page1 showExampleResults={showExampleResults} />
 		    }[this.state.showPage]
 		    
 		}
