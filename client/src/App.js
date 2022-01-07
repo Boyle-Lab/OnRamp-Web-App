@@ -138,6 +138,11 @@ class App extends Component {
 	}
     }
 
+    // Handle requests for the example dataset.
+    handleShowExampleData = () => {
+	this.getCachedResults('example_results', 'example_references', 'combined_ref_seqs.fasta', 'brutish_gearshift');
+    }
+
     // Get a cached result set from the server.
     getCachedResults = (resServerId, refServerId, refFile, sessionName) => {
 	axios.post(apiHost + "/processCachedData",
@@ -192,7 +197,9 @@ class App extends Component {
 			            runParams = {this.state.runParams}
 			        />
 		            : this.state.showTutorial ?
-			        <Tutorial />
+			        <Tutorial
+			            showExampleResults={this.handleShowExampleData}
+			        />
 			    :
 		                <StartRunWrapper
 	                            dataIsLoaded={this.state.dataIsLoaded}
@@ -222,7 +229,9 @@ class App extends Component {
 	            name={"How to Get Help"}
 	            open={this.state.showHelpDialog}
 	            onClose={() => this.updateStateSettings("showHelpDialog", false)}
-	            content=<HelpContent handleChange={this._updateStateSettings}/>
+	            content=<HelpContent
+	                        handleChange={this._updateStateSettings}
+		            />
 		    maxWidth={'md'}
 	        />
 		</div>
