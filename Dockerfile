@@ -59,6 +59,9 @@ RUN cd /root && bash configure.sh
 # Copy server health check script to /usr/local/bin
 COPY server_health_check.sh /usr/local/bin
 
+# Copy example data archives into the /tmp folder
+COPY example_data/*.tar.gz /tmp
+
 # The container should run npm start from the root directory of the app wihtin the medaka conda env.
 COPY bootstrap_server.sh /usr/local/bin
 CMD bootstrap_server.sh
