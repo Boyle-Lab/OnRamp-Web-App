@@ -1,0 +1,12 @@
+pLT.81_eb-SVpmx-spr33-0_gw-r33:
+  fileName: pLT.81_eb-SVpmx-spr33-0_gw-r33.fa
+  cut-site: 30
+  enzyme: SwaI
+pENTR1a-prdm1_DHS30fw:
+  fileName: pENTR1a-prdm1_DHS30fw.fa
+  cut-site: 65
+  enzyme: ZraI
+mp185_pEctrl-si-2-fw:
+  fileName: mp185_pEctrl-si-2-fw.fa
+  cut-site: 65
+  enzyme: ZraI

@@ -1,0 +1,295 @@
+########################################
+# Program: needle
+# Rundate: Wed  5 Jan 2022 19:55:50
+# Commandline: needle
+#    -outfile /tmp/7730856441//consensus_sequences/pENTR1a-prdm1_DHS30fw_0.txt
+#    -asequence /tmp/7730856441//pENTR1a-prdm1_DHS30fw_reference.fasta
+#    -bsequence /tmp/7730856441//consensus_sequences/pENTR1a-prdm1_DHS30fw_0_consensus.fasta
+#    -gapopen 10
+#    -gapextend 0.5
+#    -scircular1 True
+# Align_format: srspair
+# Report_file: /tmp/7730856441/consensus_sequences/pENTR1a-prdm1_DHS30fw_0.txt
+########################################
+
+#=======================================
+#
+# Aligned_sequences: 2
+# 1: pENTR1a-prdm1_DHS30fw
+# 2: pENTR1a-prdm1_DHS30fw_0
+# Matrix: EDNAFULL
+# Gap_penalty: 10.0
+# Extend_penalty: 0.5
+#
+# Length: 3227
+# Identity:    3226/3227 (100.0%)
+# Similarity:  3226/3227 (100.0%)
+# Gaps:           0/3227 ( 0.0%)
+# Score: 16126.0
+# 
+#
+#=======================================
+
+pENTR1a-prdm1      1 CGTCTAACTACTAAGCGAGAGTAGGGAACTGCCAGGCATCAAATAAAACG     50
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1      1 CGTCTAACTACTAAGCGAGAGTAGGGAACTGCCAGGCATCAAATAAAACG     50
+
+pENTR1a-prdm1     51 AAAGGCTCAGTCGGAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGG    100
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1     51 AAAGGCTCAGTCGGAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGG    100
+
+pENTR1a-prdm1    101 TGAACGCTCTCCTGAGTAGGACAAATCCGCCGGGAGCGGATTTGAACGTT    150
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    101 TGAACGCTCTCCTGAGTAGGACAAATCCGCCGGGAGCGGATTTGAACGTT    150
+
+pENTR1a-prdm1    151 GTGAAGCAACGGCCCGGAGGGTGGCGGGCAGGACGCCCGCCATAAACTGC    200
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    151 GTGAAGCAACGGCCCGGAGGGTGGCGGGCAGGACGCCCGCCATAAACTGC    200
+
+pENTR1a-prdm1    201 CAGGCATCAAACTAAGCAGAAGGCCATCCTGACGGATGGCCTTTTTGCGT    250
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    201 CAGGCATCAAACTAAGCAGAAGGCCATCCTGACGGATGGCCTTTTTGCGT    250
+
+pENTR1a-prdm1    251 TTCTACAAACTCTTCCTGTTAGTTAGTTACTTAAGCTCGGGCCCCAAATA    300
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    251 TTCTACAAACTCTTCCTGTTAGTTAGTTACTTAAGCTCGGGCCCCAAATA    300
+
+pENTR1a-prdm1    301 ATGATTTTATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATAA    350
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    301 ATGATTTTATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATAA    350
+
+pENTR1a-prdm1    351 GCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTTTaggc    400
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    351 GCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTTTAGGC    400
+
+pENTR1a-prdm1    401 aggttcatcaggactcactgatggctatggtataggtgagaaaagaaggg    450
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    401 AGGTTCATCAGGACTCACTGATGGCTATGGTATAGGTGAGAAAAGAAGGG    450
+
+pENTR1a-prdm1    451 aaattaaattaggactcctacattttgggaccgaatgactaggtcgcatc    500
+                     |||||||||||||||||||||||||||||||||||||||||||||||||.
+pENTR1a-prdm1    451 AAATTAAATTAGGACTCCTACATTTTGGGACCGAATGACTAGGTCGCATT    500
+
+pENTR1a-prdm1    501 tattcagatggaatagaaagggagaggtataggtttgggggagaagcaag    550
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    501 TATTCAGATGGAATAGAAAGGGAGAGGTATAGGTTTGGGGGAGAAGCAAG    550
+
+pENTR1a-prdm1    551 agttctactttgaccccctacccccactcaaaaaaggtgaactattacta    600
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    551 AGTTCTACTTTGACCCCCTACCCCCACTCAAAAAAGGTGAACTATTACTA    600
+
+pENTR1a-prdm1    601 tctgagatggatgacaagtaggtggttgggtattaagtttggagctcagg    650
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    601 TCTGAGATGGATGACAAGTAGGTGGTTGGGTATTAAGTTTGGAGCTCAGG    650
+
+pENTR1a-prdm1    651 agagaggtaaatactggagttaacacagggatggtgttaaaagccatggg    700
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    651 AGAGAGGTAAATACTGGAGTTAACACAGGGATGGTGTTAAAAGCCATGGG    700
+
+pENTR1a-prdm1    701 atgtgctcatatactgagtgtagctgcagaaacggaaccaaaggctgagc    750
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    701 ATGTGCTCATATACTGAGTGTAGCTGCAGAAACGGAACCAAAGGCTGAGC    750
+
+pENTR1a-prdm1    751 cctgagatatttcaacattaggagtcaaagtagagaagaatcgaaggaaa    800
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    751 CCTGAGATATTTCAACATTAGGAGTCAAAGTAGAGAAGAATCGAAGGAAA    800
+
+pENTR1a-prdm1    801 ctgagaaaggtgctgagttaggaggaaaaccagaagggtgtggtgcccag    850
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    801 CTGAGAAAGGTGCTGAGTTAGGAGGAAAACCAGAAGGGTGTGGTGCCCAG    850
+
+pENTR1a-prdm1    851 tgaagaaagtgtttcaagagtgaaacaaggtgtgatcaaatgtcaaatgc    900
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    851 TGAAGAAAGTGTTTCAAGAGTGAAACAAGGTGTGATCAAATGTCAAATGC    900
+
+pENTR1a-prdm1    901 tgctgagaggccaagcaaggtatcaaaggtaactcaaagtaaacaggtct    950
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    901 TGCTGAGAGGCCAAGCAAGGTATCAAAGGTAACTCAAAGTAAACAGGTCT    950
+
+pENTR1a-prdm1    951 ctcggctctatttcctcatagtgctttatttgcgcctttctcattgcaat   1000
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1    951 CTCGGCTCTATTTCCTCATAGTGCTTTATTTGCGCCTTTCTCATTGCAAT   1000
+
+pENTR1a-prdm1   1001 ttccaagtattatgttgtacagttatttttgtcttctctagtaagaagag   1050
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1001 TTCCAAGTATTATGTTGTACAGTTATTTTTGTCTTCTCTAGTAAGAAGAG   1050
+
+pENTR1a-prdm1   1051 aaggtcccttaagatcaacagaccatgtcttgttcttcctagaacttcca   1100
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1051 AAGGTCCCTTAAGATCAACAGACCATGTCTTGTTCTTCCTAGAACTTCCA   1100
+
+pENTR1a-prdm1   1101 ctactctatttgctcaacaaatgtttgaataaacagatgaatcgtggaat   1150
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1101 CTACTCTATTTGCTCAACAAATGTTTGAATAAACAGATGAATCGTGGAAT   1150
+
+pENTR1a-prdm1   1151 tctataaaatctaggacaatatgcctatcatagaattagcagttagagct   1200
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1151 TCTATAAAATCTAGGACAATATGCCTATCATAGAATTAGCAGTTAGAGCT   1200
+
+pENTR1a-prdm1   1201 ggttttattgagatgttctaaatgttctgcccagaattaaagatgtccac   1250
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1201 GGTTTTATTGAGATGTTCTAAATGTTCTGCCCAGAATTAAAGATGTCCAC   1250
+
+pENTR1a-prdm1   1251 cgtatatctgagttggattactgacaatcgcaacccatcaggcatttcta   1300
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1251 CGTATATCTGAGTTGGATTACTGACAATCGCAACCCATCAGGCATTTCTA   1300
+
+pENTR1a-prdm1   1301 tttttttgctccaatatcgcatgcactatccagtccacaaattacttagt   1350
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1301 TTTTTTTGCTCCAATATCGCATGCACTATCCAGTCCACAAATTACTTAGT   1350
+
+pENTR1a-prdm1   1351 tttggccgggtgccgtggctcatgcctgtaatcccaATCTAGACCCAGCT   1400
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1351 TTTGGCCGGGTGCCGTGGCTCATGCCTGTAATCCCAATCTAGACCCAGCT   1400
+
+pENTR1a-prdm1   1401 TTCTTGTACAAAGTTGGCATTATAAGAAAGCATTGCTTATCAATTTGTTG   1450
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1401 TTCTTGTACAAAGTTGGCATTATAAGAAAGCATTGCTTATCAATTTGTTG   1450
+
+pENTR1a-prdm1   1451 CAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTGCCATCCAG   1500
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1451 CAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTGCCATCCAG   1500
+
+pENTR1a-prdm1   1501 CTGCAGCTCTGGCCCGTGTCTCAAAATCTCTGATGTTACATTGCACAAGA   1550
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1501 CTGCAGCTCTGGCCCGTGTCTCAAAATCTCTGATGTTACATTGCACAAGA   1550
+
+pENTR1a-prdm1   1551 TAAAAATATATCATCATGAACAATAAAACTGTCTGCTTACATAAACAGTA   1600
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1551 TAAAAATATATCATCATGAACAATAAAACTGTCTGCTTACATAAACAGTA   1600
+
+pENTR1a-prdm1   1601 ATACAAGGGGTGTTATGAGCCATATTCAACGGGAAACGTCGAGGCCGCGA   1650
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1601 ATACAAGGGGTGTTATGAGCCATATTCAACGGGAAACGTCGAGGCCGCGA   1650
+
+pENTR1a-prdm1   1651 TTAAATTCCAACATGGATGCTGATTTATATGGGTATAAATGGGCTCGCGA   1700
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1651 TTAAATTCCAACATGGATGCTGATTTATATGGGTATAAATGGGCTCGCGA   1700
+
+pENTR1a-prdm1   1701 TAATGTCGGGCAATCAGGTGCGACAATCTATCGCTTGTATGGGAAGCCCG   1750
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1701 TAATGTCGGGCAATCAGGTGCGACAATCTATCGCTTGTATGGGAAGCCCG   1750
+
+pENTR1a-prdm1   1751 ATGCGCCAGAGTTGTTTCTGAAACATGGCAAAGGTAGCGTTGCCAATGAT   1800
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1751 ATGCGCCAGAGTTGTTTCTGAAACATGGCAAAGGTAGCGTTGCCAATGAT   1800
+
+pENTR1a-prdm1   1801 GTTACAGATGAGATGGTCAGACTAAACTGGCTGACGGAATTTATGCCTCT   1850
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1801 GTTACAGATGAGATGGTCAGACTAAACTGGCTGACGGAATTTATGCCTCT   1850
+
+pENTR1a-prdm1   1851 TCCGACCATCAAGCATTTTATCCGTACTCCTGATGATGCATGGTTACTCA   1900
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1851 TCCGACCATCAAGCATTTTATCCGTACTCCTGATGATGCATGGTTACTCA   1900
+
+pENTR1a-prdm1   1901 CCACTGCGATCCCCGGAAAAACAGCATTCCAGGTATTAGAAGAATATCCT   1950
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1901 CCACTGCGATCCCCGGAAAAACAGCATTCCAGGTATTAGAAGAATATCCT   1950
+
+pENTR1a-prdm1   1951 GATTCAGGTGAAAATATTGTTGATGCGCTGGCAGTGTCCCTGCGCCGGTT   2000
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   1951 GATTCAGGTGAAAATATTGTTGATGCGCTGGCAGTGTCCCTGCGCCGGTT   2000
+
+pENTR1a-prdm1   2001 GCATTCGATTCCTGTTTGTAATTGTCCTTTTAACAGCGATCGCGTATTTC   2050
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2001 GCATTCGATTCCTGTTTGTAATTGTCCTTTTAACAGCGATCGCGTATTTC   2050
+
+pENTR1a-prdm1   2051 GTCTCGCTCAGGCGCAATCACGAATGAATAACGGTTTGGTTGATGCGAGT   2100
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2051 GTCTCGCTCAGGCGCAATCACGAATGAATAACGGTTTGGTTGATGCGAGT   2100
+
+pENTR1a-prdm1   2101 GATTTTGATGACGAGCGTAATGGCTGGCCTGTTGAACAAGTCTGGAAAGA   2150
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2101 GATTTTGATGACGAGCGTAATGGCTGGCCTGTTGAACAAGTCTGGAAAGA   2150
+
+pENTR1a-prdm1   2151 AATGCATAAACTTTTGCCATTCTCACCGGATTCAGTCGTCACTCATGGTG   2200
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2151 AATGCATAAACTTTTGCCATTCTCACCGGATTCAGTCGTCACTCATGGTG   2200
+
+pENTR1a-prdm1   2201 ATTTCTCACTTGATAACCTTATTTTTGACGAGGGGAAATTAATAGGTTGT   2250
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2201 ATTTCTCACTTGATAACCTTATTTTTGACGAGGGGAAATTAATAGGTTGT   2250
+
+pENTR1a-prdm1   2251 ATTGATGTTGGACGAGTCGGAATCGCAGACCGATACCAGGATCTTGCCAT   2300
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2251 ATTGATGTTGGACGAGTCGGAATCGCAGACCGATACCAGGATCTTGCCAT   2300
+
+pENTR1a-prdm1   2301 CCTATGGAACTGCCTCGGTGAGTTTTCTCCTTCATTACAGAAACGGCTTT   2350
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2301 CCTATGGAACTGCCTCGGTGAGTTTTCTCCTTCATTACAGAAACGGCTTT   2350
+
+pENTR1a-prdm1   2351 TTCAAAAATATGGTATTGATAATCCTGATATGAATAAATTGCAGTTTCAT   2400
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2351 TTCAAAAATATGGTATTGATAATCCTGATATGAATAAATTGCAGTTTCAT   2400
+
+pENTR1a-prdm1   2401 TTGATGCTCGATGAGTTTTTCTAATCAGAATTGGTTAATTGGTTGTAACA   2450
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2401 TTGATGCTCGATGAGTTTTTCTAATCAGAATTGGTTAATTGGTTGTAACA   2450
+
+pENTR1a-prdm1   2451 TTATTCAGATTGGGCCCCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGA   2500
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2451 TTATTCAGATTGGGCCCCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGA   2500
+
+pENTR1a-prdm1   2501 TCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTG   2550
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2501 TCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTG   2550
+
+pENTR1a-prdm1   2551 CAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGA   2600
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2551 CAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGA   2600
+
+pENTR1a-prdm1   2601 GCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATAC   2650
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2601 GCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATAC   2650
+
+pENTR1a-prdm1   2651 CAAATACTGTTCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAAC   2700
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2651 CAAATACTGTTCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAAC   2700
+
+pENTR1a-prdm1   2701 TCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGC   2750
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2701 TCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGC   2750
+
+pENTR1a-prdm1   2751 TGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGAT   2800
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2751 TGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGAT   2800
+
+pENTR1a-prdm1   2801 AGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACA   2850
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2801 AGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACA   2850
+
+pENTR1a-prdm1   2851 CAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCG   2900
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2851 CAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCG   2900
+
+pENTR1a-prdm1   2901 TGAGCTATGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGT   2950
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2901 TGAGCTATGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGT   2950
+
+pENTR1a-prdm1   2951 ATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCA   3000
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   2951 ATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCA   3000
+
+pENTR1a-prdm1   3001 GGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTG   3050
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   3001 GGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTG   3050
+
+pENTR1a-prdm1   3051 ACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGA   3100
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   3051 ACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGA   3100
+
+pENTR1a-prdm1   3101 AAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCT   3150
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   3101 AAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCT   3150
+
+pENTR1a-prdm1   3151 TTTGCTCACATGTTCTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCG   3200
+                     ||||||||||||||||||||||||||||||||||||||||||||||||||
+pENTR1a-prdm1   3151 TTTGCTCACATGTTCTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCG   3200
+
+pENTR1a-prdm1   3201 TATTACCGCTAGCATGGATCTCGGGGA   3227
+                     |||||||||||||||||||||||||||
+pENTR1a-prdm1   3201 TATTACCGCTAGCATGGATCTCGGGGA   3227
+
+
+#---------------------------------------
+#---------------------------------------
