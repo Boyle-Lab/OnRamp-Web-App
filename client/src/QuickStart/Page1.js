@@ -56,7 +56,7 @@ class Page1 extends Component {
     }
     
     render () {
-	const { classes } = this.props;
+	const { classes, showExampleResults } = this.props;
         return (
 		<div>
 		<div className={classes.appBarSpacer} />
@@ -94,8 +94,11 @@ class Page1 extends Component {
                         <Typography align='left' variant='h6'>
     <span className='bold'>1)</span> The Results Table summarizes results with color codes to show at a glance which plasmids are of high quality and which may have issues, such as gaps or mismatches. Detailed metrics used in calculating quality scores for each plasmid, including overall sequencing coverage, mismatches, and gap counts, can be found in each row. You can get even more in-depth by viewing the reference and consensus sequences and their pairwise alignments to see where substitutions and gaps occurred.<br />
                             <span className='bold'>2)</span> Action buttons enable you to visualize your results in the integrated IGV browser, download results for local analysis, and view run parameters.<br />
-                            <span className='bold'>3)</span> Navigation buttons: the storage icon gives you access to all datasets submitted in the last 24 hours, and a click on the home icon will return you to the start page where you can submit more datasets for analysis!<br />
-                        </Typography>
+                            <span className='bold'>3)</span> Navigation buttons: the storage icon gives you access to all datasets submitted in the last 24 hours, and a click on the home icon will return you to the start page where you can submit more datasets for analysis!<br /><br />
+    </Typography>
+    <Typography align='left' variant='h5' style={{fontWeight: "bold"}}>
+    <Link onClick={ () => showExampleResults() }>Click here to view example results in the app!</Link>
+</Typography>
                     </Grid>
                 </Grid>
                 <div className={classes.appBarSpacer} />
