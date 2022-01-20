@@ -72,11 +72,6 @@ class Tutorial extends Component {
 		                    Quick Start
  	                        </Link>
                             </Grid>
-		            <Grid item xs={12} style={{display: "flex", justifyContent: "flex-end"}}>
-                                <Link onClick={() => this.setState({'showPage': 2})}>
-                                    Page 2
-                                </Link>
-		            </Grid>
 	                </Grid>
 		    </Grid>
 		    <Grid item xs={10}>
