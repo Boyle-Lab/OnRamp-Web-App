@@ -26,7 +26,7 @@ CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
 
 const host = window.location.protocol + "//" + window.location.host;
-const apiHost = host + '/api';
+const apiHost = window.location.protocol + "//" + window.location.hostname + ':3001/api';
 
 class Downloader extends Component {
     constructor(props) {
