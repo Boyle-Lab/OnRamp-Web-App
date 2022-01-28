@@ -9,9 +9,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Link from '@material-ui/core/Link';
 
-import SplashImage from './images/splash-image.svg';
-import StartButton from './images/StartButton.svg';
-
 /*
 This code is part of the CGIMP distribution
 (https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
@@ -34,6 +31,8 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 
 // This toggles several console.log messages for dubugging purposes.
 const verbose = false;
+const host = window.location.protocol + "//" + window.location.host;
+const apiHost = window.location.protocol + "//" + window.location.hostname + ':3001/api';
 
 const styles = theme => ({
     root: {
@@ -48,49 +47,53 @@ const styles = theme => ({
 });
 
 
-class LandingPage extends Component {
+class Tutorial_Submit extends Component {
     constructor(props) {
         super(props);
 	this.state = {
         };
     }
-    
+
     render () {
 	const { classes } = this.props;
         return (
 		<div>
-		<Grid container spacing={2} alignItems='center'>
-		<Grid item xs={12}>
 		<div className={classes.appBarSpacer} />
-		<img src={SplashImage} width="900"/>
+		<Grid container spacing={2} alignItems='flex-start' alignContent='flex-start'>
+		    <Grid item xs={12}>
+		        <Typography variant="h4">
+		            Step 5: Submit your Run
+	                </Typography>
+		    </Grid>
+                    <Grid item xs={12}>
+
+                        <Typography align="left" variant="h5">
+		            With your data uploaded and run parameters selected, you are now ready to submit your run for analysis. This is done with a simple button click!
+	                </Typography>
+	    
+	            </Grid>
+		    <Grid item xs={12}>
+	    
+	                <Typography align="left" variant="h6">
+		            <span className='bold'>1: Click the "Submit" button.<br/></span>
+		Clicking the submit button will initiate the data analysis on the server side. While you are waiting, you will see a spinner icon that will remain until the analysis is finished and results are ready to view. A typical analysis may take anywhere from 3-15 minutes to complete.<br/><br/>
+		        </Typography>
+	    
+                        <Typography align="left" variant="h6">
+                            Once your analysis has completed, the results will load on the results display and you are ready for the next step...<br/>
+                            <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_result'}) } className={classes.icon}>View your Results</Link><br/>
+                        </Typography>
+	    
+	    
+                    </Grid>
 		</Grid>
-		<Grid item xs={12}>
-		<Typography variant='h4'>
-		Click Below to Get Started!
-	        </Typography>
-		</Grid>
-		<Grid item xs={12}>
-		<Tooltip title="Get Started!">
-		<Link onClick={() => this.props.updateParentState('showLandingPage', false)}>
-		<img src={StartButton} width="100" className={classes.icon}/>
-		</Link>
-                </Tooltip>		
-		</Grid>
-		<Grid item xs={12}>
-		<Typography variant="h5">
-		<span className='bold'>On-Ramp (Oxford-Nanopore based Rapid Analysis of Multiplexed Plasmids)</span> is your one-stop shop for rapid analysis of plasmid sequencing data. Just upload your files, choose your options, and submit your analysis to the cloud! Results for most datasets are ready in minutes, including key quality metrics such as sequencing coverage, gaps, and mismatch counts, and you can dive deep into your data with access to sequence alignments and an integrated IGV Browser view at your fingertips. With features like these, it's no wonder On-Ramp is quickly becoming the cloud's most popular plasmid sequencing app. <span className='bold'>Click the animated circle to join the revolution!</span>
-	    </Typography>
-	    </Grid>
-		</Grid>
-		<div className={classes.appBarSpacer} />
-		<div className={classes.appBarSpacer} />
 	    </div>
         );
     }
 }
 
-LandingPage.propTypes = {
+Tutorial_Submit.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(LandingPage);
+export default withStyles(styles)(Tutorial_Submit);

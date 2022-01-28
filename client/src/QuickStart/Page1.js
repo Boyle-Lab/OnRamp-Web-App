@@ -97,7 +97,7 @@ class Page1 extends Component {
                             <span className='bold'>3)</span> Navigation buttons: the storage icon gives you access to all datasets submitted in the last 24 hours, and a click on the home icon will return you to the start page where you can submit more datasets for analysis!<br /><br />
     </Typography>
     <Typography align='left' variant='h5' style={{fontWeight: "bold"}}>
-    <Link onClick={ () => showExampleResults() }>Click here to view example results in the app!</Link>
+    <Link onClick={ () => showExampleResults() } className={classes.icon}>Click here to view example results in the app!</Link>
 </Typography>
                     </Grid>
                 </Grid>

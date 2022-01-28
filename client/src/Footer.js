@@ -8,9 +8,9 @@ import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 
-import BoyleLabIcon from './boyle-lab-logo_diag-BL.svg';
-import OnRampLogo from './ONRAMP-logo.small.svg';
-import MichiganMedicineLogo from './Michigan-Medicine_Logo-Stacked-White.svg';
+import BoyleLabIcon from './images/boyle-lab-logo_diag-BL.svg';
+import OnRampLogo from './images/ONRAMP-logo.small.svg';
+import MichiganMedicineLogo from './images/Michigan-Medicine_Logo-Stacked-White.svg';
 
 function Copyright() {
   return (
@@ -49,7 +49,7 @@ export default function StickyFooter() {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
+	  <CssBaseline />
 	  <footer className={classes.footer}>
 	  <Grid container spacing={2} alignItems='center'>
 	  <Grid item xs={1}>
@@ -78,7 +78,7 @@ export default function StickyFooter() {
           </Tooltip>
           </Grid>
 	  </Grid>
-      </footer>
+	  </footer>
     </div>
   );
 }
