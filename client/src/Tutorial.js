@@ -22,6 +22,7 @@ import Tutorial_Enzymes from './QuickStart/Tutorial_Enzymes';
 import Tutorial_Params from './QuickStart/Tutorial_Params';
 import Tutorial_Submit from './QuickStart/Tutorial_Submit';
 import Tutorial_Result from './QuickStart/Tutorial_Result';
+import Tutorial_LoadStored from './QuickStart/Tutorial_LoadStored';
 import Tutorial_Conclusion from './QuickStart/Tutorial_Conclusion';
 
 import Page3 from './QuickStart/Page3';
@@ -162,6 +163,12 @@ class Tutorial extends Component {
       	      	   	      	      	   </Grid>
 
                                            <Grid item xs={12} style={{display: "flex", justifyContent: "flex-end"}}>
+                                               <Link onClick={() => this.setState({'showPage': 'tutorial_stored'})} className={classes.icon}>
+                                                   Stored Sessions
+                                               </Link>
+                                           </Grid>
+	    
+                                           <Grid item xs={12} style={{display: "flex", justifyContent: "flex-end"}}>
                                                <Link onClick={() => this.setState({'showPage': 'tutorial_conclusion'})} className={classes.icon}>
                                                    Conclusion
                                                </Link>
@@ -280,6 +287,7 @@ class Tutorial extends Component {
 					tutorial_params: <Tutorial_Params updateParentState={this.updateStates} />,
 					tutorial_submit: <Tutorial_Submit updateParentState={this.updateStates} />,
 					tutorial_result: <Tutorial_Result updateParentState={this.updateStates} />,
+					tutorial_stored: <Tutorial_LoadStored updateParentState={this.updateStates} />,
 					tutorial_conclusion: <Tutorial_Conclusion updateParentState={this.updateStates} />,
 					3: <Page3 />,
 					4: <Page4 />,

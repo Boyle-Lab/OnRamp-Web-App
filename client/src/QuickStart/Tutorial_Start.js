@@ -89,7 +89,7 @@ class Tutorial_Start extends Component {
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>2: Decompress the archived example data files.<br/></span>
-		Navigate to the folder you created in step 1 and find the file "example_data.tar.gz". If you are using a Mac, Ctrl-click/right-click and select "Open" to decompress the file. If you are using PC/Windows, you will need to decompress the file using a utility such as <Link href="https://www.7-zip.org" target="_blank" className={classes.icon}>7-Zip</Link> or <Link href="https://www.rarlab.com/" target='_blank' className={classes.icon}>WinRAR</Link>.<br/><br/>
+		Navigate to the folder you created in step 1 and find the file "example_data.tar.gz". If you are using a Mac, Ctrl-click/right-click and select "Open" to decompress the file. If you are using PC/Windows, you will need to decompress the file using a utility such as<Link href="https://www.7-zip.org" target="_blank" className={classes.icon}>7-Zip</Link> or<Link href="https://www.rarlab.com/" target='_blank' className={classes.icon}>WinRAR</Link>.<br/><br/>
                         </Typography>
 
                         <Typography align="left" variant="h6">

@@ -9,8 +9,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Link from '@material-ui/core/Link';
 
-import StartPageImg from './Onramp_StartPage_annotated.png';
-import ResultsPageImg from './Onramp_ResultsPage_annotated.png';
+import StartPageImg from './images/Onramp_StartPage_annotated.png';
+import ResultsPageImg from './images/Onramp_ResultsPage_annotated.png';
 
 /*
 This code is part of the CGIMP distribution

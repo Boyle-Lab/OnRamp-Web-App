@@ -8,6 +8,18 @@ import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Link from '@material-ui/core/Link';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
+import OpenEnzymes from './images/Onramp_Open-Enzymes.png';
+import EnzymesDialog from './images/Onramp_Enzymes-Dialog.png';
+import EnterEnzymes from './images/Onramp_Enter-Enzymes.png';
+import FindEnzymes from './images/Onramp_Find-Enzyme-Offsets.png';
+import CloseEnzymes from './images/Onramp_Close-Enzymes-Dialog.png';
 
 /*
 This code is part of the CGIMP distribution
@@ -68,37 +80,76 @@ class Tutorial_Enzymes extends Component {
                     <Grid item xs={12}>
 
                         <Typography align="left" variant="h5">
-		            The plasmids in the example dataset were linearized for sequencing using restriction enzymes. Therefore, we must specify which restriction enzyme was used for each plasmid using the "Edit Restriction Enzymes" dialog. This step is not necessary for plasmids sequenced using a TN5 transposase tagmentation protocol.
+		            The plasmids in the example dataset were linearized for sequencing using restriction enzymes. Therefore, we must specify which restriction enzyme was used for each plasmid using the "Edit Restriction Enzymes" dialog.
 	                </Typography>
 	    
 	            </Grid>
 		    <Grid item xs={12}>
 	    
 	                <Typography align="left" variant="h6">
-		            <span className='bold'>1: Click the "Edit Restriction Enzymes" button.<br/></span>
-                            This will open the "Edit Restriction Enzymes" dialog.<br/><br/>
+		<span className='bold'>1: Click the "Edit Restriction Enzymes" button.<br/></span>
+		<img src={OpenEnzymes} alt="Open Edit Restriction Enzymes dialog"/><br />
+            This will open the "Edit Restriction Enzymes" dialog.<br/>
+<img src={EnzymesDialog} alt="Restriction Enzymes Dialog"/><br /><br/>
 		        </Typography>
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>2: Use the entry form to enter the restrcition enzyme used for each plasmid.<br/></span>
                             For this experiment, type the restriction enzyme names corresponding to each of the three plasmid reference sequences according to the table below:<br/>
 
-	                    <br/><br/>
+		            <img src={EnterEnzymes} alt="Enter Restriction Enzymes"/><br />
                         </Typography>
 	    
+	                <Table className={classes.table} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>File</TableCell>
+		                    <TableCell align="right">Enzyme</TableCell>
+		                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>mp185_pEctrl-si-2-fw.fa</TableCell>
+		                    <TableCell align="right">ZraI</TableCell>
+		                </TableRow>
+                                <TableRow>
+                                    <TableCell>pENTR1a-prdm1_DHS30fw.fa</TableCell>
+                                    <TableCell align="right">ZraI</TableCell>
+		                </TableRow>
+                                <TableRow>
+                                    <TableCell>pLT.81_eb-SVpmx-spr33-0_gw-r33.fa</TableCell>
+                                    <TableCell align="right">SwaI</TableCell>
+		                </TableRow>
+	                    </TableBody>
+	                </Table>
+	    
                         <Typography align="left" variant="h6">
-                            <span className='bold'>3: Click the "Find Offsets" button.<br/></span>
-                            The On-Ramp engine will now find the location of the recognition site within each of the plasmid sequences, and the corresponding offset will then be shown in the far left column.<br/><br/>
+                            <br/><span className='bold'>3: Click the "Find Offsets" button.<br/></span>
+                            The On-Ramp engine will now find the location of the recognition site within each of the plasmid sequences.<br/>
+                            <img src={FindEnzymes} alt="Find Restriction Enzyme Offsets"/><br/><br/>
                         </Typography>
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>4: Click the "Close Window" button to return to the job submission form.<br/></span>
-                            With the restriction enzyme data successfully entered, you may now close the "Edit Restriction Enzymes" dialog by clicking the "Close Window" button, which will return you to the data submission page.<br/><br/>
+                            Once restriction enzyme sites have been located, their positions will be shown in the "Offset" column.<br/>
+
+                            <img src={CloseEnzymes} alt="Close Enzymes Dialog"/><br />
+	    
+	    If either no sites or multiple sites were found for the given restriction enzyme in any plasmids, an error message will be shown instead. If so, you will need to correct the errors and reclick the "Find Offsets" button. If there are no errors, the "Close Window" button will activate and you may close the "Edit Restriction Enzymes" dialog.<br/><br/>
                         </Typography>
 
+		        <Typography align="left" variant="h6">
+		            <span className='bold'>Tips:</span><br/>
+		            1) If you did not use any restriction enzymes in your sequencing protocol (e.g., if you used a TN5 transposase tagmentation protocol for sequencing), you may skip this step for your own runs.<br/>
+	                    2) You may mix plasmids sequenced with and without restriction enzymes. Just leave the enzyme field blank for plasmids on which they were not used.<br/>
+	                    3) It is possible to include multiple clones of the same plasmid, as long as different restriction enzymes are used to linearize each clone.<br/>
+                            4) Entering incorrect restriction enzyme data or failing to enter restriction enzymes when they were used will cause unreliable mapping results which will negatively affect your results.<br/>
+                            5) You cannot close the "Edit Restriction Enzymes" dialog without first clicking the "Find Offsets" button. If you mistakenly opened the dialog, simply leave all fields blank and follow instructions 3-4. Your results will not be affected.<br/><br/>
 
+	                </Typography>
+		
                         <Typography align="left" variant="h6">
-                            You are now ready to proceed to the next step...<br/>
+                            <span className='bold'>You are now ready to proceed to the next step...</span><br/>
                             <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_params'}) } className={classes.icon}>Choosing Run Parameters</Link><br/>
                         </Typography>
 	    
