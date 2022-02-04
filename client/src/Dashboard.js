@@ -15,10 +15,10 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import StorageIcon from '@material-ui/icons/Storage';
 import HelpIcon from '@material-ui/icons/Help';
 import Tooltip from '@material-ui/core/Tooltip';
-
 import SvgIcon from '@material-ui/core/SvgIcon';
-import { ReactComponent as BoyleLabLogo } from './boyle-lab-logo_diag-BL.svg';
-import OnRampLogo from './ONRAMP-logo.white.svg';
+
+import { ReactComponent as BoyleLabLogo } from './images/boyle-lab-logo_diag-BL.svg';
+import OnRampLogo from './images/ONRAMP-logo.white.svg';
 
 import StickyFooter from './Footer';
 
@@ -167,7 +167,7 @@ class Dashboard extends React.Component {
                         </Tooltip>
 		     </div>}
                 </Toolbar>
-	    <div className={classes.colorBar} />
+	        <div className={classes.colorBar} />
               </AppBar>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
@@ -175,9 +175,7 @@ class Dashboard extends React.Component {
 	            {this.props.content}
                 </Typography>
             </main>
-	    <div>
 	    <StickyFooter />
-	    </div>
         </div>
     );
   }
