@@ -115,7 +115,7 @@ class Tutorial extends Component {
 		                <Link onClick={() => this.setState({'showPage': 1})} className={classes.icon}>
 		                    Quick Start
  	                        </Link>
-                            </Grid>
+                </Grid>
 
 		            <Grid item xs={12} style={{display: "flex", justifyContent: "flex-end"}}>
 		                <Accordion elevation={0}>
@@ -272,7 +272,7 @@ class Tutorial extends Component {
                                 </Link>
                             </Grid>
 		        </Paper>
-	                </Grid>
+	          </Grid>
 		    </Grid>
 
 		    <Grid item xs={10}>
@@ -303,9 +303,9 @@ class Tutorial extends Component {
 				    }[this.state.showPage]
 				    
 				}
-	                    </Grid>
-	                </Grid>
-                    </Grid>
+	              </Grid>
+	          </Grid>
+        </Grid>
 		</Grid>
 		<div className={classes.appBarSpacer} />
 		<div className={classes.appBarSpacer} />
