@@ -38,7 +38,7 @@ pip install biopython
 
 # Unpack the example data archives in /tmp
 cd /tmp
-tar -xvzf example_results.tar.gz
+tar -xzf example_results.tar.gz
 mkdir exmaple_data
 mv example_data.tar.gz example_data/
 
