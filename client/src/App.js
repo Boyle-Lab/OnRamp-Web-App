@@ -140,7 +140,7 @@ class App extends Component {
 
     // Handle requests for the example dataset.
     handleShowExampleData = () => {
-	this.getCachedResults('example_results', 'example_references', 'combined_ref_seqs.fasta', 'brutish_gearshift');
+	this.getCachedResults('example_results', 'example_references', 'combined_ref_seqs.fasta', 'sticky_kilt');
     }
 
     // Get a cached result set from the server.

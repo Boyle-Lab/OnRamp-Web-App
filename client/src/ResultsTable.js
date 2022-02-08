@@ -41,12 +41,14 @@ const styles = theme => ({
 
 function ResultsTable(props) {
     const { classes, names, rows, handleInfoClick, sessionName } = props;
-    const checkQuality = (gapCount, mismatchCount, seqDepth) => {
-	if (gapCount == 0 && mismatchCount == 0 && seqDepth >= 100) {
+    
+    const checkQuality = (gapCount, mismatchCount, seqDepth, seqLen, longestErrRun) => {
+	const errsPerKb = (gapCount + mismatchCount) / (seqLen / 1000);
+	if (errsPerKb <= 1 && longestErrRun <= 2 && seqDepth >= 100) {
 	    return('good');
-	} else if (gapCount == 0 && mismatchCount <=1 && seqDepth >= 50) {
+	} else if ( (gapCount + mismatchCount) <= 6 && longestErrRun <= 3 && seqDepth >= 50) {
 	    return('fair');
-	} else if (gapCount > 0 || mismatchCount > 1 || seqDepth < 50) {
+	} else if ( (gapCount + mismatchCount) > 6 || longestErrRun > 3 || seqDepth < 50) {
 	    return('poor');
 	} else {
 	    return('poor')
@@ -88,8 +90,11 @@ function ResultsTable(props) {
 		    </TableCell>
 		    <TableCell key="2" align="left">
 		        <span className={checkQuality(row.pairwise_algn_stats.gaps_str,
-                                                  row.pairwise_algn_stats.mismatch_count,
-                                                  100)}>
+                                                      row.pairwise_algn_stats.mismatch_count,
+                                                      row.sequencing_cov,
+						      row.pairwise_algn_stats.length,
+						      row.pairwise_algn_stats.longest_err_run
+						     )}>
 		        Length: {row.pairwise_algn_stats.length}<br/>
 		        Gaps: {row.pairwise_algn_stats.gaps_str} ({row.pairwise_algn_stats.gaps_pct.toPrecision(1)}%)<br/>
 		        Mismatches: {row.pairwise_algn_stats.mismatch_count} ({row.pairwise_algn_stats.mismatch_pct.toPrecision(1)}%)<br/>
