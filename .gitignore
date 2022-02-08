@@ -119,3 +119,5 @@ backend/medakaModels.json
 
 # Directory used to monitor dev run resource usage, etc.
 run_stats
+
+example_data/*.orig.*
