@@ -109,15 +109,15 @@ class Tutorial_Enzymes extends Component {
                             </TableHead>
                             <TableBody>
                                 <TableRow>
-                                    <TableCell>mp185_pEctrl-si-2-fw.fa</TableCell>
+                                    <TableCell>mp193_pEctrl-eb-2-fw.fa</TableCell>
 		                    <TableCell align="right">ZraI</TableCell>
 		                </TableRow>
                                 <TableRow>
-                                    <TableCell>pENTR1a-prdm1_DHS30fw.fa</TableCell>
+                                    <TableCell>mp198_pEctrl-eb-8-fw.fa</TableCell>
                                     <TableCell align="right">ZraI</TableCell>
 		                </TableRow>
                                 <TableRow>
-                                    <TableCell>pLT.81_eb-SVpmx-spr33-0_gw-r33.fa</TableCell>
+                                    <TableCell>pLT.76-EB-SVpmx-spr33-F23fw.fa</TableCell>
                                     <TableCell align="right">SwaI</TableCell>
 		                </TableRow>
 	                    </TableBody>
