@@ -93,7 +93,7 @@ class Tutorial_Upload extends Component {
 
 	                    <img src={OpenFasta} alt="Open fasta reference file upload dialog"/><br />
 
-	                    Highlight the three fasta files (pLT.81_eb-SVpmx-spr33-0_gw-r33.fa, pENTR1a-prdm1_DHS30fw.fa, mp185_pEctrl-si-2-fw.fa), then click "Open" to initiate the upload.<br/><br/>
+	    Highlight the three fasta files (mp193_pEctrl-eb-2-fw.fa, mp198_pEctrl-eb-8-fw.fa, and pLT.76-EB-SVpmx-spr33-F23fw.fa), then click "Open" to initiate the upload.<br/><br/>
 
 	                    <img src={UploadFasta} alt="Upload fasta reference sequences"/><br />
 
