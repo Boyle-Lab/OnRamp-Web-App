@@ -97,7 +97,8 @@ if __name__ == "__main__":
                 "gaps_pct": 0,
                 "mismatch_count": 0,
                 "mismatch_pct": 0,
-                "score": 0
+                "score": 0,
+                "longest_err_run": 0
             },
             "quality_metrics": {}
         }
@@ -136,6 +137,8 @@ if __name__ == "__main__":
         # in the header as to which sequence they correspond to. We need a way to track which
         # sequence line we're appending.
         whichSeq = 1
+        # The next variable is used to determine the longest run of consecutive errors.
+        longest_err_run = 0
         with open(pw_algn_seq_fname, 'r') as f:
             for line in f:
                 line.strip('\n')
@@ -190,10 +193,18 @@ if __name__ == "__main__":
                             line = re.sub(replPat, label, line)
                         # Add color codes to sequence string
                         _line = ""
+                        last_nuc = ""
+                        consecutive_errs = 0
                         for nuc in fields[2]:                            
                             _line = _line + nucColors[nuc]
+                            # Also check for runs of gaps and/or mismatches
+                            if nuc in ['.', '-'] and last_nuc in ['.', '-']:
+                                consecutive_errs += 1
+                            last_nuc = nuc
                         replPat = fields[2]
                         line = re.sub(replPat, _line, line)
+                        if consecutive_errs > longest_err_run:
+                            longest_err_run = consecutive_errs
                         if whichSeq == 2:
                             line = line + '\n'
                             whichSeq = 1
@@ -202,6 +213,7 @@ if __name__ == "__main__":
             #sys.stderr.write("%s" % res["pairwise_algn_seq"])
             #sys.stderr.write("%s\n" % res["pairwise_algn_stats"]["mismatch_count"])
             res["pairwise_algn_stats"]["mismatch_pct"] = (res["pairwise_algn_stats"]["mismatch_count"] / res["pairwise_algn_stats"]["length"]) * 100
+            res["pairwise_algn_stats"]["longest_err_run"] = longest_err_run
 
         # Push the data to the return array
         ret.append(res)
