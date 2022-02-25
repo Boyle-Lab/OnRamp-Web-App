@@ -736,7 +736,8 @@ runAnalysis = async function(req, res) {
 	res.status(500).json({ message: 'Error combining reference files: ' + error });
 	return;
     }
-    resData["refFile"] = 'combined_ref_seqs.fasta';
+    //resData["refFile"] = 'combined_ref_seqs.fasta';
+    resData["refFile"] = 'rotated_reference.fasta';
     
     // We'll run the main pipeline on the server as a background
     // job, returning the process ID for monitoring purposes.
