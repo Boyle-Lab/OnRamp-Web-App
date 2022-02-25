@@ -106,16 +106,23 @@ if __name__ == "__main__":
         sys.stderr.write("%s\n" % fasta_file)
         fasta_fname = os.path.basename(fasta_file)
         fasta_fname_root = os.path.splitext(fasta_fname)[0]
+        seqname = fasta_fname_root
 
         # Retrieve the fasta filename and squence.
         f = open(fasta_file, 'r')
-        res["input_fasta_name"] = fasta_fname
+        #res["input_fasta_name"] = fasta_fname
         res["input_fasta_seq"] = f.read()
         f.close()
         #sys.stderr.write("%s\n" % res["input_fasta_seq"])
+        match = re.search('^>(\S+)', res["input_fasta_seq"])
+        if match:
+            res["input_fasta_name"] = match.group(1)
+            seqname = match.group(1)
+        else:
+            res["input_fasta_name"] = fasta_fname
 
         # Store the precomputed sequencing coverage.
-        res["sequencing_cov"] = seq_coverages[fasta_fname_root]
+        res["sequencing_cov"] = seq_coverages[seqname]
 
         # Get the consensus sequence filename and sequence.
         consensus_seq_fname = glob(args.consensus_path + '/' + fasta_fname_root + '*.fasta')[0] # SHOULD only return one file!
