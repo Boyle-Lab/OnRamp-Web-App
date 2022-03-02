@@ -15,6 +15,8 @@ import FileRenameAlert from './FileRenameAlert';
 import PropTypes from 'prop-types';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 
+import ReactGA from 'react-ga';
+
 /*
 This code is part of the CGIMP distribution
 (https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
@@ -138,7 +140,7 @@ class StartNewRun extends Component {
     
     // This is where we call pybedtools to do the intersection.
     processData = (event) => {
-	//console.log(event);
+	//console.log(event);	
 	this.props.updateParentStates({ "dataIsLoaded": false })
 
 	// We need to pass the two (lists of) files to the backend, along
@@ -163,6 +165,12 @@ class StartNewRun extends Component {
 	    name: this.state.name,
 	    trim: this.state.trim
 	}
+
+	// Send an event to Google Analytics.
+	ReactGA.event({
+	    category: 'User',
+	    action: 'start_new_analysis'
+	});
 
 	// Server method only needs the file names and locations. Passing the full filepond
 	// object appears not to work, so pull out the necessary information here and pass
