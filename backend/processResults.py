@@ -95,6 +95,7 @@ if __name__ == "__main__":
                 "similarity_pct": 0,
                 "gaps_str": "",
                 "gaps_pct": 0,
+                "gaps_count": 0,
                 "mismatch_count": 0,
                 "mismatch_pct": 0,
                 "score": 0,
@@ -103,7 +104,7 @@ if __name__ == "__main__":
             "quality_metrics": {}
         }
         
-        sys.stderr.write("%s\n" % fasta_file)
+        #sys.stderr.write("%s\n" % fasta_file)
         fasta_fname = os.path.basename(fasta_file)
         fasta_fname_root = os.path.splitext(fasta_fname)[0]
         seqname = fasta_fname_root
@@ -137,7 +138,7 @@ if __name__ == "__main__":
         # Process the pairwise alignment. We need the summary stats and the alignment string.
         pw_algn_seq_fname = glob(args.consensus_path + '/' + fasta_fname_root + '*.txt')[0] # SHOULD only return one file!
         res["pairwise_algn_name"] = os.path.basename(pw_algn_seq_fname)
-        sys.stderr.write("%s\n" % pw_algn_seq_fname)
+        #sys.stderr.write("%s\n" % pw_algn_seq_fname)
 
         # Since sequence names are truncated at 13 characters, creating possible ambiguity,
         # we will replace sequence line labels with "Seq 1" or "Seq 2", which are identified
@@ -146,6 +147,13 @@ if __name__ == "__main__":
         whichSeq = 1
         # The next variable is used to determine the longest run of consecutive errors.
         longest_err_run = 0
+        # Keep track of the overall number of runs of contiguous gap characters.
+        gap_count = 0
+        # Keep track of the last nucleotide we examined in each seq (this needs to be maintained across lines!)
+        last_nuc = {
+            1: "",
+            2: ""
+        }
         with open(pw_algn_seq_fname, 'r') as f:
             for line in f:
                 line.strip('\n')
@@ -198,16 +206,19 @@ if __name__ == "__main__":
                             replPat = label
                             label = label + ' ' * lineLenDiff
                             line = re.sub(replPat, label, line)
-                        # Add color codes to sequence string
+                        # Add color codes to sequence string and count stretches of mismatches/gaps
                         _line = ""
-                        last_nuc = ""
                         consecutive_errs = 0
-                        for nuc in fields[2]:                            
+                        #sys.stderr.write("%s\n" % fields[2])
+                        for nuc in fields[2]:         
                             _line = _line + nucColors[nuc]
                             # Also check for runs of gaps and/or mismatches
-                            if nuc in ['.', '-'] and last_nuc in ['.', '-']:
+                            if nuc in ['.', '-'] and last_nuc[whichSeq] in ['.', '-']:
                                 consecutive_errs += 1
-                            last_nuc = nuc
+                            if nuc == '-' and last_nuc[whichSeq] != '-':
+                                gap_count += 1
+                                #sys.stderr.write("nuc: %s, last_nuc: %s, gap_count: %d\n" % (nuc, last_nuc[whichSeq], gap_count))
+                            last_nuc[whichSeq] = nuc
                         replPat = fields[2]
                         line = re.sub(replPat, _line, line)
                         if consecutive_errs > longest_err_run:
@@ -221,6 +232,7 @@ if __name__ == "__main__":
             #sys.stderr.write("%s\n" % res["pairwise_algn_stats"]["mismatch_count"])
             res["pairwise_algn_stats"]["mismatch_pct"] = (res["pairwise_algn_stats"]["mismatch_count"] / res["pairwise_algn_stats"]["length"]) * 100
             res["pairwise_algn_stats"]["longest_err_run"] = longest_err_run
+            res["pairwise_algn_stats"]["gaps_count"] = gap_count
 
         # Push the data to the return array
         ret.append(res)

@@ -54,7 +54,7 @@ function ResultsTable(props) {
 	    return('poor')
 	}
     }
-
+    console.log(rows);
     return (
 	    <div>
 	    <p className='leftAlignedBold'>
@@ -96,7 +96,8 @@ function ResultsTable(props) {
 						      row.pairwise_algn_stats.longest_err_run
 						     )}>
 		        Length: {row.pairwise_algn_stats.length}<br/>
-		    Gaps: {row.pairwise_algn_stats.gaps_str} ({row.pairwise_algn_stats.gaps_pct.toFixed(1)}%)<br/>
+		    Gap Positions: {row.pairwise_algn_stats.gaps_str} ({row.pairwise_algn_stats.gaps_pct.toFixed(1)}%)<br/>
+		    Gap Count: {row.pairwise_algn_stats.gaps_count}<br/>
 		    Mismatches: {row.pairwise_algn_stats.mismatch_count} ({row.pairwise_algn_stats.mismatch_pct.toFixed(1)}%)<br/>
 		        Sequencing Depth: {row.sequencing_cov}
 		        </span>
