@@ -15,6 +15,10 @@ import Tutorial from './Tutorial';
 
 import axios from "axios";
 
+//Google Analytics:
+import ReactGA from 'react-ga';
+import RouteChangeTracker from './RouteChangeTracker';
+
 /*
 This code is part of the bulk_plasmid_seq_web distribution
 (https://github.com/Boyle-Lab/bulk_plasmid_seq_web) and is governed by its license.
@@ -33,6 +37,12 @@ GNU General Public License for more details.
 
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
+
+// Google Analytics setup
+const TRACKING_ID = "G-9VCV3457HJ";
+ReactGA.initialize(TRACKING_ID);
+
+// Cookies for cached results
 const _cookies = new Cookies();
 
 // To enable debugging messages, set this to true.
