@@ -197,9 +197,9 @@ function HelpContent(props) {
 	                <span className='leftAlignedBold'>
 	                  Please use the following citation if you use this tool in your work:
 	                </span><br/>
-                          Bulk Plasmid Sequencing Paper.<br/>
-	                  Mumm, C.R., some other folks, Boyle, A.P.<br/>
-	                  Journal of Cool Stuff. 21 (10), 11 October 2021.
+	                  On-Ramp: a tool for rapid, multiplexed validation of plasmids using nanopore sequencing.<br/>
+                          Camille Mumm, Melissa L Drexel, Torrin L McDonald, Adam Diehl, Jessica A Switzenberg, and Alan P Boyle. 
+	                  BIORXIV/2022/484480.
 	              </Typography>
 	          </Tooltip>
                 </Grid>
