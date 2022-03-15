@@ -195,7 +195,10 @@ class App extends Component {
 	           title={this.state.mainTitle}
 	           controls={<div></div>}
  	           content={this.state.showLandingPage ?
-		     <LandingPage updateParentState={this.updateStateSettings}/>
+	           <LandingPage
+                       updateParentState={this._updateStateSettings}
+		       showExampleResults={this.handleShowExampleData}
+                   />
 		     : this.state.showResults ?
 		                <ResultsDisplay
                                     updateParentState={this.updateStateSettings}

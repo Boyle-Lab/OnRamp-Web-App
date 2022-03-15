@@ -71,15 +71,24 @@ class LandingPage extends Component {
 		</Grid>
 		<Grid item xs={12}>
 		<Tooltip title="Get Started!">
-		<Link onClick={() => this.props.updateParentState('showLandingPage', false)}>
+		<Link onClick={() => this.props.updateParentState({'showLandingPage': false})}>
 		<img src={StartButton} width="100" className={classes.icon}/>
 		</Link>
                 </Tooltip>		
 		</Grid>
 		<Grid item xs={12}>
 		<Typography variant="h5">
-		<span className='bold'>On-Ramp (Oxford-Nanopore based Rapid Analysis of Multiplexed Plasmids)</span> is your one-stop shop for rapid analysis of plasmid sequencing data. Just upload your files, choose your options, and submit your analysis to the cloud! Results for most datasets are ready in minutes, including key quality metrics such as sequencing coverage, gaps, and mismatch counts, and you can dive deep into your data with access to sequence alignments and an integrated IGV Browser view at your fingertips. With features like these, it's no wonder On-Ramp is quickly becoming the cloud's most popular plasmid sequencing app. <span className='bold'>Click the animated circle to join the revolution!</span>
-	    </Typography>
+		    <span className='bold'>On-Ramp (Oxford-Nanopore based Rapid Analysis of Multiplexed Plasmids)</span> is your one-stop shop for rapid analysis of plasmid sequencing data. Just upload your files, choose your options, and submit your analysis to the cloud! Results for most datasets are ready in minutes, including quality metrics such as sequencing coverage, gaps, and mismatch counts, and easy access to sequence alignments and an integrated IGV Browser view at your fingertips. <span className='bold'>Click the animated circle to get started!</span>
+	        </Typography>
+		</Grid>
+                <Grid item xs={12}>
+                <Typography variant="h5">
+		<span className='bold'>Not ready yet? Try this instead...</span><br/>
+		<Link onClick={() => this.props.updateParentState({ 'showLandingPage': false,
+								    'showTutorial': true })} className={classes.icon}>View the quick-start guide and interactive tutorial.</Link><br/>
+		<Link onClick={ () => this.props.showExampleResults() } className={classes.icon}>Take a look at some example results.</Link>
+	        </Typography>
+
 	    </Grid>
 		</Grid>
 		<div className={classes.appBarSpacer} />
