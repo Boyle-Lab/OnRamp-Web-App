@@ -12,12 +12,9 @@ import GenericDialog from './GenericDialog';
 import HelpContent from './HelpContent';
 import LandingPage from './LandingPage';
 import Tutorial from './Tutorial';
-
 import axios from "axios";
 
-//Google Analytics:
-import ReactGA from 'react-ga';
-import RouteChangeTracker from './RouteChangeTracker';
+import gtag from 'ga-gtag';
 
 /*
 This code is part of the bulk_plasmid_seq_web distribution
@@ -37,10 +34,6 @@ GNU General Public License for more details.
 
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
-
-// Google Analytics setup
-const TRACKING_ID = "G-9VCV3457HJ";
-ReactGA.initialize(TRACKING_ID);
 
 // Cookies for cached results
 const _cookies = new Cookies();
@@ -145,12 +138,20 @@ class App extends Component {
 	if (data.useCached) {
 	    const cookie = _cookies.get(data.useCached);
 	    this.getCachedResults(cookie.resServerId, cookie.refServerId, cookie.refFile, cookie.name);
+	    // Send an event to Google Analytics.
+	    gtag('event', 'load_cached_results', {
+		resServerId: cookie.resServerId
+            });
 	}
     }
 
     // Handle requests for the example dataset.
     handleShowExampleData = () => {
 	this.getCachedResults('example_results', 'example_references', 'rotated_reference.fasta', 'sticky_kilt');
+	// Send an event to Google Analytics.
+	gtag('event', 'load_example_results', {
+	    resServerId: 'example_results'
+        });
     }
 
     // Get a cached result set from the server.
@@ -247,7 +248,7 @@ class App extends Component {
 		            />
 		    maxWidth={'md'}
 	        />
-		</div>
+	        </div>
 	);
     }
 }

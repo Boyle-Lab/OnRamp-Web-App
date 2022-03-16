@@ -14,6 +14,8 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 
+import gtag from 'ga-gtag';
+
 import Page1 from './QuickStart/Page1';
 
 import Tutorial_Start from './QuickStart/Tutorial_Start';
@@ -81,6 +83,11 @@ class Tutorial extends Component {
 	this.state = {
 	    showPage: 1
         };
+    }
+
+    componentDidMount() {
+	// Send an event to Google Analytics.
+        gtag('event', 'show_tutorial');
     }
 
     updateStates = (data) => {

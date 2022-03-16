@@ -3,8 +3,8 @@
 import React, { Component } from "react";
 import LoadAlertDialog from './LoadAlert';
 import Tooltip from '@material-ui/core/Tooltip';
-
 import axios from "axios";
+import gtag from 'ga-gtag';
 
 /*
 This code is part of the bulk_plasmid_seq_web distribution
@@ -37,6 +37,10 @@ class Downloader extends Component {
     }
     
     downloadResults = () => {
+	// Send an event to Google Analytics.
+        gtag('event', 'download_results', {
+           serverId: this.props.serverId
+        });
 	this.setState({ working: true });
 	axios.post(apiHost + '/prepareResults',
 		   { serverId: this.props.serverId }

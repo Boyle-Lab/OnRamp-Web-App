@@ -54,7 +54,6 @@ function ResultsTable(props) {
 	    return('poor')
 	}
     }
-    console.log(rows);
     return (
 	    <div>
 	    <p className='leftAlignedBold'>
