@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom';
 import ReactGA from 'react-ga';
 
-const history = createBrowserHistory();
+const RouteChangeTracker = ({ history }) => {
     
     history.listen((location, action) => {
 	console.log(location, action);

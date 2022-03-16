@@ -246,7 +246,8 @@ class App extends Component {
 		            />
 		    maxWidth={'md'}
 	        />
-		</div>
+                <RouteChangeTracker/>
+	        </div>
 	);
     }
 }
