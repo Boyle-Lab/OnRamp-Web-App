@@ -106,7 +106,9 @@ class Tutorial_LoadStored extends Component {
 	    
                         <Typography align="left" variant="h6">
                             <span className='bold'>You have now completed the tutorial! Continue to the conclusions...</span><br/>
-                            <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_conclusion'}) } className={classes.icon}>Conclusion</Link><br/>
+        <Link onClick={ () => { this.props.updateParentState({'showPage': 'tutorial_conclusion'});
+				// Send an event to Google Analytics.
+				gtag('event', 'finish_tutorial');} } className={classes.icon}>Conclusion</Link><br/>
                         </Typography>
 	    
 	    

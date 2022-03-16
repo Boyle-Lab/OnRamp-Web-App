@@ -15,7 +15,7 @@ import FileRenameAlert from './FileRenameAlert';
 import PropTypes from 'prop-types';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 
-import ReactGA from 'react-ga';
+import gtag from 'ga-gtag';
 
 /*
 This code is part of the CGIMP distribution
@@ -167,9 +167,8 @@ class StartNewRun extends Component {
 	}
 
 	// Send an event to Google Analytics.
-	ReactGA.event({
-	    category: 'User',
-	    action: 'start_new_analysis'
+	gtag('event', 'submit_new_run', {
+	    mode: this.state.mode
 	});
 
 	// Server method only needs the file names and locations. Passing the full filepond

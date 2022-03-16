@@ -54,7 +54,14 @@ class Tutorial_Start extends Component {
         };
     }
 
+    componentDidMount() {
+        // Send an event to Google Analytics.
+        gtag('event', 'start_tutorial');
+    }
+
     downloadData = () => {
+	// Send an event to Google Analytics.
+        gtag('event', 'download_example_data');
         const downloadURL = apiHost + '/downloadResults' +
               '?serverId=' + 'example_data' +
               '&fileName=' + 'example_data.tar.gz'

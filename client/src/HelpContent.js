@@ -18,6 +18,8 @@ import Link from '@material-ui/core/Link';
 
 import ErrorContent from './ErrorContent';
 
+import gtag from 'ga-gtag';
+
 /*
 This code is part of the bulk_plasmid_seq_web distribution
 (https://github.com/Boyle-Lab/) and is governed by its license.
@@ -62,6 +64,9 @@ const styles = theme => ({
 function HelpContent(props) {
     const { classes, handleChange } = props;
 
+    // Send an event to Google Analytics.
+    gtag('event', 'show_help');
+    
     return (
 	    
 	    <Paper className={classes.root}>
