@@ -39,8 +39,7 @@ CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
 
 // Google Analytics setup
-const TRACKING_ID = "G-9VCV3457HJ";
-ReactGA.initialize(TRACKING_ID);
+ReactGA.initialize( "G-9VCV3457HJ");
 
 // Cookies for cached results
 const _cookies = new Cookies();
