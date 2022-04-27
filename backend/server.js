@@ -468,7 +468,7 @@ catFastaFiles = function(_refFiles, refPath, outPath) {
     return new Promise((resolve, reject) => {
 	exec(filesToCat.join(' '), (error, stdout, stderr) => {
             if (error) {
-		console.log(err);
+		console.log(error);
 		reject(error);
             } else {
 		resolve();
