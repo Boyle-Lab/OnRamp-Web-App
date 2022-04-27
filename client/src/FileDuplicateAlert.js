@@ -50,7 +50,7 @@ const styles = theme => ({
 
 
 //function OptsTable(props) {
-class FileRenameAlert extends Component {
+class FileDuplicateAlert extends Component {
     constructor(props) {
 	super(props);
     }
@@ -62,12 +62,17 @@ class FileRenameAlert extends Component {
 		<Grid container className={classes.root} spacing={2}>
 		    <Grid item xs={12}>
 		        <Typography container="div" align="center" className={classes.bold}>
-		            We noticed one or more of your file names contains space characters...
+		            We noticed you have uploaded duplicate reference sequence files...
 		        </Typography>
 		    </Grid>
 		    <Grid item xs={12}>
 		        <Typography container="div" align="center">
-		            This will cause runtime errors in the analysis pipeline, so we have renamed the affected files:
+		            Duplicated reference sequences will be omitted from results unless they were linearized with different restriction enzymes. Please make sure you provide accurate restriction enzyme information for these files!**
+	                </Typography>
+		    </Grid>
+		    <Grid item xs={12}>
+	                <Typography container="div" align="center">
+	                    To ensure that the pipeline runs properly, we have renamed the affected files:
 	                </Typography>
 		    </Grid>
 
@@ -92,13 +97,18 @@ class FileRenameAlert extends Component {
 	                    </Table>
 	                </Paper>
 		    </Grid>
+                <Grid item xs={12}>
+		<Typography container="div" align="left">
+		** Please note that any previously-supplied restriction enzyme data for affected files must be reentered using the "Edit Restriction Enzymes" dialog.
+		 </Typography>
+	    </Grid>
 	        </Grid>
 	);
     }
 }
 
-FileRenameAlert.propTypes = {
+FileDuplicateAlert.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(FileRenameAlert);
+export default withStyles(styles)(FileDuplicateAlert);
