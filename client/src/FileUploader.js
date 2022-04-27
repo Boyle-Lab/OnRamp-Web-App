@@ -32,9 +32,6 @@ const apiHost = host + '/api';
 
 const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, updateParentState }) => {
 
-    // Object to track renamed files.
-    const renamedFiles = {};
-    
     // Create a reference to watch for events in the filepond
     const pond = React.useRef(null);
 
@@ -85,18 +82,40 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
         });
     });
 
-    /* This listener watches for duplicate filenames and renames
-       by appending '..._1...', '..._2...', etc., tags to the file
-       name root. */
+    /* This listener watches for duplicate and space-containg filenames and renames
+       by appending '..._1...', '..._2...', etc., tags to the filename, for duplicates,
+       and replacing spaces with underscores. */
     React.useEffect(() => {
         pond.current._pond.on('processfile', (file, error) => {
             if (error && verbose) {
                 //console.log(error);
             }
+	    const filenames = getFilenames(pond.current._pond);
+	    const files = pond.current._pond.getFiles();
+	    let renamedFiles = {};
+	    
+	    // Check for spaces in file names. These will choke medaka.
+            const _filenames = checkForSpaces(filenames);
+            files.forEach( (file, index) => {
+                if (_filenames[index] !== file.file.name) {
+                    // File was renamed. Replace the original with the renamed file.                                           
+                    const renamedFile = renameFile(file.file, _filenames[index]);
+                    pond.current._pond.addFile(renamedFile);
+                    pond.current._pond.removeFile(file);
+                    // Keep track of what we've renamed.                                                                       
+                    renamedFiles[_filenames[index]] = file.file.name;
+                }
+            });
+            if (Object.keys(renamedFiles).length > 0) {
+                updateParentState("renamedFiles", renamedFiles);
+                updateParentState("showRenameFilesAlert", true);
+            }
+	    
 	    // Check for duplicate file names and rename as needed.
 	    if (checkForDuplicates(pond.current._pond)) {
-		const files = pond.current._pond.getFiles();
-		let filenames = getFilenames(pond.current._pond);
+		// Object to track renamed files.
+		renamedFiles = {};
+
 		files.forEach( (file, index) => {
 		    //console.log(file.file.name);
 		    if (filenames.lastIndexOf(file.filename) > filenames.indexOf(file.filename)) {
@@ -138,11 +157,10 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 		    // This triggers a rerender, which, for some reason, triggers
 		    // deletion of one of the copied files.
 		    updateParentState("renamedFiles", renamedFiles);
-                    updateParentState("showRenameFilesAlert", true);
+                    updateParentState("showDuplicateFilesAlert", true);
 		}
 	    }
         });
-	
     });
 
     if (verbose) {
@@ -208,5 +226,15 @@ function renameFile(file, name) {
     renamedFile.name = name;
     return renamedFile;
 };
+
+function checkForSpaces(filenames) {
+    // Check for spaces in file names and replace with _ chars.
+    let _filenames = filenames;
+    const re = / /g;
+    filenames.forEach( (file, index) => {
+	_filenames[index] = file.replace(re, '_');
+    });
+    return(_filenames);
+}
 
 export default FileUploader;

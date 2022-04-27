@@ -7,6 +7,7 @@ import REOptsTable from './REOptsTable'
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import FileRenameAlert from './FileRenameAlert';
+import FileDuplicateAlert from './FileDuplicateAlert';
 import StartNewRun from './StartNewRun';
 import FileUploadWrapper from './FileUploadWrapper';
 import REOpts from './REOpts';
@@ -168,10 +169,16 @@ class StartRunWrapper extends Component {
 	        />
 		<GenericDialog
 	            name={'Warning!'}
-	            open={this.state.showRenameFilesAlert}
-	            onClose={() => this.updateStateSettings("showRenameFilesAlert", false)}
-	            content=<FileRenameAlert data={this.state.renamedFiles}/>
+	            open={this.state.showDuplicateFilesAlert}
+	            onClose={() => this.updateStateSettings("showDuplicateFilesAlert", false)}
+	            content=<FileDuplicateAlert data={this.state.renamedFiles}/>
 		/>
+		<GenericDialog
+                    name={'Warning!'}
+                    open={this.state.showRenameFilesAlert}
+                    onClose={() => this.updateStateSettings("showRenameFilesAlert", false)}
+                    content=<FileRenameAlert data={this.state.renamedFiles}/>
+                />
 		</Grid>
 
 	        <Grid item xs={9}>

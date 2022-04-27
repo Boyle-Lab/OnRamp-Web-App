@@ -2,6 +2,7 @@
 
 import React, { Component } from "react";
 import axios from "axios";
+import gtag from 'ga-gtag';
 
 /*
 This code is part of the bulk_plasmid_seq_web distribution
@@ -34,6 +35,10 @@ class IgvBrowser extends Component {
     }
 
     componentDidMount() {
+	// Send an event to Google Analytics.
+        gtag('event', 'view_in_igv', {
+           serverId: this.props.resServerId
+        });
 	const igvDiv = document.getElementById("igv-div");
 	let options =
 	    {
