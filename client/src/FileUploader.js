@@ -90,22 +90,12 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
             if (error && verbose) {
                 //console.log(error);
             }
-	    const filenames = getFilenames(pond.current._pond);
-	    const files = pond.current._pond.getFiles();
+
+	    // To keep track of files we've renamed
 	    let renamedFiles = {};
 	    
 	    // Check for spaces in file names. These will choke medaka.
-            const _filenames = checkForSpaces(filenames);
-            files.forEach( (file, index) => {
-                if (_filenames[index] !== file.file.name) {
-                    // File was renamed. Replace the original with the renamed file.                                           
-                    const renamedFile = renameFile(file.file, _filenames[index]);
-                    pond.current._pond.addFile(renamedFile);
-                    pond.current._pond.removeFile(file);
-                    // Keep track of what we've renamed.                                                                       
-                    renamedFiles[_filenames[index]] = file.file.name;
-                }
-            });
+            renamedFiles = checkForSpaces(pond);
             if (Object.keys(renamedFiles).length > 0) {
                 updateParentState("renamedFiles", renamedFiles);
                 updateParentState("showRenameFilesAlert", true);
@@ -227,14 +217,31 @@ function renameFile(file, name) {
     return renamedFile;
 };
 
-function checkForSpaces(filenames) {
+function checkForSpaces(pond) {
     // Check for spaces in file names and replace with _ chars.
+    const filenames = getFilenames(pond.current._pond);
+    const files = pond.current._pond.getFiles();
+    
     let _filenames = filenames;
+    let renamedFiles = {};
+    
     const re = / /g;
     filenames.forEach( (file, index) => {
 	_filenames[index] = file.replace(re, '_');
     });
-    return(_filenames);
+
+    files.forEach( (file, index) => {
+        if (_filenames[index] !== file.file.name) {
+            // File was renamed. Replace the original with the renamed file.
+            const renamedFile = renameFile(file.file, _filenames[index]);
+            pond.current._pond.addFile(renamedFile);
+            pond.current._pond.removeFile(file);
+            // Keep track of what we've renamed.
+            renamedFiles[_filenames[index]] = file.file.name;
+        }
+    });
+    
+    return(renamedFiles);
 }
 
 export default FileUploader;
