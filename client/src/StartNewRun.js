@@ -220,7 +220,8 @@ class StartNewRun extends Component {
 	    })
 	    .catch(error => {
 		console.log(error.response);
-		this.props.updateParentStates({ "dataIsLoaded": true });
+		this.props.updateParentStates({ "dataIsLoaded": true,
+						"waitingForResults": false });
                 this.setState({
                     processingErr: error.response.data.message,
                     showErrorDialog: true
@@ -264,6 +265,13 @@ class StartNewRun extends Component {
 		    })
 		    .catch(error => {
 			console.log(error);
+			clearInterval(iv);
+			this.props.updateParentStates({ "dataIsLoaded": true,
+							"waitingForResults": false });
+			this.setState({
+			    processingErr: error.response.data.message,
+			    showErrorDialog: true
+			});
 		    });
 	    }
 	}, 15000);
