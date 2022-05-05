@@ -62,6 +62,7 @@ class StartRunWrapper extends Component {
 	    readFilesLoaded: false,
 	    fastaREData: {},
 	    renamedFiles: {},
+	    duplicatedFiles: {},
 	    showRenameFilesAlert: false
         };
     }
@@ -171,7 +172,7 @@ class StartRunWrapper extends Component {
 	            name={'Warning!'}
 	            open={this.state.showDuplicateFilesAlert}
 	            onClose={() => this.updateStateSettings("showDuplicateFilesAlert", false)}
-	            content=<FileDuplicateAlert data={this.state.renamedFiles}/>
+	            content=<FileDuplicateAlert data={this.state.duplicatedFiles}/>
 		/>
 		<GenericDialog
                     name={'Warning!'}

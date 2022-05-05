@@ -92,23 +92,23 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
             }
 
 	    // To keep track of files we've renamed
-	    const renamedFiles = {};
+	    //const renamedFiles = {};
 	    
 	    // Check for spaces in file names. These will choke medaka.
             let sf = checkForSpaces(pond);
             if (Object.keys(sf).length > 0) {
-		combineDicts(renamedFiles, sf);
-                updateParentState("renamedFiles", renamedFiles);
+		//combineDicts(renamedFiles, sf);
+                updateParentState("renamedFiles", sf);
                 updateParentState("showRenameFilesAlert", true);
             }
 	    
 	    // Check for duplicate file names and rename as needed.
-	    if (checkForDuplicates(pond.current._pond)) {
+	    if (checkForDuplicates(getFilenames(pond.current._pond))) {
 		// Object to track renamed files.
 		let df = renameDuplictes(pond);
 		if (Object.keys(df).length > 0) {
-		    combineDicts(renamedFiles, df);
-		    updateParentState("renamedFiles", renamedFiles);
+		    //combineDicts(renamedFiles, df);
+		    updateParentState("duplicatedFiles", df);
                     updateParentState("showDuplicateFilesAlert", true);
 		}
 	    }
@@ -161,9 +161,8 @@ function createNewFilename(pond, filename) {
     return newFname
 }
 
-function checkForDuplicates(pond) {
+function checkForDuplicates(filenames) {
     // Check the current file pond for duplicate filenames and rename as found.
-    const filenames = getFilenames(pond);
     if (filenames.some((item, index) => index !== filenames.indexOf(item))) {
 	// There are duplicates.
 	return true;
@@ -185,10 +184,10 @@ function renameDuplictes(pond) {
     const files = pond.current._pond.getFiles();
     const filenames = getFilenames(pond.current._pond);
     files.forEach( (file, index) => {
-        //console.log(file.file.name);
 	if (filenames.lastIndexOf(file.filename) > filenames.indexOf(file.filename)) {
             // File is a duplicate. Rename it. Because of filepond quirks,
 	    // we must do this by creating a copy with a new name.
+	    //console.log(file.file.name);
 	    const newFilename = createNewFilename(pond.current._pond, file.file.name);
             const renamedFile = renameFile(file.file, newFilename);
 	    
@@ -220,12 +219,12 @@ function renameFile(file, name) {
     // processing files with spaces in the names that result
     // in duplicate file names. Apparently the file object is
     // not fully-formed when this is issued??
-    console.log(file);
     try {
 	renamedFile = file.slice(0, file.size, file.type);
     } catch(err) {
 	// file object is not fully formed. Not sure why this
 	// happens.
+	//console.log(file);
 	file.name = name;	
 	return file;
     }
@@ -247,10 +246,20 @@ function checkForSpaces(pond) {
 	_filenames[index] = file.replace(re, '_');
     });
 
+    // Check for dupicate filenames and append digits as needed.
+    if (checkForDuplicates(_filenames)) {
+	_filenames.forEach( (filename, index) => {
+	    if (_filenames.lastIndexOf(filename) > _filenames.indexOf(filename)) {
+		const newFilename = createNewFilename(pond.current._pond, filename);
+		_filenames[index] = newFilename;
+	    }
+	});
+    }
+    
     files.forEach( (file, index) => {
         if (_filenames[index] !== file.file.name) {
             // File was renamed. Replace the original with the renamed file.
-	    console.log(file);
+	    //console.log(file);
             const renamedFile = renameFile(file.file, _filenames[index]);
             pond.current._pond.addFile(renamedFile);
             pond.current._pond.removeFile(file);
