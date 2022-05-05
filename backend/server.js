@@ -783,9 +783,15 @@ checkOutput = async function(res, refServerId, resServerId) {
 	    // No BAM found. There was an error.
 
 	    // Process any stored error output and return it along with the json
-	    // ...
-	    res.status(500).json({ pipelineStatus: "error" });
-	    return;
+	    fs.readFile(resPath + 'pipelineProcess.err', 'utf8', (err, data) => {
+		if (err) {
+		    console.log(err);
+		    res.json({ success: false, error: err });
+		    return;
+		}
+		res.status(500).json({ pipelineStatus: "error", message: data });
+		return;
+	    });
 	}
     });
 
