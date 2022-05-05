@@ -526,7 +526,7 @@ runProcessResults = function(refPath, outPath) {
 
 // async function to run the python-based pipeline steps sequentially.
 runAnalysis = async function(req, res) {
-    const { readFiles, readServerId, refFiles, refServerId, renamedFiles, fastaREData, options } = req.body;
+    const { readFiles, readServerId, refFiles, refServerId, fastaREData, options } = req.body;
 
     // Get locations of data on the server.
     const readPath = '/tmp/' + readServerId + '/';
@@ -714,18 +714,16 @@ runAnalysis = async function(req, res) {
     // Write params to console for debug purposes.
     console.log(cmdArgs.join(' '));
     
-    // Update the sequence names within any renamed (duplicate) files.
-    //if (Object.keys(renamedFiles).length > 0) {
-	//console.log("Processing renamed files...");
-        try {
-            await handleRenamed(refPath);
-        } catch(err) {
+    // Make sure fasta sequence names match file names.
+    //console.log("Processing renamed files...");
+    try {
+        await handleRenamed(refPath);
+    } catch(err) {
 	    console.log(err);
-            res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
-	    return;
-        }
-	//console.log('Renamed files processed.');
-    //}
+        res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
+	return;
+    }
+    //console.log('Renamed files processed.');
 
     // After handling renamed files, we need to assemble the combined fasta file
     // for the IGV component. This can run asynchronously since the combined
