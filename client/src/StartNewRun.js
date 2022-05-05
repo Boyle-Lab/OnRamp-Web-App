@@ -10,7 +10,6 @@ import REOptsTable from './REOptsTable'
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import ErrorContent from './ErrorContent';
-import FileRenameAlert from './FileRenameAlert';
 
 import PropTypes from 'prop-types';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
@@ -185,13 +184,11 @@ class StartNewRun extends Component {
 	let resServerId = null;
 	
 	// Call the server method to launch the analysis. Location of results is returned.
-	//console.log(this.props.renamedFiles);
 	axios.post(apiHost + "/processData",
                    { readFiles: readFiles,
 		     readServerId: readServerId,
 		     refFiles: refFiles,
 		     refServerId: refServerId,
-		     renamedFiles: this.props.renamedFiles,
 		     fastaREData: this.props.fastaREData,
                      options: opts
                    }
@@ -223,7 +220,8 @@ class StartNewRun extends Component {
 	    })
 	    .catch(error => {
 		console.log(error.response);
-		this.props.updateParentStates({ "dataIsLoaded": true });
+		this.props.updateParentStates({ "dataIsLoaded": true,
+						"waitingForResults": false });
                 this.setState({
                     processingErr: error.response.data.message,
                     showErrorDialog: true
@@ -267,6 +265,13 @@ class StartNewRun extends Component {
 		    })
 		    .catch(error => {
 			console.log(error);
+			clearInterval(iv);
+			this.props.updateParentStates({ "dataIsLoaded": true,
+							"waitingForResults": false });
+			this.setState({
+			    processingErr: error.response.data.message,
+			    showErrorDialog: true
+			});
 		    });
 	    }
 	}, 15000);

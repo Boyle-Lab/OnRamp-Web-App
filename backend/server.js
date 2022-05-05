@@ -430,10 +430,10 @@ handleGzipped = async function (files, path) {
     }
 }
 
-handleRenamed = function(renamedFiles, path) {
-    // Handle fasta record names within renamed files.
+handleRenamed = function(path) {
+    // Make sure all fasta record names match the file names.
     // Returns a promise.
-    let cmdArgs = [path, JSON.stringify(renamedFiles)]
+    let cmdArgs = [path]
     let options = {
         mode: 'text',
         pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
@@ -499,13 +499,15 @@ runPlasmidSeq = function(cmdArgs) {
 }
 
 runProcessResults = function(refPath, outPath) {
+    let cmdArgs = [refPath, outPath + 'consensus_sequences', outPath + 'filtered_alignment.bam'];
     let options = {
         mode: 'text',
         pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
         pythonOptions: ['-u'],
-        args: [refPath, outPath + 'consensus_sequences', outPath + 'filtered_alignment.bam']
+        args: cmdArgs
     }
 
+    //console.log('processResults.py ' + cmdArgs.join(' '));
     return new Promise((resolve, reject) => {
 	PythonShell.run('processResults.py', options, function (err, resStats) {
             if (err) {
@@ -524,7 +526,7 @@ runProcessResults = function(refPath, outPath) {
 
 // async function to run the python-based pipeline steps sequentially.
 runAnalysis = async function(req, res) {
-    const { readFiles, readServerId, refFiles, refServerId, renamedFiles, fastaREData, options } = req.body;
+    const { readFiles, readServerId, refFiles, refServerId, fastaREData, options } = req.body;
 
     // Get locations of data on the server.
     const readPath = '/tmp/' + readServerId + '/';
@@ -712,18 +714,16 @@ runAnalysis = async function(req, res) {
     // Write params to console for debug purposes.
     console.log(cmdArgs.join(' '));
     
-    // Update the sequence names within any renamed (duplicate) files.
-    if (Object.keys(renamedFiles).length > 0) {
-	//console.log("Processing renamed files...");
-        try {
-            await handleRenamed(renamedFiles, refPath);
-        } catch(err) {
+    // Make sure fasta sequence names match file names.
+    //console.log("Processing renamed files...");
+    try {
+        await handleRenamed(refPath);
+    } catch(err) {
 	    console.log(err);
-            res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
-	    return;
-        }
-	//console.log('Renamed files processed.');
+        res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
+	return;
     }
+    //console.log('Renamed files processed.');
 
     // After handling renamed files, we need to assemble the combined fasta file
     // for the IGV component. This can run asynchronously since the combined
@@ -783,9 +783,15 @@ checkOutput = async function(res, refServerId, resServerId) {
 	    // No BAM found. There was an error.
 
 	    // Process any stored error output and return it along with the json
-	    // ...
-	    res.status(500).json({ pipelineStatus: "error" });
-	    return;
+	    fs.readFile(resPath + 'pipelineProcess.err', 'utf8', (err, data) => {
+		if (err) {
+		    console.log(err);
+		    res.json({ success: false, error: err });
+		    return;
+		}
+		res.status(500).json({ pipelineStatus: "error", message: data });
+		return;
+	    });
 	}
     });
 
