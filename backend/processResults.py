@@ -126,6 +126,7 @@ if __name__ == "__main__":
         res["sequencing_cov"] = seq_coverages[seqname]
 
         # Get the consensus sequence filename and sequence.
+        #sys.stderr.write("%s\n" % (glob(args.consensus_path + '/' + fasta_fname_root + '*.fasta')));
         consensus_seq_fname = glob(args.consensus_path + '/' + fasta_fname_root + '*.fasta')[0] # SHOULD only return one file!
         #sys.stderr.write("%s\n" % consensus_seq_fname)
         f = open(consensus_seq_fname, 'r')

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import sys, os, re
-import json
+from glob import glob
 import argparse
 
 """
@@ -23,8 +23,8 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 """
 
 """
-This script renames sequences within fasta files that have been
-renamed to avoid errors in the pipeline.
+This script changes the fasta sequence name in the fasta
+header to match the file name up to the .fa[.gz.] extension.
 """
 
 if __name__ == "__main__":
@@ -35,20 +35,11 @@ if __name__ == "__main__":
         "fasta_path", type=str,
         help="Path to input reference fasta files."
     )
-    parser.add_argument(
-        "renamed_files_str", type=str,	
-        help="JSON string with renamed file info."
-    )
     
     args = parser.parse_args()
 
-    # First thing is to convert the renamed_files_str into a dict.
-    renamed_files = json.loads(args.renamed_files_str)
-
-    # Loop over renamed files to change the seq names within.
-    for filename in renamed_files.keys():
-        file_path = args.fasta_path + '/' + filename
-        #sys.stderr.write("%s\n" % file_path)
+    # Loop over fasta files to change the seq names within.
+    for file_path in glob(args.fasta_path + '/*'):
 
         # We will use a string to build the new fasta record,
         # then later write it to a file.
@@ -60,7 +51,8 @@ if __name__ == "__main__":
                 if match:
                     # Description line.
                     #sys.stderr.write("%s\n" % match.group(1))
-                    new_name = filename.split('.')[0]
+                    new_name = os.path.splitext(os.path.basename(file_path))[0]
+                    #sys.stderr.write("%s\n" % new_name)
                     new_line = re.sub(match.group(1), new_name, line)
                     #sys.stderr.write("%s\n" % new_line)
                     new_fasta_str = new_fasta_str + new_line
