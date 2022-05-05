@@ -92,11 +92,12 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
             }
 
 	    // To keep track of files we've renamed
-	    let renamedFiles = {};
+	    const renamedFiles = {};
 	    
 	    // Check for spaces in file names. These will choke medaka.
-            renamedFiles = checkForSpaces(pond);
-            if (Object.keys(renamedFiles).length > 0) {
+            let sf = checkForSpaces(pond);
+            if (Object.keys(sf).length > 0) {
+		combineDicts(renamedFiles, sf);
                 updateParentState("renamedFiles", renamedFiles);
                 updateParentState("showRenameFilesAlert", true);
             }
@@ -104,52 +105,14 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 	    // Check for duplicate file names and rename as needed.
 	    if (checkForDuplicates(pond.current._pond)) {
 		// Object to track renamed files.
-		renamedFiles = {};
-
-		files.forEach( (file, index) => {
-		    //console.log(file.file.name);
-		    if (filenames.lastIndexOf(file.filename) > filenames.indexOf(file.filename)) {
-			// File is a duplicate. Rename it.
-			const newFilename = createNewFilename(pond.current._pond, file.file.name);
-
-			// Setting filename directly does not work. "no setter" even though I
-			// hacked the filepond code to add one :-/
-			//file.filename = newFilename;
-			//console.log(file.filename);
-
-			// Because we can't access the file name directly, we must create
-			// a copy of the original with the new name.
-			// This creates a copy of the duplicate file with a new name
-			const renamedFile = renameFile(file.file, newFilename);
-
-			// We have to add the renamed file and remove the original
-			pond.current._pond.addFile(renamedFile);
-			pond.current._pond.removeFile(file);
-
-			/*
-			// Refresh the list of files so we don't rename both copies.
-                        //filenames = getFilenames(pond.current._pond);
-			
-			Because of the collision between file names between duplicates,
-			the file removal above causes deletion of the original file on
-			the server. However, if we rename both files, we can avoid
-			having a file in the pond without a corresponding file on the
-			server. This is sort of a hack, but seems to be the best we can
-			do for now.
-			*/
-
-			// Keep track of what we've renamed.
-			renamedFiles[newFilename] = file.file.name;
-		    }
-		});
-		//console.log(renamedFiles);
-		if (Object.keys(renamedFiles).length > 0) {
-		    // This triggers a rerender, which, for some reason, triggers
-		    // deletion of one of the copied files.
+		let df = renameDuplictes(pond);
+		if (Object.keys(df).length > 0) {
+		    combineDicts(renamedFiles, df);
 		    updateParentState("renamedFiles", renamedFiles);
                     updateParentState("showDuplicateFilesAlert", true);
 		}
 	    }
+	    
         });
     });
 
@@ -210,8 +173,62 @@ function checkForDuplicates(pond) {
     }
 }
 
+function renameDuplictes(pond) {
+    // Rename any duplicate filenames in the pond to avoid collisions
+    // in the analysis pipeline. The net result is that both files are
+    // renamed with _1, _2, etc., added to the root name. Because of
+    // complexities with file deletions triggered by rerenders, etc.,
+    // it is problematic to rename only one of the files. Therefore
+    
+    const renamedFiles = {};
+    
+    const files = pond.current._pond.getFiles();
+    const filenames = getFilenames(pond.current._pond);
+    files.forEach( (file, index) => {
+        //console.log(file.file.name);
+	if (filenames.lastIndexOf(file.filename) > filenames.indexOf(file.filename)) {
+            // File is a duplicate. Rename it. Because of filepond quirks,
+	    // we must do this by creating a copy with a new name.
+	    const newFilename = createNewFilename(pond.current._pond, file.file.name);
+            const renamedFile = renameFile(file.file, newFilename);
+	    
+            // Add the renamed file and remove the original
+            pond.current._pond.addFile(renamedFile);
+            pond.current._pond.removeFile(file);
+	    
+            // Keep track of what we've renamed.
+            renamedFiles[newFilename] = file.file.name;
+        }
+    });
+    return(renamedFiles);
+}
+
 function renameFile(file, name) {
-    const renamedFile = file.slice(0, file.size, file.type);
+    // Creates a renamed file as a copy from the file given
+
+    /* 
+       Filepond has no file name setter and I was unable to
+       hack one in, despite mutliple tries. Therefore, this
+       is the only way to rename files in the pond.
+
+       Because we can't access the file name directly, we must
+       create  a copy of the original with the new name.
+    */
+    let renamedFile;
+    // The try/catch block is here to address the error
+    // 'file.slice is not a function' that comes up when
+    // processing files with spaces in the names that result
+    // in duplicate file names. Apparently the file object is
+    // not fully-formed when this is issued??
+    console.log(file);
+    try {
+	renamedFile = file.slice(0, file.size, file.type);
+    } catch(err) {
+	// file object is not fully formed. Not sure why this
+	// happens.
+	file.name = name;	
+	return file;
+    }
     renamedFile.lastModifiedDate = file.lastModifiedDate;
     renamedFile.name = name;
     return renamedFile;
@@ -223,7 +240,7 @@ function checkForSpaces(pond) {
     const files = pond.current._pond.getFiles();
     
     let _filenames = filenames;
-    let renamedFiles = {};
+    const renamedFiles = {};
     
     const re = / /g;
     filenames.forEach( (file, index) => {
@@ -233,6 +250,7 @@ function checkForSpaces(pond) {
     files.forEach( (file, index) => {
         if (_filenames[index] !== file.file.name) {
             // File was renamed. Replace the original with the renamed file.
+	    console.log(file);
             const renamedFile = renameFile(file.file, _filenames[index]);
             pond.current._pond.addFile(renamedFile);
             pond.current._pond.removeFile(file);
@@ -242,6 +260,17 @@ function checkForSpaces(pond) {
     });
     
     return(renamedFiles);
+}
+
+function combineDicts(dest_dict, source_dict) {
+    // Add records from source_dict to dest_dict
+    Object.keys(source_dict).forEach( (key, index) => {
+	if (key in dest_dict) {
+	    // Do nothing
+	} else {
+	    dest_dict[key] = source_dict[key];
+	}
+    });    
 }
 
 export default FileUploader;
