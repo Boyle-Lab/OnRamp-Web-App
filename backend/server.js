@@ -778,27 +778,32 @@ checkOutput = async function(res, refServerId, resServerId) {
 
     // Check for the final BAM alignment. If this is present, the analysis
     // completed successfully and we can process and return results.
-    await fs.access(resPath + 'filtered_alignment.bam', fs.constants.F_OK, (err) => {
+    fs.access(resPath + 'filtered_alignment.bam', fs.constants.F_OK, (err) => {
 	if (err) {
 	    // No BAM found. There was an error.
-
 	    // Process any stored error output and return it along with the json
 	    fs.readFile(resPath + 'pipelineProcess.err', 'utf8', (err, data) => {
 		if (err) {
-		    console.log(err);
-		    res.json({ success: false, error: err });
+		    res.status(500).json({ success: false, error: err });
 		    return;
 		}
 		res.status(500).json({ pipelineStatus: "error", message: data });
 		return;
 	    });
+	} else {
+	    // All is well! Process the output and return results.
+	    processOutput(res, refPath, resPath);
+	    return;
 	}
     });
+}
 
+// Process results for a completed job.
+processOutput = async function(res, refPath, resPath) {
     let resStats = {};
     try {
         resStats = await runProcessResults(refPath, resPath);
-        //console.log("Results processed.");                                                       
+        //console.log("Results processed.");                                          
     } catch(err) {
 	console.log(err)
 	res.status(400).json({ message: err });
