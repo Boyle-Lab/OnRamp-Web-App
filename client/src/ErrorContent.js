@@ -69,9 +69,7 @@ function ErrorContent(props) {
 	        </Grid>
                 <Divider />
 	        <Grid item xs={12} className={classes.centerAligned}>
-	            <Typography	container="div"	align="left">
-	                {error}
-              	    </Typography>
+	            <span className='infoDialog' dangerouslySetInnerHTML={{ __html: error, }}></span>	
                 </Grid>
 	    </Grid>
 	</Paper>
