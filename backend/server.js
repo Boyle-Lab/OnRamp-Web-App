@@ -733,7 +733,7 @@ runAnalysis = async function(req, res) {
 	await catFastaFiles(_refFiles, refPath, outPath);
 	//console.log('Reference fasta files combined.');
     } catch(err) {
-	res.status(500).json({ message: 'Error combining reference files: ' + error });
+	res.status(500).json({ message: 'Error combining reference files: ' + err });
 	return;
     }
     //resData["refFile"] = 'combined_ref_seqs.fasta';
