@@ -91,13 +91,9 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
                 //console.log(error);
             }
 
-	    // To keep track of files we've renamed
-	    //const renamedFiles = {};
-	    
 	    // Check for spaces in file names. These will choke medaka.
             let sf = checkForSpaces(pond);
             if (Object.keys(sf).length > 0) {
-		//combineDicts(renamedFiles, sf);
                 updateParentState("renamedFiles", sf);
                 updateParentState("showRenameFilesAlert", true);
             }
@@ -107,7 +103,6 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
 		// Object to track renamed files.
 		let df = renameDuplictes(pond);
 		if (Object.keys(df).length > 0) {
-		    //combineDicts(renamedFiles, df);
 		    updateParentState("duplicatedFiles", df);
                     updateParentState("showDuplicateFilesAlert", true);
 		}
@@ -151,8 +146,12 @@ function createNewFilename(pond, filename) {
     const filenames = getFilenames(pond);
     let suffix = 1;
     const fnameParts = filename.split('.');
-    const fnameRoot = fnameParts[0];
-    const ext = fnameParts.slice(1,fnameParts.length).join('.');
+    let idx = -1;
+    if (fnameParts[idx] === 'gz') {
+	idx = -2;
+    }
+    const fnameRoot = fnameParts.slice(0,idx).join('.');
+    const ext = fnameParts.slice(idx,fnameParts.length).join('.');
     let newFname = fnameRoot + '_' + suffix + '.' + ext;
     while (filenames.some((item, index) => item === newFname)) {
         suffix++;
@@ -242,9 +241,18 @@ function checkForSpaces(pond) {
     const renamedFiles = {};
     
     const re = / /g;
+    let foundSpaces = false;
     filenames.forEach( (file, index) => {
 	_filenames[index] = file.replace(re, '_');
+	if (_filenames[index] !== file) {
+	    foundSpaces = true;
+	}
     });
+
+    // If we did not find any spaces, nothing to do
+    if (!foundSpaces) {
+	return(renamedFiles);
+    }
 
     // Check for dupicate filenames and append digits as needed.
     if (checkForDuplicates(_filenames)) {
@@ -267,7 +275,6 @@ function checkForSpaces(pond) {
             renamedFiles[_filenames[index]] = file.file.name;
         }
     });
-    
     return(renamedFiles);
 }
 

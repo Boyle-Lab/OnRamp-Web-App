@@ -63,7 +63,8 @@ class StartRunWrapper extends Component {
 	    fastaREData: {},
 	    renamedFiles: {},
 	    duplicatedFiles: {},
-	    showRenameFilesAlert: false
+	    showRenameFilesAlert: false,
+	    showDuplicateFilesAlert: false
         };
     }
     
