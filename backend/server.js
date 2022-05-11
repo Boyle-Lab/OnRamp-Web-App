@@ -61,7 +61,7 @@ router.post('/upload', (req, res) => {
     const serverId = req.query.serverId;
     fs.mkdir('/tmp/' + serverId, { recursive: true }, (err) => {
 	if (err) {
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
 	    res.set('Content-Type', 'application/json');
 	    res.status(500).json({ message: err });
 	    return;
@@ -71,7 +71,7 @@ router.post('/upload', (req, res) => {
 	// callback to avoid send errors.
 	req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
 	    if (err) {
-		console.log(err);
+		console.log(new Date() + ': ' + err);
 		res.set('Content-Type', 'application/json');
 		res.status(500).json({ message: err });
 		return;
@@ -92,11 +92,11 @@ router.delete('/delete', (req, res) => {
     }
     fs.stat(_filePath, (err, stats) => {
 	if (err) {
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
 	} else {
 	    fs.remove(_filePath, (err) => {
 		if (err) {
-		    console.log(err);
+		    console.log(new Date() + ': ' + err);
 		    res.set('Content-Type', 'application/json');
 		    res.status(500).json({ message: err });
 		    return;
@@ -121,7 +121,7 @@ router.post("/getFile", (req, res) => {
     res.set('Content-Type', contentType);
     fs.readFile(fileName, encodingType, (err, data) => {
         if (err) {
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
 	    res.set('Content-Type', 'application/json');
             res.json({ success: false, error: err });
 	    return;
@@ -139,7 +139,7 @@ router.post('/writeJson', (req, res) => {
 	return;
     }
     fs.writeFile(fileName, JSON.stringify(index), (err) => {
-	console.log(err);
+	console.log(new Date() + ': ' + err);
 	res.set('Content-Type', 'application/json');
         res.status(500).json({ message: err });
 	return;
@@ -156,7 +156,7 @@ router.get("/getResult", (req, res) => {
     res.set('Content-Type', contentType);
     fs.readFile(filePath, encodingType, (err, data) => {
         if (err) {
-	    console.log(err);	    
+	    console.log(new Date() + ': ' + err);	    
             res.status(400).json({ message: err });
 	    return;
         }
@@ -173,7 +173,7 @@ router.get("/downloadResults", (req, res) => {
 	     'Content-Disposition': 'attachment; filename=' + fileName});
     fs.readFile(filePath, null, (err, data) => {
         if (err) {
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
 	    res.set('Content-Type', 'application/json');
             res.status(400).json({ message: err });
 	    return;
@@ -199,7 +199,7 @@ router.post("/prepareResults", (req, res) => {
     const outFile = 'bulkPlasmidSeq_' + serverId + '_results.tar.gz';
     exec('tar -czf ' + destPath + outFile + ' ' + resultsPath + '*', (err, stdout, stderr) => {
 	if (err) {
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
 	    res.status(400).json({ message: 'Results retrieval failed: ' + err });
 	    return;
 	}
@@ -218,7 +218,7 @@ router.post('/getMedakaModels', (req, res) => {
 	    let options = {}
 	    PythonShell.run('getMedakaModels.py', options, function (err, results) {
 		if (err) {
-		    console.log(err)
+		    console.log(new Date() + ': ' + err)
 		    res.status(500).json({ message: 'error getting medaka models: ' + err });
 		    return;
 		}
@@ -226,7 +226,7 @@ router.post('/getMedakaModels', (req, res) => {
 		fs.writeFile("medakaModels.json", JSON.stringify(results), (err) => {
 		    if (err) {
 			// File could not be written.
-			console.log(err);
+			console.log(new Date() + ': ' + err);
 		    }
 		});
 		res.status(200).json({ success: true, data: results });
@@ -278,7 +278,7 @@ router.post('/processCachedData', (req, res) => {
     // Get the run params from the stored session.
     fs.readFile(resPath + 'run_params.json', 'utf8', (err, data) => {
 	if (err) {
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
             res.status(500).json({ message: 'Cannot restore session:' + err });
 	    return;
 	}
@@ -302,7 +302,7 @@ router.post('/processCachedData', (req, res) => {
 	
 	PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
             if (err) {
-		console.log(err)
+		console.log(new Date() + ': ' + err)
 		res.status(500).json({ message: err });
 		return;
             } else {
@@ -326,7 +326,7 @@ router.post('/findREOffsets', (req, res) => {
     };
     PythonShell.run('findCutSites.py', options, function (err, results) {
         if (err) {
-            console.log(err)
+            console.log(new Date() + ': ' + err)
             res.status(400).json({ message: 'error finding offsets:' + err });
 	    return;
         }
@@ -420,7 +420,7 @@ handleGzipped = async function (files, path) {
 	return new Promise((resolve, reject) => {
 	    exec(_cmdArgs.join(' '), (error, stdout, stderr) => {
 		if (error) {
-		    console.log(err);
+		    console.log(new Date() + ': ' + err);
 		    reject(error);
 		} else {
 		    resolve(_outfiles);
@@ -443,7 +443,7 @@ handleRenamed = function(path) {
     return new Promise((resolve, reject) => {
 	PythonShell.run('renameSeqs.py', options, function (err, results) {
             if (err) {
-		console.log(err);
+		console.log(new Date() + ': ' + err);
 		reject(err);
             } else {
 		resolve(results);
@@ -468,7 +468,7 @@ catFastaFiles = function(_refFiles, refPath, outPath) {
     return new Promise((resolve, reject) => {
 	exec(filesToCat.join(' '), (error, stdout, stderr) => {
             if (error) {
-		console.log(error);
+		console.log(new Date() + ': ' + error);
 		reject(error);
             } else {
 		resolve();
@@ -489,7 +489,7 @@ runPlasmidSeq = function(cmdArgs) {
     return new Promise((resolve, reject) => {
 	exec('./runPipelineBackground.sh ' + cmdArgs.join(' '), (error, stdout, stderr) => {
             if (error) {
-		console.log(error);
+		console.log(new Date() + ': ' + error);
 		reject(error);
 	    } else {
 		resolve(stdout);
@@ -511,7 +511,7 @@ runProcessResults = function(refPath, outPath) {
     return new Promise((resolve, reject) => {
 	PythonShell.run('processResults.py', options, function (err, resStats) {
             if (err) {
-		console.log(err);
+		console.log(new Date() + ': ' + err);
 		const keyErr = err.stack.match(/(KeyError:\s+\S+)/);
 		if (keyErr &&  keyErr.length > 0) {
 		    err = 'Error: One or more reference sequences was not found in the alignment! Did you forget to supply restriction enzyme(s) for any duplicated reference sequence files? ' + keyErr[0];
@@ -538,7 +538,7 @@ runAnalysis = async function(req, res) {
     try {
 	await fs.mkdir(outPath);
     } catch(err) {
-	console.log(err);
+	console.log(new Date() + ': ' + err);
     }
 
     // JSON object for storage of run params. This will be stored as part of
@@ -583,7 +583,7 @@ runAnalysis = async function(req, res) {
     });
     fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
         if (err) {
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
             res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
 	    return;
         }
@@ -596,7 +596,7 @@ runAnalysis = async function(req, res) {
     try {
 	_refFiles = await handleGzipped(refFiles, refPath);
     } catch(err) {
-	console.log(err);
+	console.log(new Date() + ': ' + err);
 	res.status(500).json({ message: 'Error inflating gzipped reference files: ' + err });
 	return;
     }
@@ -605,7 +605,7 @@ runAnalysis = async function(req, res) {
     try{
 	_readFiles = await handleGzipped(readFiles, readPath);
     } catch(err) {
-	console.log(err);
+	console.log(new Date() + ': ' + err);
 	res.status(500).json({ message: 'Error inflating gzipped read files: ' + err });
 	return;
     }
@@ -705,21 +705,21 @@ runAnalysis = async function(req, res) {
     fs.writeFile(outPath + 'run_params.json', JSON.stringify(runParams), (err) => {
         if (err) {
             // File not written. Return an error.
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
             res.status(500).json({ message: "Could not write params file." });
 	    return;
         }
     });
 
     // Write params to console for debug purposes.
-    console.log(cmdArgs.join(' '));
+    console.log(new Date() + ': ' + cmdArgs.join(' '));
     
     // Make sure fasta sequence names match file names.
     //console.log("Processing renamed files...");
     try {
         await handleRenamed(refPath);
     } catch(err) {
-	    console.log(err);
+	    console.log(new Date() + ': ' + err);
         res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
 	return;
     }
@@ -730,10 +730,10 @@ runAnalysis = async function(req, res) {
     // file is not used unless someone opens the IGV component in their results.
     //console.log('Combining reference fasta files...');
     try {
-	catFastaFiles(_refFiles, refPath, outPath);
+	await catFastaFiles(_refFiles, refPath, outPath);
 	//console.log('Reference fasta files combined.');
     } catch(err) {
-	res.status(500).json({ message: 'Error combining reference files: ' + error });
+	res.status(500).json({ message: 'Error combining reference files: ' + err });
 	return;
     }
     //resData["refFile"] = 'combined_ref_seqs.fasta';
@@ -799,7 +799,7 @@ processOutput = async function(res, refPath, resPath) {
         resStats = await runProcessResults(refPath, resPath);
         //console.log("Results processed.");                                          
     } catch(err) {
-	console.log(err)
+	console.log(new Date() + ': ' + err)
 	res.status(400).json({ message: err });
 	return;
     }
