@@ -32,7 +32,12 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 // This toggles several console.log messages for dubugging purposes.
 const verbose = false;
 const host = window.location.protocol + "//" + window.location.host;
-const apiHost = window.location.protocol + "//" + window.location.hostname + ':3001/api';
+
+// Use this for development
+//const apiHost = window.location.protocol + "//" + window.location.hostname + ':3001/api';
+
+// Use this for production
+const apiHost = host + '/api';
 
 const styles = theme => ({
     root: {
