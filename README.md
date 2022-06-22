@@ -1,5 +1,9 @@
-# Bulk Plasmid Sequencing Web App
-## Web-enabled version of the Bulk Plasmid Sequencing tool by Camille Mumm. (https://github.com/crmumm/bulkPlasmidSeq)
+# On-Ramp Web Application
+## Web-enabled version of the On-Ramp bulk plasmid sequencing tool by Camille Mumm. (https://github.com/crmumm/bulkPlasmidSeq)
+
+## *** ATTENTION ***
+This repository contains the web application framework and services to provide the On-Ramp tool as a public web service. If you are looking for the command-line application, please visit the main repository: (https://github.com/crmumm/bulkPlas\
+midSeq)
 
 ## System Requirements
 A unix-like system with the following prerequisites:
