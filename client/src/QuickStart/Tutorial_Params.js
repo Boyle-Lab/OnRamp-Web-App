@@ -9,6 +9,9 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Link from '@material-ui/core/Link';
 
+import GenericDialog from '../GenericDialog';
+import ErrorContent from '../ErrorContent';
+
 import RunNameParam from './images/Onramp_Params-Name.png';
 import ModeParam from './images/Onramp_Params-Mode.png';
 import MedakaModelParam from './images/Onramp_Params-Medaka-Model.png';
@@ -57,6 +60,7 @@ class Tutorial_Params extends Component {
     constructor(props) {
         super(props);
 	this.state = {
+	    showCosntructionAlert: false
         };
     }
 
@@ -90,38 +94,42 @@ class Tutorial_Params extends Component {
                             <span className='bold'>2: Choose an analysis mode<br/></span>
 	                    The default "Medaka" mode uses the Medaka program (citation) to generate a consensus sequence. Biobin mode uses a different algorithm to construct the consensus.<br/>
 		            <img src={ModeParam} alt="Analysis Mode Param"/><br />
-		            <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_params'}) } className={classes.icon}>Learn More about Analysis  Modes</Link><br/><br/>
+		            <Link onClick={ () => this.setState({'showConstructionAlert': true}) } className={classes.icon}>Learn More about Analysis  Modes</Link><br/><br/>
                         </Typography>
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>3: Select a Medaka consensus model<br/></span>
 	                    For Medaka mode, the consensus model affects how reads are assembled into a consensus sequence.<br/>
 		            <img src={MedakaModelParam} alt="Medaka Model Param"/><br />
-		            <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_params'}) } className={classes.icon}>Learn More about Medaka Consensus Models</Link><br/><br/>
+		            <Link onClick={ () => this.setState({'showConstructionAlert': true}) } className={classes.icon}>Learn More about Medaka Consensus Models</Link><br/><br/>
                         </Typography>
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>4: Filter reads with Nanofilt<br/></span>
 	                    Nanofilt provides the ability to filter reads by length and quality score.<br/>
 		            <img src={NanofiltParam} alt="Nanofilt Param"/><br />
-		            <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_params'}) } className={classes.icon}>Learn More about Nanofilt</Link><br/><br/>
+		            <Link onClick={ () => this.setState({'showConstructionAlert': true}) } className={classes.icon}>Learn More about Nanofilt</Link><br/><br/>
                         </Typography>
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>5: Trim adapters with Porechop<br/></span>
 	                    Porechop will trim any adapters or adapter fragments from your reads, potentially improving alignments to the references.<br/>
 		            <img src={PorechopParam} alt="Porechop Param"/><br />
-		            <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_params'}) } className={classes.icon}>Learn More about Porechop</Link><br/><br/>
+		            <Link onClick={ () => this.setState({'showConstructionAlert': true}) } className={classes.icon}>Learn More about Porechop</Link><br/><br/>
                         </Typography>
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>Continue to the next step of the tutorial...</span><br/>
-		            <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_submit'}) } className={classes.icon}>Submit your Run</Link><br/>
+		            <Link onClick={ () => this.setState({'showConstructionAlert': true}) } className={classes.icon}>Submit your Run</Link><br/>
                         </Typography>
-	    
-	    
                     </Grid>
 		</Grid>
+		<GenericDialog
+                    name={'Under Construction!'}
+                    open={this.state.showConstructionAlert}
+                    onClose={ () => this.setState({"showConstructionAlert": false}) }
+                    content=<Typography>Coming Soon; Thank you for your interest!</Typography>
+                />
 	    </div>
         );
     }
