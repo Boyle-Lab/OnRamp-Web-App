@@ -48,7 +48,7 @@ const styles = theme => ({
 });
 
 
-class Page1 extends Component {
+class QuickStart extends Component {
     constructor(props) {
         super(props);
 	this.state = {
@@ -108,8 +108,8 @@ class Page1 extends Component {
     }
 }
 
-Page1.propTypes = {
+QuickStart.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Page1);
+export default withStyles(styles)(QuickStart);

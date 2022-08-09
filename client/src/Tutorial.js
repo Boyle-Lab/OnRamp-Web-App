@@ -16,7 +16,7 @@ import Divider from '@material-ui/core/Divider';
 
 import gtag from 'ga-gtag';
 
-import Page1 from './QuickStart/Page1';
+import QuickStart from './QuickStart/QuickStart';
 
 import Tutorial_Start from './QuickStart/Tutorial_Start';
 import Tutorial_Upload from './QuickStart/Tutorial_Upload';
@@ -185,7 +185,7 @@ class Tutorial extends Component {
 	                            </AccordionDetails>
                                 </Accordion>
                            </Grid>
-
+		{/*
                            <Grid item xs={12} style={{display: "flex", justifyContent: "flex-end", alignContent: "flex-end"}}>
 		               <Accordion elevation={0}>
 		                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -278,6 +278,7 @@ class Tutorial extends Component {
                                     Loading stored sessions
                                 </Link>
                             </Grid>
+		 */}
 		        </Paper>
 	          </Grid>
 		    </Grid>
@@ -287,7 +288,7 @@ class Tutorial extends Component {
 		            <Grid item xs={12}>
 		                {
 				    {
-		    			1: <Page1 showExampleResults={showExampleResults} />,
+		    			1: <QuickStart showExampleResults={showExampleResults} />,
 					tutorial_start: <Tutorial_Start updateParentState={this.updateStates} />,
 					tutorial_upload: <Tutorial_Upload updateParentState={this.updateStates} />,
 					tutorial_enzymes: <Tutorial_Enzymes updateParentState={this.updateStates} />,
