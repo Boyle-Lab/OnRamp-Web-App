@@ -129,7 +129,14 @@ class ResultsDisplay extends Component {
 	        </button>
 		<Downloader
 	            serverId={this.props.resServerId}
+	            scope={'all'}
+	            title={'Download All Results'}
 		/>
+		<Downloader
+                    serverId={this.props.resServerId}
+                    scope={'consensus'}
+	            title={'Download Consensus and Alignments'}
+                />
 		<div className={classes.appBarSpacer} />
 		<div className={classes.appBarSpacer} />
 		</div>

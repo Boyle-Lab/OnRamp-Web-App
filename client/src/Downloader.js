@@ -48,7 +48,9 @@ class Downloader extends Component {
         });
 	this.setState({ working: true });
 	axios.post(apiHost + '/prepareResults',
-		   { serverId: this.props.serverId }
+		   { serverId: this.props.serverId,
+		     scope: this.props.scope
+		   }
 		  )
 	    .then( response => {
 		this.setState({ working: false });
@@ -68,7 +70,7 @@ class Downloader extends Component {
 	            message={"This may take several minutes; please be patient!"}
                 />
 		<Tooltip title="Save results to your local hard drive.">
-		<button onClick={this.downloadResults}>Download Results</button>
+		<button onClick={this.downloadResults}>{this.props.title}</button>
 		</Tooltip>
 		</div>
 	);

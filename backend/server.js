@@ -187,7 +187,7 @@ router.get("/downloadResults", (req, res) => {
 router.post("/prepareResults", (req, res) => {
     res.set('Content-Type', 'application/json');
 
-    const { serverId } = req.body;
+    const { serverId, scope } = req.body;
     const resultsPath = '/tmp/' + serverId + '/';
 
     // Must put the tarball some place else during creation.
@@ -197,7 +197,12 @@ router.post("/prepareResults", (req, res) => {
     
     // Tar up the results for download.
     const outFile = 'bulkPlasmidSeq_' + serverId + '_results.tar.gz';
-    exec('tar -czf ' + destPath + outFile + ' ' + resultsPath + '*', (err, stdout, stderr) => {
+    if (scope == 'consensus') {
+	downloadPath = destPath + outFile + ' ' + resultsPath + 'consensus_sequences/*';
+    } else {
+	downloadPath = destPath + outFile + ' ' + resultsPath + '*';
+    }
+    exec('tar -czf ' + downloadPath, (err, stdout, stderr) => {
 	if (err) {
 	    console.log(new Date() + ': ' + err);
 	    res.status(400).json({ message: 'Results retrieval failed: ' + err });
