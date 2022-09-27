@@ -198,11 +198,11 @@ router.post("/prepareResults", (req, res) => {
     // Tar up the results for download.
     const outFile = 'bulkPlasmidSeq_' + serverId + '_results.tar.gz';
     if (scope == 'consensus') {
-	downloadPath = destPath + outFile + ' ' + resultsPath + 'consensus_sequences/*';
+	tarArgs = destPath + outFile + ' ' + resultsPath + 'consensus_sequences/*';
     } else {
-	downloadPath = destPath + outFile + ' ' + resultsPath + '*';
+	tarArgs = destPath + outFile + ' ' + resultsPath + '*';
     }
-    exec('tar -czf ' + downloadPath, (err, stdout, stderr) => {
+    exec('tar -czf ' + tarArgs, (err, stdout, stderr) => {
 	if (err) {
 	    console.log(new Date() + ': ' + err);
 	    res.status(400).json({ message: 'Results retrieval failed: ' + err });
