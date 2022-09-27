@@ -121,3 +121,6 @@ backend/medakaModels.json
 run_stats
 
 example_data/*.orig.*
+
+# The general public doesn't need to see our to-do list! :-)
+TO-DO.txt
