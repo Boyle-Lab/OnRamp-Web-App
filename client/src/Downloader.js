@@ -28,16 +28,20 @@ CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 const host = window.location.protocol + "//" + window.location.host;
 
 // Use this for development
-//const apiHost = window.location.protocol + "//" + window.location.hostname + ':3001/api';
+const apiHost = window.location.protocol + "//" + window.location.hostname + ':3001/api';
 
 // Use this for production
-const apiHost = host + '/api';
+//const apiHost = host + '/api';
 
 class Downloader extends Component {
     constructor(props) {
         super(props);
 	this.state = {
-	    working: false
+	    working: false,
+	    PID: null,
+	    serverId: null,
+	    fileName: null,
+	    status: "idle"
 	};
     }
     
@@ -53,12 +57,65 @@ class Downloader extends Component {
 		   }
 		  )
 	    .then( response => {
-		this.setState({ working: false });
 		const downloadURL = apiHost + '/downloadResults' +
-		      '?serverId=' + response.data.data.serverId +
-		      '&fileName=' + response.data.data.fileName
-		window.location.href = downloadURL;
-	    });
+                      '?serverId=' + response.data.data.serverId +
+                      '&fileName=' + response.data.data.fileName
+		this.setState({ working: false,
+				PID: response.data.data.PID,
+				serverId: response.data.data.serverId,
+				fileName: response.data.data.fileName,
+				status: "running"
+			      });
+		//window.location.href = downloadURL;
+	    })
+	    .catch(error => {
+                console.log(error.response);
+            });
+
+	// Periodically check to see if the file is ready.
+	let iv = setInterval( () => {
+	    //console.log(this.state.serverId, this.state.PID, this.state.fileName)
+            if (this.state.status === "running") {
+                axios.post(apiHost + "/checkDownloadPrepJob",
+                           {
+                               serverId: this.state.serverId,
+                               serverPID: this.state.PID,
+			       fileName: this.state.fileName
+                           }
+                          )
+                    .then(res => {
+                        let status = res.data.pipelineStatus;
+			if (status === "running") {
+                            // Do nothing
+                            //console.log("still running");
+                        } else if (status === "completed") {
+                            // Launch the download
+                            //console.log("done!");
+                            clearInterval(iv);
+			    const downloadURL = apiHost + '/downloadResults' +
+				  '?serverId=' + this.state.serverId +
+				  '&fileName=' + this.state.fileName
+			    window.location.href = downloadURL;
+                        } else {
+                            // Error
+                            clearInterval(iv);
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        clearInterval(iv);
+			/*
+			// Should really get this fully-implemented here!
+                        this.setState({
+                            processingErr: error.response.data.message,
+                            showErrorDialog: true
+                        });
+			*/
+                    });
+            }
+        }, 5000);
+
+        event.preventDefault();
     }
     
     render() {
