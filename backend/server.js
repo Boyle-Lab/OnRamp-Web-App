@@ -52,6 +52,7 @@ app.use(fileUpload());
 
 // This is our file upload method.
 router.post('/upload', (req, res) => {
+    console.log(new Date() + ': ' + 'upload');
     res.set('Content-Type', 'text/plain');
     if (Object.keys(req.files).length == 0) {
 	res.set('Content-Type', 'application/json');
@@ -85,7 +86,8 @@ router.post('/upload', (req, res) => {
 // This is our user file delete method.
 router.delete('/delete', (req, res) => {
     res.set('Content-Type', 'text/plain');
-    const { serverId, fileName } = req.query;
+    const { serverId, fileName } = req.query;    
+    console.log(new Date() + ': ' + 'delete ' + serverId + ' ' + fileName);
     let _filePath = '/tmp/' + serverId;
     if (fileName) {
 	_filePath = _filePath + '/' + fileName;
@@ -118,6 +120,7 @@ router.delete('', (req, res) => {
 // Retrieve a local file from the given path.
 router.post("/getFile", (req, res) => {
     const { fileName, contentType, encodingType } = req.body;
+    console.log(new Date() + ': ' + 'getFile ' + fileName);
     res.set('Content-Type', contentType);
     fs.readFile(fileName, encodingType, (err, data) => {
         if (err) {
@@ -133,7 +136,7 @@ router.post("/getFile", (req, res) => {
 
 // This method writes a json object to a local file.
 router.post('/writeJson', (req, res) => {
-    const { fileName, index } = req.body;
+    const { fileName, index } = req.body;    
     if (index.length == 0) {
         res.status(400).json({ message: 'No content.' });
 	return;
@@ -152,6 +155,7 @@ router.post('/writeJson', (req, res) => {
 router.get("/getResult", (req, res) => {
     res.set('Content-Type', 'application/json');
     const { serverId, fileName, contentType, encodingType } = req.query;
+    console.log(new Date() + ': ' + 'getResult ' + serverId + ' ' + fileName);
     const filePath = '/tmp/' + serverId + '/' + fileName;
     res.set('Content-Type', contentType);
     fs.readFile(filePath, encodingType, (err, data) => {
@@ -168,6 +172,7 @@ router.get("/getResult", (req, res) => {
 // This method is used to retrieve analysis results for download as a tarball.
 router.get("/downloadResults", (req, res) => {
     const { serverId, fileName, } = req.query;
+    console.log(new Date() + ': ' + 'downloadResults ' + serverId + ' ' + fileName);
     const filePath = '/tmp/' + serverId + '/' + fileName;
     res.set({'Content-Type': 'application/x-gtar',
 	     'Content-Disposition': 'attachment; filename=' + fileName});
@@ -185,10 +190,15 @@ router.get("/downloadResults", (req, res) => {
 
 // This method retrieves analysis results for download by the user.
 router.post("/prepareResults", (req, res) => {
-    res.set('Content-Type', 'application/json');
+    // We need to call an async function to make sure we return a proper server PID!
+    prepareResults(req, res);
+});
 
+prepareResults = async function(req, res) {
+    res.set('Content-Type', 'application/json');
     const { serverId, scope } = req.body;
-    const resultsPath = '/tmp/' + serverId + '/';
+    console.log(new Date() + ': ' + 'prepareResults ' + serverId + ' ' + scope);
+    const resultsPath = '/tmp/' + serverId;
 
     // Must put the tarball some place else during creation.
     const resServerId = Math.floor(1000000000 + Math.random() * 9000000000)
@@ -197,21 +207,80 @@ router.post("/prepareResults", (req, res) => {
     
     // Tar up the results for download.
     const outFile = 'bulkPlasmidSeq_' + serverId + '_results.tar.gz';
+    let cmdArgs = destPath + outFile + ' ' + resultsPath + ' "\*"';
     if (scope == 'consensus') {
-	tarArgs = destPath + outFile + ' ' + resultsPath + 'consensus_sequences/*';
-    } else {
-	tarArgs = destPath + outFile + ' ' + resultsPath + '*';
+	cmdArgs = destPath + outFile + ' ' + resultsPath + 'consensus_sequences' + ' "\*"';
     }
-    exec('tar -czf ' + tarArgs, (err, stdout, stderr) => {
-	if (err) {
-	    console.log(new Date() + ': ' + err);
-	    res.status(400).json({ message: 'Results retrieval failed: ' + err });
-	    return;
-	}
-	res.status(200).json({success: true, data: {serverId: resServerId, fileName: outFile} });
-	return;
+    cmdArgs = cmdArgs + ' ' + destPath
+    try {
+	let pid_line = await runPrepareDownload(cmdArgs, destPath);
+	res.status(200).json({
+	    success: true,
+	    data: {
+		serverId: resServerId,
+		fileName: outFile,
+		PID: pid_line.replace(/[\n\r]/g, '')
+	    }
+	});
+    } catch(err) {
+	res.status(400).json({ message: err });
+        return;
+    }
+}
+
+// This method runs tar on the server as a background process and returns the PID.
+runPrepareDownload = function(cmdArgs) {
+    //console.log(cmdArgs);
+    return new Promise((resolve, reject) => {
+        exec('./runPrepareDownload.sh ' + cmdArgs, (error, stdout, stderr) => {
+            if (error) {
+                console.log(new Date() + ': ' + error);
+                reject(error);
+            } else {
+                resolve(stdout);
+            }
+        });
     });
+}
+
+// This method checks for a running process from runPrepareDownload
+router.post('/checkDownloadPrepJob', (req, res) => {
+    res.set('Content-Type', 'application/json');
+    const { serverId, serverPID, fileName } = req.body;
+    console.log(new Date() + ': ' + 'checkDownloadPrepJob ' + serverId + ' ' + serverPID + ' ' + fileName);
+
+    // Check for the PID of the pipeline process.
+    try {
+        process.kill(serverPID, 0);
+        // If we've gotten this far, the process is still running.
+        // Resolve the request accordingly.
+        res.status(200).json({ pipelineStatus: "running" });
+    } catch(err) {
+        // Process is not running. See if we have results or an error.
+        checkDownloadFile(res, serverId, fileName);
+    }
 });
+
+// This function checks to make sure a download file is present when/where it's expected.
+checkDownloadFile = async function(res, serverId, fileName) {
+    // Get location of data on the server.
+    const resPath = '/tmp/' + serverId + '/';
+
+    // Check for the final tarball. If this is present, the download prep 
+    // completed successfully and we can return results.
+    fs.access(resPath + fileName, fs.constants.F_OK, (err) => {
+        if (err) {
+            // No tarball found. There was an error.
+            // Process any stored error output and return it along with the json 
+            processError(res, resPath);
+            return;
+        } else {
+            // All is well! Process the output and return results.
+            res.status(200).json({ pipelineStatus: "completed" });
+            return;
+        }
+    });
+}
 
 // This method retrieves the available medaka models and returns the result as an array.
 router.post('/getMedakaModels', (req, res) => {
@@ -255,6 +324,7 @@ router.post('/processData', (req, res) => {
 router.post('/checkJob', (req, res) => {
     res.set('Content-Type', 'application/json');
     const { refServerId, resServerId, serverPID } = req.body;
+    console.log(new Date() + ': ' + 'checkJob ' + refServerId+ ' ' + serverPID);
 
     // Check for the PID of the pipeline process.
     try {
@@ -275,6 +345,7 @@ router.post('/processCachedData', (req, res) => {
     res.set('Content-Type', 'application/json');
 
     const { resServerId, refServerId, refFile, name } = req.body;
+    console.log(new Date() + ': ' + 'processCachedData ' + resServerId+ ' ' + refServerId + ' ' + refFile + ' ' + name);
 
     // Get locations of data on the server.
     const refPath = '/tmp/' + refServerId + '/';
@@ -323,6 +394,8 @@ router.post('/findREOffsets', (req, res) => {
     res.set('Content-Type', 'application/json');
 
     const { serverId, fastaREStr } = req.body;
+    console.log(new Date() + ': ' + 'findREOffsets ' + serverId + ' ' + fastaREStr);
+    
     let options = {
         mode: 'text',
         pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
@@ -532,6 +605,7 @@ runProcessResults = function(refPath, outPath) {
 // async function to run the python-based pipeline steps sequentially.
 runAnalysis = async function(req, res) {
     const { readFiles, readServerId, refFiles, refServerId, fastaREData, options } = req.body;
+    console.log(new Date() + ': ' + 'processData');
 
     // Get locations of data on the server.
     const readPath = '/tmp/' + readServerId + '/';
