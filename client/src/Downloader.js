@@ -28,10 +28,10 @@ CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 const host = window.location.protocol + "//" + window.location.host;
 
 // Use this for development
-const apiHost = window.location.protocol + "//" + window.location.hostname + ':3001/api';
+//const apiHost = window.location.protocol + "//" + window.location.hostname + ':3001/api';
 
 // Use this for production
-//const apiHost = host + '/api';
+const apiHost = host + '/api';
 
 class Downloader extends Component {
     constructor(props) {

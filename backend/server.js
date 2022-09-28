@@ -209,7 +209,7 @@ prepareResults = async function(req, res) {
     const outFile = 'bulkPlasmidSeq_' + serverId + '_results.tar.gz';
     let cmdArgs = destPath + outFile + ' ' + resultsPath + ' "\*"';
     if (scope == 'consensus') {
-	cmdArgs = destPath + outFile + ' ' + resultsPath + 'consensus_sequences' + ' "\*"';
+	cmdArgs = destPath + outFile + ' ' + resultsPath + '/consensus_sequences' + ' "\*"';
     }
     cmdArgs = cmdArgs + ' ' + destPath
     try {
