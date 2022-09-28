@@ -53,7 +53,8 @@ class Downloader extends Component {
 	this.setState({ working: true });
 	axios.post(apiHost + '/prepareResults',
 		   { serverId: this.props.serverId,
-		     scope: this.props.scope
+		     scope: this.props.scope,
+		     sessionName: this.props.sessionName
 		   }
 		  )
 	    .then( response => {
