@@ -60,8 +60,7 @@ class Downloader extends Component {
 		const downloadURL = apiHost + '/downloadResults' +
                       '?serverId=' + response.data.data.serverId +
                       '&fileName=' + response.data.data.fileName
-		this.setState({ working: false,
-				PID: response.data.data.PID,
+		this.setState({ PID: response.data.data.PID,
 				serverId: response.data.data.serverId,
 				fileName: response.data.data.fileName,
 				status: "running"
@@ -92,6 +91,7 @@ class Downloader extends Component {
                             // Launch the download
                             //console.log("done!");
                             clearInterval(iv);
+			    this.setState({ working: false });
 			    const downloadURL = apiHost + '/downloadResults' +
 				  '?serverId=' + this.state.serverId +
 				  '&fileName=' + this.state.fileName
