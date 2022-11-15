@@ -77,8 +77,21 @@ router.post('/upload', (req, res) => {
 		res.status(500).json({ message: err });
 		return;
 	    }
-	    res.status(200).send(serverId.toString());
-	    return;
+	    // At this stage, we can do some format checks using the file
+	    // contents. Note that the response will be sent from the called
+	    // function for anything we are testing.
+
+	    // Fastq file tests
+	    const re1 = /(\.fq)$/;
+	    const re2 = /(\.fastq)$/;
+	    if (re1.test(req.files.filepond.name) || re1.test(req.files.filepond.name)) {
+		// File extension suggests fastq. First rule out fast5...
+		checkReadFileFormat(res, '/tmp/' + serverId + '/', req.files.filepond.name);		
+	    } else {
+		// Not a file fornat we need to check
+		res.status(200).send(serverId.toString());
+		return;
+	    }
 	});
     });
 });
@@ -909,4 +922,39 @@ processError = async function(res, resPath) {
         return;
     });
     
+}
+
+// Check a read file to make sure it's in fastq format, not fast5.
+checkReadFileFormat = async function(res, refPath, refFile) {
+    /* Check to ensure the read file is in fastq format, using
+       various tests. */
+    // Check for fast5
+    try {
+	await runCheckForFast5(refPath + refFile)
+	res.status(200).send(serverId.toString());
+        return;
+    } catch(err) {
+	console.log(new Date() + ': ' + err);
+        res.set('Content-Type', 'application/json');
+        res.status(500).json({ message: err });
+        return;
+    }
+}
+
+runCheckForFast5 = function(refPath) {
+    // Run the shell script to see if the given file is fast5.
+    //console.log(cmdArgs);
+    return new Promise((resolve, reject) => {
+        exec('h5dump ' + cmdArgs, (error, stdout, stderr) => {
+	    // Note we are calling an error a success here, since it means
+	    // h5dump could not read the file, so we know it is not .fast5
+            if (error) {
+                resolve();
+            } else {
+		let err = new Date() + ': ' + refPath + ' appears to be in fast5 format.';
+		console.log(err);
+                reject(err);
+            }
+        });
+    });    
 }

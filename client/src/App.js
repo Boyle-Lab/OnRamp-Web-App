@@ -1,18 +1,23 @@
 // /client/App.js
 import React, { Component } from "react";
 
-import Dashboard from './Dashboard';
 import LoadAlertDialog from './LoadAlert';
 import StartRunWrapper from './StartRunWrapper';
 import ResultsDisplay from './Results';
-import Cookies from 'universal-cookie';
 import CachedSessionDialog from './CachedSessionDialog';
 import AcceptCookiesDialog from './AcceptCookiesDialog';
 import GenericDialog from './GenericDialog';
 import HelpContent from './HelpContent';
 import LandingPage from './LandingPage';
 import Tutorial from './Tutorial';
+import Header from './Header';
+
+import Cookies from 'universal-cookie';
+
 import axios from "axios";
+
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 
 import gtag from 'ga-gtag';
 
@@ -34,6 +39,11 @@ GNU General Public License for more details.
 
 CONTACT: Adam Diehl, adadiehl@umich.edu; Camille Mumm, cmumm@umich.edu
 */
+
+// Material-UI CSS Props
+const styles = theme => ({
+    appBarSpacer: theme.mixins.toolbar,
+});
 
 // Cookies for cached results
 const _cookies = new Cookies();
@@ -190,41 +200,45 @@ class App extends Component {
 	if (verbose) {
 	    console.log('Render App.js');
 	}
+	const { classes } = this.props;
 	return (
-		<div>
-		<Dashboard
-	           title={this.state.mainTitle}
-	           controls={<div></div>}
- 	           content={this.state.showLandingPage ?
-	           <LandingPage
-                       updateParentState={this._updateStateSettings}
-		       showExampleResults={this.handleShowExampleData}
-                   />
-		     : this.state.showResults ?
-		                <ResultsDisplay
-                                    updateParentState={this.updateStateSettings}
-			            resServerId={this.state.resServerId}
-			            refFile={this.state.refFile}
-			            algnFile={this.state.algnFile}
-			            resData={this.state.resData}
-			            sessionName={this.state.sessionName}
-			            runParams = {this.state.runParams}
-			        />
-		            : this.state.showTutorial ?
-			        <Tutorial
-			            showExampleResults={this.handleShowExampleData}
-			        />
-			    :
-		                <StartRunWrapper
-	                            dataIsLoaded={this.state.dataIsLoaded}
-	                            updateParentState={this.updateStateSettings}
-			            updateParentStates={this._updateStateSettings}
-			            setCookie={this.setCookie}
-			        />
-			   }
+		<div className='content'>
+		
+	        <Header
+	            title={this.state.mainTitle}
 	            handleChange={this._updateStateSettings}
 	            enableSessionsIcon={this.state.enableSessionsButton}
 		/>
+		
+		<div className={classes.appBarSpacer} />
+		
+	        {this.state.showLandingPage ?                                                                                             
+                   <LandingPage
+                       updateParentState={this._updateStateSettings}
+                       showExampleResults={this.handleShowExampleData}
+                   />
+                : this.state.showResults ?
+	            <ResultsDisplay
+                        updateParentState={this.updateStateSettings}
+                        resServerId={this.state.resServerId}
+                        refFile={this.state.refFile}
+                        algnFile={this.state.algnFile}
+                        resData={this.state.resData}
+                        sessionName={this.state.sessionName}
+                        runParams = {this.state.runParams}
+                    />
+                : this.state.showTutorial ?
+                    <Tutorial
+                        showExampleResults={this.handleShowExampleData}
+                    />
+                :
+                    <StartRunWrapper
+                        dataIsLoaded={this.state.dataIsLoaded}
+                        updateParentState={this.updateStateSettings}
+                        updateParentStates={this._updateStateSettings}
+                        setCookie={this.setCookie}
+                    /> 
+	        }
 		<AcceptCookiesDialog
                     open={this.state.showAcceptCookiesDialog}
                     handleResponse={this.handleCookiesClick}
@@ -253,4 +267,8 @@ class App extends Component {
     }
 }
 
-export default App;
+App.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(App);
