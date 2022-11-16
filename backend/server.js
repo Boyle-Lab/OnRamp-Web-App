@@ -54,7 +54,7 @@ app.use(fileUpload());
 router.post('/upload', (req, res) => {
     console.log(new Date() + ': ' + 'upload');
     res.set('Content-Type', 'text/plain');
-    if (Object.keys(req.files).length == 0) {
+    if (Object.keys(req.files) === undefined || Object.keys(req.files) === null || Object.keys(req.files).length == 0) {
 	res.set('Content-Type', 'application/json');
 	res.status(400).json({ message: 'No files were uploaded.' });
 	return;
