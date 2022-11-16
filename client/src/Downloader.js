@@ -53,15 +53,15 @@ class Downloader extends Component {
 	this.setState({ working: true });
 	axios.post(apiHost + '/prepareResults',
 		   { serverId: this.props.serverId,
-		     scope: this.props.scope
+		     scope: this.props.scope,
+		     sessionName: this.props.sessionName
 		   }
 		  )
 	    .then( response => {
 		const downloadURL = apiHost + '/downloadResults' +
                       '?serverId=' + response.data.data.serverId +
                       '&fileName=' + response.data.data.fileName
-		this.setState({ working: false,
-				PID: response.data.data.PID,
+		this.setState({ PID: response.data.data.PID,
 				serverId: response.data.data.serverId,
 				fileName: response.data.data.fileName,
 				status: "running"
@@ -92,6 +92,7 @@ class Downloader extends Component {
                             // Launch the download
                             //console.log("done!");
                             clearInterval(iv);
+			    this.setState({ working: false });
 			    const downloadURL = apiHost + '/downloadResults' +
 				  '?serverId=' + this.state.serverId +
 				  '&fileName=' + this.state.fileName

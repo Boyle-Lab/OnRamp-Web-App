@@ -22,4 +22,9 @@ else
 fi
 
 echo "Starting the bulk_plasid_seq_web app..."
-cd /home/node/bulk_plasmid_seq_web && conda activate medaka && npm start 1>&2 2> /var/log/bulk_plasmid_seq_web.log
+#cd /home/node/bulk_plasmid_seq_web && conda activate medaka && npm start 1>&2 2> /var/log/bulk_plasmid_seq_web.log
+# pm2 daemonizes server.js
+conda activate medaka
+cd /home/node/bulk_plasmid_seq_web/backend && pm2 start server.js --log /var/log/bulk_plasmid_seq_web.log --time
+cd /home/node/bulk_plasmid_seq_web/client && pm2 start "npm start"
+pm2 save

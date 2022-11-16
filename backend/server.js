@@ -194,10 +194,12 @@ router.post("/prepareResults", (req, res) => {
     prepareResults(req, res);
 });
 
+const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 prepareResults = async function(req, res) {
     res.set('Content-Type', 'application/json');
-    const { serverId, scope } = req.body;
-    console.log(new Date() + ': ' + 'prepareResults ' + serverId + ' ' + scope);
+    const { serverId, scope, sessionName } = req.body;
+    console.log(new Date() + ': ' + 'prepareResults ' + serverId + ' ' + scope + ' ' + sessionName);
     const resultsPath = '/tmp/' + serverId;
 
     // Must put the tarball some place else during creation.
@@ -206,10 +208,20 @@ prepareResults = async function(req, res) {
     fs.mkdir(destPath);
     
     // Tar up the results for download.
-    const outFile = 'bulkPlasmidSeq_' + serverId + '_results.tar.gz';
+    let now = new Date();
+    const outFile = 'OnRamp-Results-for_'
+	  + sessionName + '_'
+	  + days[now.getDay()] + '_'
+	  + now.getMonth() + '-'
+	  + now.getDate() + '-'
+	  + now.getFullYear() + '_'
+	  + now.getHours() + '-'
+	  + now.getMinutes() + '-'
+	  + now.getSeconds()
+	  + '.tar.gz';
     let cmdArgs = destPath + outFile + ' ' + resultsPath + ' "\*"';
     if (scope == 'consensus') {
-	cmdArgs = destPath + outFile + ' ' + resultsPath + 'consensus_sequences' + ' "\*"';
+	cmdArgs = destPath + outFile + ' ' + resultsPath + '/consensus_sequences' + ' "\*"';
     }
     cmdArgs = cmdArgs + ' ' + destPath
     try {

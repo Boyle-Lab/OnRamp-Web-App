@@ -128,11 +128,13 @@ class ResultsDisplay extends Component {
 		    Show Run Parameters
 	        </button>
 		<Downloader
+	            sessionName={this.props.sessionName}
 	            serverId={this.props.resServerId}
 	            scope={'all'}
 	            title={'Download All Results'}
 		/>
 		<Downloader
+	            sessionName={this.props.sessionName}
                     serverId={this.props.resServerId}
                     scope={'consensus'}
 	            title={'Download Consensus and Alignments'}
