@@ -64,7 +64,9 @@ class StartRunWrapper extends Component {
 	    renamedFiles: {},
 	    duplicatedFiles: {},
 	    showRenameFilesAlert: false,
-	    showDuplicateFilesAlert: false
+	    showDuplicateFilesAlert: false,
+	    showFileErrorAlert: false,
+	    fileError: null
         };
     }
     
@@ -180,6 +182,12 @@ class StartRunWrapper extends Component {
                     open={this.state.showRenameFilesAlert}
                     onClose={() => this.updateStateSettings("showRenameFilesAlert", false)}
                     content=<FileRenameAlert data={this.state.renamedFiles}/>
+                />
+		<GenericDialog
+                    name={'ERROR!'}
+                    open={this.state.showFileErrorAlert}
+                    onClose={() => this.updateStateSettings("showFileErrorAlert", false)}
+                    content={this.state.fileError}
                 />
 		</Grid>
 
