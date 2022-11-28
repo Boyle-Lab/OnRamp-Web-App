@@ -82,15 +82,49 @@ const FileUploader = ({ onFilesChange, files, dest, serverId, allowedTypes, upda
         });
     });
 
-    /* This listener watches for duplicate and space-containg filenames and renames
-       by appending '..._1...', '..._2...', etc., tags to the filename, for duplicates,
-       and replacing spaces with underscores. */
+    /* This listener watches for anomolies related to uploaded files. Inlcudes:
+       1) Duplicate files (renamed by appending _1, _2, ...)
+       2) Space-containg filenames renames (spaces replaced by _)
+       3) Files with extensions that don't match the format (fast5 with fastq extension, e.g.)
+       More to come???
+    */
     React.useEffect(() => {
-        pond.current._pond.on('processfile', (file, error) => {
-            if (error && verbose) {
-                //console.log(error);
-            }
-
+        pond.current._pond.on('processfile', (error, file) => {	    
+            if (error) {
+		// Here is where we will watch for generic file processing errors.
+		// We can follow up with various actions to diagnose the problem,
+		// and present the user with a useful error message.
+                console.log(error);
+		if (error.response.data.message !== undefined) {
+		    updateParentState("fileError", error.response.data.message);
+                    updateParentState("showFileErrorAlert", true);
+		}
+		return;
+	    }
+	    
+	    // Check the file extension and run any necessary format tests.
+	    
+	    //For fastq, we need to make sure the file is not actually fast5.
+	    if (file.fileExtension == "fastq" || file.fileExtension == "fq") {
+		axios.post(apiHost + '/checkformat',
+			   {
+			       serverId: serverId,
+			       fileName: file.filename,
+			       fileFormat: "fastq"
+			   })
+		    .then(res => {
+			// Nothing to do -- file is an accepted format
+		    })
+		    .catch(error => {
+			// Not an accepted file format. Raise an error dialog.
+			//console.log(error.response.data.message);
+			updateParentState("fileError", error.response.data.message);
+			updateParentState("showFileErrorAlert", true);
+			pond.current._pond.removeFile(file);
+		    });
+	    }
+	    
+	    
 	    // Check for spaces in file names. These will choke medaka.
             let sf = checkForSpaces(pond);
             if (Object.keys(sf).length > 0) {
