@@ -52,8 +52,19 @@ app.use(fileUpload());
 
 // This is our file upload method.
 router.post('/upload', (req, res) => {
-    console.log(new Date() + ': ' + 'upload');
+    console.error(new Date() + ': ' + 'upload');
     res.set('Content-Type', 'text/plain');
+    // Sometimes an empty reqest comes in (i.e., req.files is undefined).
+    // Not sure why this happens, but it will crash the server if we do
+    // not handle it.
+    let filesList = undefined;
+    try {
+	Object.keys(req.files);
+    } catch(err) {
+	res.set('Content-Type', 'application/json');
+        res.status(400).json({ message: 'No files were uploaded.' });
+        return;
+    }
     if (Object.keys(req.files) === undefined || Object.keys(req.files) === null || Object.keys(req.files).length == 0) {
 	res.set('Content-Type', 'application/json');
 	res.status(400).json({ message: 'No files were uploaded.' });
@@ -62,7 +73,7 @@ router.post('/upload', (req, res) => {
     const serverId = req.query.serverId;
     fs.mkdir('/tmp/' + serverId, { recursive: true }, (err) => {
 	if (err) {
-	    console.log(new Date() + ': ' + err);
+	    console.error(new Date() + ': ' + err);
 	    res.set('Content-Type', 'application/json');
 	    res.status(500).json({ message: err });
 	    return;
@@ -72,46 +83,52 @@ router.post('/upload', (req, res) => {
 	// callback to avoid send errors.
 	req.files.filepond.mv('/tmp/' + serverId + '/' + req.files.filepond.name, function(err) {
 	    if (err) {
-		console.log(new Date() + ': ' + err);
+		console.error(new Date() + ': ' + err);
 		res.set('Content-Type', 'application/json');
 		res.status(500).json({ message: err });
 		return;
 	    }
-	    // At this stage, we can do some format checks using the file
-	    // contents. Note that the response will be sent from the called
-	    // function for anything we are testing.
-
-	    // Fastq file tests
-	    const re1 = /(\.fq)$/;
-	    const re2 = /(\.fastq)$/;
-	    if (re1.test(req.files.filepond.name) || re1.test(req.files.filepond.name)) {
-		// File extension suggests fastq. First rule out fast5...
-		checkReadFileFormat(res, '/tmp/' + serverId + '/', req.files.filepond.name);		
-	    } else {
-		// Not a file fornat we need to check
-		res.status(200).send(serverId.toString());
-		return;
-	    }
+	    res.status(200).send(serverId.toString());
+	    return;
 	});
     });
+});
+
+// This method runs various format checks on a file.
+router.post('/checkformat', (req, res) => {
+    console.error(new Date() + ': ' + 'checkFileFormat');
+    res.set('Content-Type', 'text/plain');
+
+    const {serverId, fileName, fileFormat} = req.body;
+
+    if (serverId === undefined ||
+	fileName === undefined ||
+	fileFormat === undefined) {
+	res.set('Content-Type', 'application/json');
+        res.status(400).json({ message: 'An unknown error occured. Please check the file type and extensions for all your files and retry. If this problem persists, please contact the development team for assistance.' });
+        return;
+    }
+
+    verifyFile(res, serverId, fileName, fileFormat, '/tmp/' + serverId);
+    return;
 });
 
 // This is our user file delete method.
 router.delete('/delete', (req, res) => {
     res.set('Content-Type', 'text/plain');
     const { serverId, fileName } = req.query;    
-    console.log(new Date() + ': ' + 'delete ' + serverId + ' ' + fileName);
+    console.error(new Date() + ': ' + 'delete ' + serverId + ' ' + fileName);
     let _filePath = '/tmp/' + serverId;
     if (fileName) {
 	_filePath = _filePath + '/' + fileName;
     }
     fs.stat(_filePath, (err, stats) => {
 	if (err) {
-	    console.log(new Date() + ': ' + err);
+	    console.error(new Date() + ': ' + err);
 	} else {
 	    fs.remove(_filePath, (err) => {
 		if (err) {
-		    console.log(new Date() + ': ' + err);
+		    console.error(new Date() + ': ' + err);
 		    res.set('Content-Type', 'application/json');
 		    res.status(500).json({ message: err });
 		    return;
@@ -133,11 +150,11 @@ router.delete('', (req, res) => {
 // Retrieve a local file from the given path.
 router.post("/getFile", (req, res) => {
     const { fileName, contentType, encodingType } = req.body;
-    console.log(new Date() + ': ' + 'getFile ' + fileName);
+    console.error(new Date() + ': ' + 'getFile ' + fileName);
     res.set('Content-Type', contentType);
     fs.readFile(fileName, encodingType, (err, data) => {
         if (err) {
-	    console.log(new Date() + ': ' + err);
+	    console.error(new Date() + ': ' + err);
 	    res.set('Content-Type', 'application/json');
             res.json({ success: false, error: err });
 	    return;
@@ -155,7 +172,7 @@ router.post('/writeJson', (req, res) => {
 	return;
     }
     fs.writeFile(fileName, JSON.stringify(index), (err) => {
-	console.log(new Date() + ': ' + err);
+	console.error(new Date() + ': ' + err);
 	res.set('Content-Type', 'application/json');
         res.status(500).json({ message: err });
 	return;
@@ -168,12 +185,12 @@ router.post('/writeJson', (req, res) => {
 router.get("/getResult", (req, res) => {
     res.set('Content-Type', 'application/json');
     const { serverId, fileName, contentType, encodingType } = req.query;
-    console.log(new Date() + ': ' + 'getResult ' + serverId + ' ' + fileName);
+    console.error(new Date() + ': ' + 'getResult ' + serverId + ' ' + fileName);
     const filePath = '/tmp/' + serverId + '/' + fileName;
     res.set('Content-Type', contentType);
     fs.readFile(filePath, encodingType, (err, data) => {
         if (err) {
-	    console.log(new Date() + ': ' + err);	    
+	    console.error(new Date() + ': ' + err);	    
             res.status(400).json({ message: err });
 	    return;
         }
@@ -185,13 +202,13 @@ router.get("/getResult", (req, res) => {
 // This method is used to retrieve analysis results for download as a tarball.
 router.get("/downloadResults", (req, res) => {
     const { serverId, fileName, } = req.query;
-    console.log(new Date() + ': ' + 'downloadResults ' + serverId + ' ' + fileName);
+    console.error(new Date() + ': ' + 'downloadResults ' + serverId + ' ' + fileName);
     const filePath = '/tmp/' + serverId + '/' + fileName;
     res.set({'Content-Type': 'application/x-gtar',
 	     'Content-Disposition': 'attachment; filename=' + fileName});
     fs.readFile(filePath, null, (err, data) => {
         if (err) {
-	    console.log(new Date() + ': ' + err);
+	    console.error(new Date() + ': ' + err);
 	    res.set('Content-Type', 'application/json');
             res.status(400).json({ message: err });
 	    return;
@@ -212,7 +229,7 @@ const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
 prepareResults = async function(req, res) {
     res.set('Content-Type', 'application/json');
     const { serverId, scope, sessionName } = req.body;
-    console.log(new Date() + ': ' + 'prepareResults ' + serverId + ' ' + scope + ' ' + sessionName);
+    console.error(new Date() + ': ' + 'prepareResults ' + serverId + ' ' + scope + ' ' + sessionName);
     const resultsPath = '/tmp/' + serverId;
 
     // Must put the tarball some place else during creation.
@@ -255,11 +272,11 @@ prepareResults = async function(req, res) {
 
 // This method runs tar on the server as a background process and returns the PID.
 runPrepareDownload = function(cmdArgs) {
-    //console.log(cmdArgs);
+    //console.error(cmdArgs);
     return new Promise((resolve, reject) => {
         exec('./runPrepareDownload.sh ' + cmdArgs, (error, stdout, stderr) => {
             if (error) {
-                console.log(new Date() + ': ' + error);
+                console.error(new Date() + ': ' + error);
                 reject(error);
             } else {
                 resolve(stdout);
@@ -272,7 +289,7 @@ runPrepareDownload = function(cmdArgs) {
 router.post('/checkDownloadPrepJob', (req, res) => {
     res.set('Content-Type', 'application/json');
     const { serverId, serverPID, fileName } = req.body;
-    console.log(new Date() + ': ' + 'checkDownloadPrepJob ' + serverId + ' ' + serverPID + ' ' + fileName);
+    console.error(new Date() + ': ' + 'checkDownloadPrepJob ' + serverId + ' ' + serverPID + ' ' + fileName);
 
     // Check for the PID of the pipeline process.
     try {
@@ -317,7 +334,7 @@ router.post('/getMedakaModels', (req, res) => {
 	    let options = {}
 	    PythonShell.run('getMedakaModels.py', options, function (err, results) {
 		if (err) {
-		    console.log(new Date() + ': ' + err)
+		    console.error(new Date() + ': ' + err)
 		    res.status(500).json({ message: 'error getting medaka models: ' + err });
 		    return;
 		}
@@ -325,7 +342,7 @@ router.post('/getMedakaModels', (req, res) => {
 		fs.writeFile("medakaModels.json", JSON.stringify(results), (err) => {
 		    if (err) {
 			// File could not be written.
-			console.log(new Date() + ': ' + err);
+			console.error(new Date() + ': ' + err);
 		    }
 		});
 		res.status(200).json({ success: true, data: results });
@@ -349,7 +366,7 @@ router.post('/processData', (req, res) => {
 router.post('/checkJob', (req, res) => {
     res.set('Content-Type', 'application/json');
     const { refServerId, resServerId, serverPID } = req.body;
-    console.log(new Date() + ': ' + 'checkJob ' + refServerId+ ' ' + serverPID);
+    console.error(new Date() + ': ' + 'checkJob ' + refServerId+ ' ' + serverPID);
 
     // Check for the PID of the pipeline process.
     try {
@@ -370,7 +387,7 @@ router.post('/processCachedData', (req, res) => {
     res.set('Content-Type', 'application/json');
 
     const { resServerId, refServerId, refFile, name } = req.body;
-    console.log(new Date() + ': ' + 'processCachedData ' + resServerId+ ' ' + refServerId + ' ' + refFile + ' ' + name);
+    console.error(new Date() + ': ' + 'processCachedData ' + resServerId+ ' ' + refServerId + ' ' + refFile + ' ' + name);
 
     // Get locations of data on the server.
     const refPath = '/tmp/' + refServerId + '/';
@@ -379,7 +396,7 @@ router.post('/processCachedData', (req, res) => {
     // Get the run params from the stored session.
     fs.readFile(resPath + 'run_params.json', 'utf8', (err, data) => {
 	if (err) {
-	    console.log(new Date() + ': ' + err);
+	    console.error(new Date() + ': ' + err);
             res.status(500).json({ message: 'Cannot restore session:' + err });
 	    return;
 	}
@@ -403,7 +420,7 @@ router.post('/processCachedData', (req, res) => {
 	
 	PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
             if (err) {
-		console.log(new Date() + ': ' + err)
+		console.error(new Date() + ': ' + err)
 		res.status(500).json({ message: err });
 		return;
             } else {
@@ -419,7 +436,7 @@ router.post('/findREOffsets', (req, res) => {
     res.set('Content-Type', 'application/json');
 
     const { serverId, fastaREStr } = req.body;
-    console.log(new Date() + ': ' + 'findREOffsets ' + serverId + ' ' + fastaREStr);
+    console.error(new Date() + ': ' + 'findREOffsets ' + serverId + ' ' + fastaREStr);
     
     let options = {
         mode: 'text',
@@ -429,11 +446,11 @@ router.post('/findREOffsets', (req, res) => {
     };
     PythonShell.run('findCutSites.py', options, function (err, results) {
         if (err) {
-            console.log(new Date() + ': ' + err)
+            console.error(new Date() + ': ' + err)
             res.status(400).json({ message: 'error finding offsets:' + err });
 	    return;
         }
-        //console.log(results);
+        //console.error(results);
 	res.status(200).json({ success: true, data: results[0] });
 	return;
     });
@@ -444,7 +461,7 @@ router.post('/findREOffsets', (req, res) => {
 app.use("/api", router);
 
 // launch our backend into a port
-app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
+app.listen(API_PORT, () => console.error(`LISTENING ON PORT ${API_PORT}`));
 
 
 /******************************************************************************************************/
@@ -453,30 +470,30 @@ app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
 findGzipped = async function (resolve, reject, files, path, _cmdArgs, i) {
     // Locate gzipped files at the given path.
     filename = files[i];
-    //console.log(filename);
+    //console.error(filename);
     let fnameParts = filename.split('.');
     let ext = fnameParts[fnameParts.length-1];
     if (ext === 'gz' || ext === 'gzip') {
-	//console.log('GZfile: ', filename);
+	//console.error('GZfile: ', filename);
 	await fs.access(path + filename, fs.constants.F_OK, (err) => {
 	    if (err) {
 		// File does not exist or was already inflated: do nothing.
-		//console.log('File not found.');
+		//console.error('File not found.');
 		i++;
 		if (i < files.length) {
                     findGzipped(resolve, reject, files, path, _cmdArgs, i);
                 } else {
-                    //console.log("289:", _cmdArgs);
+                    //console.error("289:", _cmdArgs);
                     return resolve(_cmdArgs);
                 }
 	    } else {
-		//console.log('File was found');
+		//console.error('File was found');
 		_cmdArgs.push(path + filename);
 		i++;
 		if (i < files.length) {
 		    findGzipped(resolve, reject, files, path, _cmdArgs, i);
 		} else {
-		    //console.log("299:", _cmdArgs);
+		    //console.error("299:", _cmdArgs);
 		    return resolve(_cmdArgs);
 		}
 	    }
@@ -486,7 +503,7 @@ findGzipped = async function (resolve, reject, files, path, _cmdArgs, i) {
         if (i < files.length) {
             findGzipped(resolve, reject, files, path, _cmdArgs, i);
         } else {
-            //console.log("309:", _cmdArgs);
+            //console.error("309:", _cmdArgs);
             return resolve(_cmdArgs);
         }
     }
@@ -510,7 +527,7 @@ handleGzipped = async function (files, path) {
     let _cmdArgs = ["gunzip"];
     await new Promise((r, j) => findGzipped(r, j, files, path, _cmdArgs, 0));
 
-    //console.log("333:", _cmdArgs.length);
+    //console.error("333:", _cmdArgs.length);
     // Unzip all gzipped files found.
     if (_cmdArgs.length === 1) {
 	// There are no gzipped files.
@@ -523,7 +540,7 @@ handleGzipped = async function (files, path) {
 	return new Promise((resolve, reject) => {
 	    exec(_cmdArgs.join(' '), (error, stdout, stderr) => {
 		if (error) {
-		    console.log(new Date() + ': ' + err);
+		    console.error(new Date() + ': ' + err);
 		    reject(error);
 		} else {
 		    resolve(_outfiles);
@@ -546,7 +563,7 @@ handleRenamed = function(path) {
     return new Promise((resolve, reject) => {
 	PythonShell.run('renameSeqs.py', options, function (err, results) {
             if (err) {
-		console.log(new Date() + ': ' + err);
+		console.error(new Date() + ': ' + err);
 		reject(err);
             } else {
 		resolve(results);
@@ -571,7 +588,7 @@ catFastaFiles = function(_refFiles, refPath, outPath) {
     return new Promise((resolve, reject) => {
 	exec(filesToCat.join(' '), (error, stdout, stderr) => {
             if (error) {
-		console.log(new Date() + ': ' + error);
+		console.error(new Date() + ': ' + error);
 		reject(error);
             } else {
 		resolve();
@@ -592,7 +609,7 @@ runPlasmidSeq = function(cmdArgs) {
     return new Promise((resolve, reject) => {
 	exec('./runPipelineBackground.sh ' + cmdArgs.join(' '), (error, stdout, stderr) => {
             if (error) {
-		console.log(new Date() + ': ' + error);
+		console.error(new Date() + ': ' + error);
 		reject(error);
 	    } else {
 		resolve(stdout);
@@ -610,11 +627,11 @@ runProcessResults = function(refPath, outPath) {
         args: cmdArgs
     }
 
-    //console.log('processResults.py ' + cmdArgs.join(' '));
+    //console.error('processResults.py ' + cmdArgs.join(' '));
     return new Promise((resolve, reject) => {
 	PythonShell.run('processResults.py', options, function (err, resStats) {
             if (err) {
-		console.log(new Date() + ': ' + err);
+		console.error(new Date() + ': ' + err);
 		const keyErr = err.stack.match(/(KeyError:\s+\S+)/);
 		if (keyErr &&  keyErr.length > 0) {
 		    err = 'Error: One or more reference sequences was not found in the alignment! Did you forget to supply restriction enzyme(s) for any duplicated reference sequence files? ' + keyErr[0];
@@ -630,7 +647,7 @@ runProcessResults = function(refPath, outPath) {
 // async function to run the python-based pipeline steps sequentially.
 runAnalysis = async function(req, res) {
     const { readFiles, readServerId, refFiles, refServerId, fastaREData, options } = req.body;
-    console.log(new Date() + ': ' + 'processData');
+    console.error(new Date() + ': ' + 'processData');
 
     // Get locations of data on the server.
     const readPath = '/tmp/' + readServerId + '/';
@@ -642,7 +659,7 @@ runAnalysis = async function(req, res) {
     try {
 	await fs.mkdir(outPath);
     } catch(err) {
-	console.log(new Date() + ': ' + err);
+	console.error(new Date() + ': ' + err);
     }
 
     // JSON object for storage of run params. This will be stored as part of
@@ -687,7 +704,7 @@ runAnalysis = async function(req, res) {
     });
     fs.writeFile(outPath + 'restriction_enzyme_cut_sites.yaml', yaml.dump(yamlData), (err) => {
         if (err) {
-	    console.log(new Date() + ': ' + err);
+	    console.error(new Date() + ': ' + err);
             res.status(500).json({ message: 'Error in restriction offsets: could not write yaml file: ' + err });
 	    return;
         }
@@ -700,7 +717,7 @@ runAnalysis = async function(req, res) {
     try {
 	_refFiles = await handleGzipped(refFiles, refPath);
     } catch(err) {
-	console.log(new Date() + ': ' + err);
+	console.error(new Date() + ': ' + err);
 	res.status(500).json({ message: 'Error inflating gzipped reference files: ' + err });
 	return;
     }
@@ -709,7 +726,7 @@ runAnalysis = async function(req, res) {
     try{
 	_readFiles = await handleGzipped(readFiles, readPath);
     } catch(err) {
-	console.log(new Date() + ': ' + err);
+	console.error(new Date() + ': ' + err);
 	res.status(500).json({ message: 'Error inflating gzipped read files: ' + err });
 	return;
     }
@@ -809,33 +826,33 @@ runAnalysis = async function(req, res) {
     fs.writeFile(outPath + 'run_params.json', JSON.stringify(runParams), (err) => {
         if (err) {
             // File not written. Return an error.
-	    console.log(new Date() + ': ' + err);
+	    console.error(new Date() + ': ' + err);
             res.status(500).json({ message: "Could not write params file." });
 	    return;
         }
     });
 
     // Write params to console for debug purposes.
-    console.log(new Date() + ': ' + cmdArgs.join(' '));
+    console.error(new Date() + ': ' + cmdArgs.join(' '));
     
     // Make sure fasta sequence names match file names.
-    //console.log("Processing renamed files...");
+    //console.error("Processing renamed files...");
     try {
         await handleRenamed(refPath);
     } catch(err) {
-	    console.log(new Date() + ': ' + err);
+	    console.error(new Date() + ': ' + err);
         res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
 	return;
     }
-    //console.log('Renamed files processed.');
+    //console.error('Renamed files processed.');
 
     // After handling renamed files, we need to assemble the combined fasta file
     // for the IGV component. This can run asynchronously since the combined
     // file is not used unless someone opens the IGV component in their results.
-    //console.log('Combining reference fasta files...');
+    //console.error('Combining reference fasta files...');
     try {
 	await catFastaFiles(_refFiles, refPath, outPath);
-	//console.log('Reference fasta files combined.');
+	//console.error('Reference fasta files combined.');
     } catch(err) {
 	res.status(500).json({ message: 'Error combining reference files: ' + err });
 	return;
@@ -845,11 +862,11 @@ runAnalysis = async function(req, res) {
     
     // We'll run the main pipeline on the server as a background
     // job, returning the process ID for monitoring purposes.
-    //console.log("Running the analysis pipeline...");
+    //console.error("Running the analysis pipeline...");
     try {
 	let pid_line = await runPlasmidSeq(cmdArgs);
         resData["PID"] = pid_line.replace(/[\n\r]/g, '');
-	//console.log("Analysis pipeline finished.");
+	//console.error("Analysis pipeline finished.");
     } catch(err) {
 	// For biobin mode, we sometimes get no results due to zero mapped
         // reads being assigned to any plasmids. We need to handle this
@@ -901,9 +918,9 @@ processOutput = async function(res, refPath, resPath) {
     let resStats = {};
     try {
         resStats = await runProcessResults(refPath, resPath);
-        //console.log("Results processed.");                                          
+        //console.error("Results processed.");                                          
     } catch(err) {
-	console.log(new Date() + ': ' + err)
+	console.error(new Date() + ': ' + err)
 	res.status(400).json({ message: err });
 	return;
     }
@@ -924,37 +941,44 @@ processError = async function(res, resPath) {
     
 }
 
-// Check a read file to make sure it's in fastq format, not fast5.
-checkReadFileFormat = async function(res, refPath, refFile) {
-    /* Check to ensure the read file is in fastq format, using
-       various tests. */
-    // Check for fast5
-    try {
-	await runCheckForFast5(refPath + refFile)
-	res.status(200).send(serverId.toString());
-        return;
-    } catch(err) {
-	console.log(new Date() + ': ' + err);
-        res.set('Content-Type', 'application/json');
-        res.status(500).json({ message: err });
-        return;
-    }
-}
-
-runCheckForFast5 = function(refPath) {
+runCheckForFast5 = function(serverId, fileName) {
     // Run the shell script to see if the given file is fast5.
-    //console.log(cmdArgs);
+    //console.error(readPath);
+    let readPath = '/tmp/' + serverId + '/' + fileName;
     return new Promise((resolve, reject) => {
-        exec('h5dump ' + cmdArgs, (error, stdout, stderr) => {
+        exec('./checkForFast5.sh ' + readPath, (error, stdout, stderr) => {
 	    // Note we are calling an error a success here, since it means
 	    // h5dump could not read the file, so we know it is not .fast5
+	    // TO-DO: Maybe would be better to have the script exit 0 when
+	    // file is not fast5, so we can use standard expectations for
+	    // error vs. success
             if (error) {
+		console.error(error);
                 resolve();
             } else {
-		let err = new Date() + ': ' + refPath + ' appears to be in fast5 format.';
-		console.log(err);
+		let err = 'ERROR: Fast5 format detected! ' + fileName + ' appears to be in fast5 format. Please perform basecalling on this file and resubmit in fastq format.';
+		console.error(new Date() + ': ' + err);
                 reject(err);
             }
         });
     });    
+}
+
+verifyFile = async function(res, serverId, fileName, fileFormat, path) {
+    /* Run tests on the given file to verify it's a format we can use */
+    //console.error("verifyFile reporting for duty!");
+
+    if (fileFormat == "fastq") {
+	// File extension suggests fastq. First rule out fast5...
+	//console.error("Fastq extension detected. Checking format...");
+	try {
+	    await runCheckForFast5(serverId, fileName);
+	} catch(err) {
+            res.set('Content-Type', 'application/json');	    
+            res.status(400).json({ message: err });
+	    return;
+	}
+	res.status(200).send(serverId);
+        return;
+    }
 }
