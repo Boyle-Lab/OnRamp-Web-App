@@ -200,12 +200,12 @@ class StartNewRun extends Component {
 						"refFile": res.data.data.refFile,
 						"algnFile": res.data.data.algnFile,
 						"sessionName": res.data.data.name,
-						"waitingForResults": true });
+						"waitingForResults": true,
+						"runParams": res.data.data.runParams});
 		if (verbose) {
 		    console.log(res.data.data.runParams);
 		}
-		this.props.updateParentStates({ "runParams": res.data.data.runParams });
-		// Set session cookies.
+w		// Set session cookies.
 		this.props.setCookie({
 		    "refServerId": res.data.data.refServerId,
 		    "resServerId": res.data.data.resServerId,
