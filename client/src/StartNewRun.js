@@ -205,7 +205,7 @@ class StartNewRun extends Component {
 		if (verbose) {
 		    console.log(res.data.data.runParams);
 		}
-w		// Set session cookies.
+		// Set session cookies.
 		this.props.setCookie({
 		    "refServerId": res.data.data.refServerId,
 		    "resServerId": res.data.data.resServerId,
