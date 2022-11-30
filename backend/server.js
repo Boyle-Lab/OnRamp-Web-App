@@ -957,7 +957,7 @@ runCheckForFast5 = function(serverId, fileName) {
 	    // file is not fast5, so we can use standard expectations for
 	    // error vs. success
             if (error) {
-		console.error(error);
+		//console.error(new Date() + ': ' + error);
                 resolve();
             } else {
 		let err = 'ERROR: Fast5 format detected! ' + fileName + ' appears to be in fast5 format. Please perform basecalling on this file and resubmit in fastq format.';
@@ -982,7 +982,8 @@ verifyFile = async function(res, serverId, fileName, fileFormat, path) {
             res.status(400).json({ message: err });
 	    return;
 	}
-	res.status(200).send(serverId);
+	res.set('Content-Type', 'text/plain');
+	res.sendStatus(200);
         return;
     }
 }
