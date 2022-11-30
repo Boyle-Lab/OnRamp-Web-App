@@ -647,7 +647,7 @@ runProcessResults = function(refPath, outPath) {
 // async function to run the python-based pipeline steps sequentially.
 runAnalysis = async function(req, res) {
     const { readFiles, readServerId, refFiles, refServerId, fastaREData, options } = req.body;
-    console.error(new Date() + ': ' + 'processData');
+    console.error(new Date() + ': ' + 'processData refServerId: ' + refServerId + ' readServerId: ' + readServerId);
 
     // Get locations of data on the server.
     const readPath = '/tmp/' + readServerId + '/';
@@ -659,7 +659,9 @@ runAnalysis = async function(req, res) {
     try {
 	await fs.mkdir(outPath);
     } catch(err) {
-	console.error(new Date() + ': ' + err);
+	console.error(new Date() + ': Could not create output directory: ' + outPath + '; ' + err);
+	res.status(500).json({ message: 'Cannot restore session:' + err });
+	return;
     }
 
     // JSON object for storage of run params. This will be stored as part of
@@ -717,7 +719,7 @@ runAnalysis = async function(req, res) {
     try {
 	_refFiles = await handleGzipped(refFiles, refPath);
     } catch(err) {
-	console.error(new Date() + ': ' + err);
+	//console.error(new Date() + ': ' + err);
 	res.status(500).json({ message: 'Error inflating gzipped reference files: ' + err });
 	return;
     }
@@ -726,7 +728,7 @@ runAnalysis = async function(req, res) {
     try{
 	_readFiles = await handleGzipped(readFiles, readPath);
     } catch(err) {
-	console.error(new Date() + ': ' + err);
+	//console.error(new Date() + ': ' + err);
 	res.status(500).json({ message: 'Error inflating gzipped read files: ' + err });
 	return;
     }
@@ -840,7 +842,7 @@ runAnalysis = async function(req, res) {
     try {
         await handleRenamed(refPath);
     } catch(err) {
-	    console.error(new Date() + ': ' + err);
+	//console.error(new Date() + ': ' + err);
         res.status(500).json({ message: 'Error renaming sequences within renamed files: ' + err });
 	return;
     }
@@ -854,6 +856,7 @@ runAnalysis = async function(req, res) {
 	await catFastaFiles(_refFiles, refPath, outPath);
 	//console.error('Reference fasta files combined.');
     } catch(err) {
+	//console.error(new Date() + ': ' + err);
 	res.status(500).json({ message: 'Error combining reference files: ' + err });
 	return;
     }
@@ -868,6 +871,7 @@ runAnalysis = async function(req, res) {
         resData["PID"] = pid_line.replace(/[\n\r]/g, '');
 	//console.error("Analysis pipeline finished.");
     } catch(err) {
+	//console.error(new Date() + ': ' + err);
 	// For biobin mode, we sometimes get no results due to zero mapped
         // reads being assigned to any plasmids. We need to handle this
         // gracefully.
@@ -953,7 +957,7 @@ runCheckForFast5 = function(serverId, fileName) {
 	    // file is not fast5, so we can use standard expectations for
 	    // error vs. success
             if (error) {
-		console.error(error);
+		//console.error(new Date() + ': ' + error);
                 resolve();
             } else {
 		let err = 'ERROR: Fast5 format detected! ' + fileName + ' appears to be in fast5 format. Please perform basecalling on this file and resubmit in fastq format.';
@@ -978,7 +982,8 @@ verifyFile = async function(res, serverId, fileName, fileFormat, path) {
             res.status(400).json({ message: err });
 	    return;
 	}
-	res.status(200).send(serverId);
+	res.set('Content-Type', 'text/plain');
+	res.sendStatus(200);
         return;
     }
 }
