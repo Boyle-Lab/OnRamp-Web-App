@@ -144,7 +144,9 @@ router.delete('/delete', (req, res) => {
 // This is a dummy endpoint for empty delete requests that happen
 // as a result of the FilePond module.
 router.delete('', (req, res) => {
-    res.status(200);
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    console.error(new Date() + ' (' + reqIp + '): ' + 'delete (empty)');
+    res.sendStatus(200);
     return;
 });
 
@@ -152,7 +154,7 @@ router.delete('', (req, res) => {
 router.post("/getFile", (req, res) => {
     const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { fileName, contentType, encodingType } = req.body;
-    console.error(new Date() + ': ' + 'getFile ' + fileName);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'getFile fileName: ' + fileName);
     fs.readFile(fileName, encodingType, (err, data) => {
         if (err) {
 	    console.error(new Date() + ': ' + err);
@@ -169,7 +171,7 @@ router.post("/getFile", (req, res) => {
 // This method writes a json object to a local file.
 router.post('/writeJson', (req, res) => {
     const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const { fileName, index } = req.body;    
+    const { fileName, index } = req.body;
     if (index.length == 0) {
 	res.set('Content-Type', 'application/json');
         res.status(400).json({ message: 'No content.' });
@@ -190,7 +192,7 @@ router.post('/writeJson', (req, res) => {
 router.get("/getResult", (req, res) => {
     const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, fileName, contentType, encodingType } = req.query;
-    console.error(new Date() + ': ' + 'getResult ' + serverId + ' ' + fileName);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'getResult ' + serverId + ' ' + fileName);
     const filePath = '/tmp/' + serverId + '/' + fileName;
     fs.readFile(filePath, encodingType, (err, data) => {
         if (err) {
@@ -209,7 +211,7 @@ router.get("/getResult", (req, res) => {
 router.get("/downloadResults", (req, res) => {
     const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, fileName, } = req.query;
-    console.error(new Date() + ': ' + 'downloadResults ' + serverId + ' ' + fileName);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'downloadResults ' + serverId + ' ' + fileName);
     const filePath = '/tmp/' + serverId + '/' + fileName;
     fs.readFile(filePath, null, (err, data) => {
         if (err) {
@@ -236,7 +238,7 @@ const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
 prepareResults = async function(req, res) {
     const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, scope, sessionName } = req.body;
-    console.error(new Date() + ': ' + 'prepareResults ' + serverId + ' ' + scope + ' ' + sessionName);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'prepareResults ' + serverId + ' ' + scope + ' ' + sessionName);
     const resultsPath = '/tmp/' + serverId;
 
     // Must put the tarball some place else during creation.
@@ -298,7 +300,7 @@ runPrepareDownload = function(cmdArgs) {
 router.post('/checkDownloadPrepJob', (req, res) => {
     const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, serverPID, fileName } = req.body;
-    console.error(new Date() + ': ' + 'checkDownloadPrepJob ' + serverId + ' ' + serverPID + ' ' + fileName);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'checkDownloadPrepJob ' + serverId + ' ' + serverPID + ' ' + fileName);
 
     // Check for the PID of the pipeline process.
     try {
@@ -381,7 +383,7 @@ router.post('/checkJob', (req, res) => {
     const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     res.set('Content-Type', 'application/json');
     const { refServerId, resServerId, serverPID } = req.body;
-    console.error(new Date() + ': ' + 'checkJob refServerId: ' + refServerId+ ' serverPid: ' + serverPID);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'checkJob refServerId: ' + refServerId+ ' serverPid: ' + serverPID);
 
     // Check for the PID of the pipeline process.
     try {
@@ -391,7 +393,7 @@ router.post('/checkJob', (req, res) => {
 	res.status(200).json({ pipelineStatus: "running" });	
     } catch(err) {
 	// Process is not running. See if we have results or an error.
-	checkOutput(res, refServerId, resServerId);
+	checkOutput(reqIp, res, refServerId, resServerId);
 	//res.status(200).json({ pipelineStatus: "completed" });
     }    
 });
@@ -403,7 +405,7 @@ router.post('/processCachedData', (req, res) => {
     res.set('Content-Type', 'application/json');
 
     const { resServerId, refServerId, refFile, name } = req.body;
-    console.error(new Date() + ': ' + 'processCachedData ' + resServerId+ ' ' + refServerId + ' ' + refFile + ' ' + name);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'processCachedData ' + resServerId+ ' ' + refServerId + ' ' + refFile + ' ' + name);
 
     // Get locations of data on the server.
     const refPath = '/tmp/' + refServerId + '/';
@@ -427,7 +429,7 @@ router.post('/processCachedData', (req, res) => {
 			};
 	
 	// Process results for display.
-	processOutput(res, refPath, resPath, resData);
+	processOutput(reqIp, res, refPath, resPath, resData);
     });    
 });
 
@@ -437,7 +439,7 @@ router.post('/findREOffsets', (req, res) => {
     res.set('Content-Type', 'application/json');
 
     const { serverId, fastaREStr } = req.body;
-    console.error(new Date() + ': ' + 'findREOffsets ' + serverId + ' ' + fastaREStr);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'findREOffsets ' + serverId + ' ' + fastaREStr);
     
     let options = {
         mode: 'text',
@@ -647,8 +649,9 @@ runProcessResults = function(refPath, outPath) {
 
 // async function to run the python-based pipeline steps sequentially.
 runAnalysis = async function(req, res) {
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { readFiles, readServerId, refFiles, refServerId, fastaREData, options } = req.body;
-    console.error(new Date() + ': ' + 'processData refServerId: ' + refServerId + ' readServerId: ' + readServerId);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'processData refServerId: ' + refServerId + ' readServerId: ' + readServerId);
 
     // Get locations of data on the server.
     const readPath = '/tmp/' + readServerId + '/';
@@ -681,7 +684,7 @@ runAnalysis = async function(req, res) {
     // Process restriction enzyme offsets into a yaml file to supply the
     // --restriction_enzyme_table option.
     const yamlData = {};
-    Object.keys(fastaREData).map( (key, index) => {
+    Object.keys(fastaREData).map ((key, index) => {
         let fnameParts = key.split('.');
         let offset = 1;
         let ext = fnameParts[fnameParts.length - offset];
@@ -836,7 +839,7 @@ runAnalysis = async function(req, res) {
     });
 
     // Write params to console for debug purposes.
-    console.error(new Date() + ': processData cmdArgs: ' + cmdArgs.join(' '));
+    console.error(new Date() + ' (' + reqIp + '): processData cmdArgs: ' + cmdArgs.join(' '));
     
     // Make sure fasta sequence names match file names.
     //console.error("Processing renamed files...");
@@ -891,13 +894,13 @@ runAnalysis = async function(req, res) {
     
     // Return data include server IDs for all data locations
     // and the PID of the process running the analysis pipeline
-    // on the server.
+    // on the server.    
     res.status(200).json({ success: true, data: resData });
     return;
 }
 
 // Check an outpath for results/errors and return processed data or error message.
-checkOutput = async function(res, refServerId, resServerId) {
+checkOutput = async function(reqIp, res, refServerId, resServerId) {
     // Get location of data on the server.
     const refPath = '/tmp/' + refServerId + '/';
     const resPath = '/tmp/' + resServerId + '/';
@@ -916,7 +919,7 @@ checkOutput = async function(res, refServerId, resServerId) {
 	    // Handle it appropriately...
 	    //if () {
 	    console.error(stats);
-		processOutput(res, refPath, resPath);
+		processOutput(reqIp, res, refPath, resPath);
 		return;
 	    //}
 	}
@@ -933,15 +936,15 @@ checkOutput = async function(res, refServerId, resServerId) {
 	    return;
 	} else {
 	    // All is well! Process the output and return results.
-	    processOutput(res, refPath, resPath);
+	    processOutput(reqIp, res, refPath, resPath);
 	    return;
 	}
     });
 }
 
 // Process results for a completed job.
-processOutput = async function(res, refPath, resPath, resData) {
-    console.error(new Date() + ': ' + 'processOutput refPath: ' + refPath+ ' resPath: ' + resPath + ' resData: ' + resData);
+processOutput = async function(reqIp, res, refPath, resPath, resData) {
+    console.error(new Date() + ' (' + reqIp + '): ' + 'processOutput refPath: ' + refPath+ ' resPath: ' + resPath + ' resData: ' + resData);
     let resStats = {};
     try {
         resStats = await runProcessResults(refPath, resPath);
@@ -961,6 +964,7 @@ processOutput = async function(res, refPath, resPath, resData) {
 
 // Look in results directory to see what error data we can find.
 processError = async function(res, resPath) {
+    
     fs.readFile(resPath + 'pipelineProcess.err', 'utf8', (err, data) => {
         if (err) {
             res.status(500).json({ success: false, error: err });
