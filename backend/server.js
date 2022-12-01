@@ -52,7 +52,9 @@ app.use(fileUpload());
 
 // This is our file upload method.
 router.post('/upload', (req, res) => {
-    console.error(new Date() + ': ' + 'upload');
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const serverId = req.query.serverId;
+    console.error(new Date() + ' (' + reqIp + '): upload serverId: ' + serverId);
     res.set('Content-Type', 'text/plain');
     // Sometimes an empty reqest comes in (i.e., req.files is undefined).
     // Not sure why this happens, but it will crash the server if we do
@@ -70,7 +72,6 @@ router.post('/upload', (req, res) => {
 	res.status(400).json({ message: 'No files were uploaded.' });
 	return;
     }
-    const serverId = req.query.serverId;
     fs.mkdir('/tmp/' + serverId, { recursive: true }, (err) => {
 	if (err) {
 	    console.error(new Date() + ': ' + err);
@@ -96,10 +97,9 @@ router.post('/upload', (req, res) => {
 
 // This method runs various format checks on a file.
 router.post('/checkformat', (req, res) => {
-    console.error(new Date() + ': ' + 'checkFileFormat');
-    res.set('Content-Type', 'text/plain');
-
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const {serverId, fileName, fileFormat} = req.body;
+    console.error(new Date() + ' (' + reqIp + '): ' + 'checkFormat serverId: ' + serverId + ' fileName: ' + fileName + ' fileFormat: ' + fileFormat);
 
     if (serverId === undefined ||
 	fileName === undefined ||
@@ -115,9 +115,9 @@ router.post('/checkformat', (req, res) => {
 
 // This is our user file delete method.
 router.delete('/delete', (req, res) => {
-    res.set('Content-Type', 'text/plain');
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, fileName } = req.query;    
-    console.error(new Date() + ': ' + 'delete ' + serverId + ' ' + fileName);
+    console.error(new Date() + ' (' + reqIp + '): ' + 'delete serverId: ' + serverId + ' fileName: ' + fileName);
     let _filePath = '/tmp/' + serverId;
     if (fileName) {
 	_filePath = _filePath + '/' + fileName;
@@ -136,7 +136,8 @@ router.delete('/delete', (req, res) => {
 	    });  
 	}
     });
-    res.status(200).send('Deleted');
+    res.set('Content-Type', 'text/plain');
+    res.sendStatus(200);
     return;
 });
 
@@ -149,9 +150,9 @@ router.delete('', (req, res) => {
 
 // Retrieve a local file from the given path.
 router.post("/getFile", (req, res) => {
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { fileName, contentType, encodingType } = req.body;
     console.error(new Date() + ': ' + 'getFile ' + fileName);
-    res.set('Content-Type', contentType);
     fs.readFile(fileName, encodingType, (err, data) => {
         if (err) {
 	    console.error(new Date() + ': ' + err);
@@ -159,6 +160,7 @@ router.post("/getFile", (req, res) => {
             res.json({ success: false, error: err });
 	    return;
         }
+	res.set('Content-Type', contentType);
         res.status(200).json({ success: true, data: data });
 	return;
     });
@@ -166,8 +168,10 @@ router.post("/getFile", (req, res) => {
 
 // This method writes a json object to a local file.
 router.post('/writeJson', (req, res) => {
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { fileName, index } = req.body;    
     if (index.length == 0) {
+	res.set('Content-Type', 'application/json');
         res.status(400).json({ message: 'No content.' });
 	return;
     }
@@ -177,23 +181,25 @@ router.post('/writeJson', (req, res) => {
         res.status(500).json({ message: err });
 	return;
     });
-    res.status(200).send('Success');
+    res.set('Content-Type', 'text/plain');
+    res.sendStatus(200);
     return;
 });
 
 // This method is used to retrieve analysis results for display in IGV.
 router.get("/getResult", (req, res) => {
-    res.set('Content-Type', 'application/json');
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, fileName, contentType, encodingType } = req.query;
     console.error(new Date() + ': ' + 'getResult ' + serverId + ' ' + fileName);
     const filePath = '/tmp/' + serverId + '/' + fileName;
-    res.set('Content-Type', contentType);
     fs.readFile(filePath, encodingType, (err, data) => {
         if (err) {
-	    console.error(new Date() + ': ' + err);	    
+	    console.error(new Date() + ': ' + err);
+	    res.set('Content-Type', contentType);
             res.status(400).json({ message: err });
 	    return;
         }
+	res.set('Content-Type', contentType);
         res.status(200).send(data);
 	return;
     });
@@ -201,11 +207,10 @@ router.get("/getResult", (req, res) => {
 
 // This method is used to retrieve analysis results for download as a tarball.
 router.get("/downloadResults", (req, res) => {
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, fileName, } = req.query;
     console.error(new Date() + ': ' + 'downloadResults ' + serverId + ' ' + fileName);
     const filePath = '/tmp/' + serverId + '/' + fileName;
-    res.set({'Content-Type': 'application/x-gtar',
-	     'Content-Disposition': 'attachment; filename=' + fileName});
     fs.readFile(filePath, null, (err, data) => {
         if (err) {
 	    console.error(new Date() + ': ' + err);
@@ -213,6 +218,8 @@ router.get("/downloadResults", (req, res) => {
             res.status(400).json({ message: err });
 	    return;
         }
+	res.set({'Content-Type': 'application/x-gtar',
+		 'Content-Disposition': 'attachment; filename=' + fileName});
         res.status(200).send(data);
 	return;
     });
@@ -227,7 +234,7 @@ router.post("/prepareResults", (req, res) => {
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 prepareResults = async function(req, res) {
-    res.set('Content-Type', 'application/json');
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, scope, sessionName } = req.body;
     console.error(new Date() + ': ' + 'prepareResults ' + serverId + ' ' + scope + ' ' + sessionName);
     const resultsPath = '/tmp/' + serverId;
@@ -256,6 +263,7 @@ prepareResults = async function(req, res) {
     cmdArgs = cmdArgs + ' ' + destPath
     try {
 	let pid_line = await runPrepareDownload(cmdArgs, destPath);
+	res.set('Content-Type', 'application/json');
 	res.status(200).json({
 	    success: true,
 	    data: {
@@ -265,6 +273,7 @@ prepareResults = async function(req, res) {
 	    }
 	});
     } catch(err) {
+	res.set('Content-Type', 'application/json');
 	res.status(400).json({ message: err });
         return;
     }
@@ -276,7 +285,7 @@ runPrepareDownload = function(cmdArgs) {
     return new Promise((resolve, reject) => {
         exec('./runPrepareDownload.sh ' + cmdArgs, (error, stdout, stderr) => {
             if (error) {
-                console.error(new Date() + ': ' + error);
+                console.error(new Date() + 'runPrepareDownload: ' + error);
                 reject(error);
             } else {
                 resolve(stdout);
@@ -287,7 +296,7 @@ runPrepareDownload = function(cmdArgs) {
 
 // This method checks for a running process from runPrepareDownload
 router.post('/checkDownloadPrepJob', (req, res) => {
-    res.set('Content-Type', 'application/json');
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const { serverId, serverPID, fileName } = req.body;
     console.error(new Date() + ': ' + 'checkDownloadPrepJob ' + serverId + ' ' + serverPID + ' ' + fileName);
 
@@ -296,6 +305,7 @@ router.post('/checkDownloadPrepJob', (req, res) => {
         process.kill(serverPID, 0);
         // If we've gotten this far, the process is still running.
         // Resolve the request accordingly.
+	res.set('Content-Type', 'application/json');
         res.status(200).json({ pipelineStatus: "running" });
     } catch(err) {
         // Process is not running. See if we have results or an error.
@@ -318,6 +328,7 @@ checkDownloadFile = async function(res, serverId, fileName) {
             return;
         } else {
             // All is well! Process the output and return results.
+	    res.set('Content-Type', 'application/json');
             res.status(200).json({ pipelineStatus: "completed" });
             return;
         }
@@ -326,7 +337,7 @@ checkDownloadFile = async function(res, serverId, fileName) {
 
 // This method retrieves the available medaka models and returns the result as an array.
 router.post('/getMedakaModels', (req, res) => {
-    res.set('Content-Type', 'application/json');
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     // First check to see if we have a cached json file.
     fs.readFile("medakaModels.json", "utf8", (err,data) => {
 	if (err) {
@@ -335,6 +346,7 @@ router.post('/getMedakaModels', (req, res) => {
 	    PythonShell.run('getMedakaModels.py', options, function (err, results) {
 		if (err) {
 		    console.error(new Date() + ': ' + err)
+		    res.set('Content-Type', 'application/json');
 		    res.status(500).json({ message: 'error getting medaka models: ' + err });
 		    return;
 		}
@@ -345,10 +357,12 @@ router.post('/getMedakaModels', (req, res) => {
 			console.error(new Date() + ': ' + err);
 		    }
 		});
+		res.set('Content-Type', 'application/json');
 		res.status(200).json({ success: true, data: results });
 		return;
 	    });
 	} else {
+	    res.set('Content-Type', 'application/json');
 	    res.status(200).json({ success: true, data: JSON.parse(data) });
 	    return;
 	}
@@ -364,9 +378,10 @@ router.post('/processData', (req, res) => {
 
 // Check progress on a (running/completed/failed) pipeline job.
 router.post('/checkJob', (req, res) => {
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     res.set('Content-Type', 'application/json');
     const { refServerId, resServerId, serverPID } = req.body;
-    console.error(new Date() + ': ' + 'checkJob ' + refServerId+ ' ' + serverPID);
+    console.error(new Date() + ': ' + 'checkJob refServerId: ' + refServerId+ ' serverPid: ' + serverPID);
 
     // Check for the PID of the pipeline process.
     try {
@@ -384,6 +399,7 @@ router.post('/checkJob', (req, res) => {
 // This method retrieves existing data from the server for a session run
 // within the last 24 hours. (session data stored in a cookie)
 router.post('/processCachedData', (req, res) => {
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     res.set('Content-Type', 'application/json');
 
     const { resServerId, refServerId, refFile, name } = req.body;
@@ -410,29 +426,14 @@ router.post('/processCachedData', (req, res) => {
 			  runParams: JSON.parse(data)
 			};
 	
-	// Get stats for the reference sequences.
-	let pipelineOptions = {
-            mode: 'text',
-            pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
-            pythonOptions: ['-u'],
-            args: [refPath, resPath + 'consensus_sequences', resPath + 'filtered_alignment.bam']
-	}
-	
-	PythonShell.run('processResults.py', pipelineOptions, function (err, resStats) {
-            if (err) {
-		console.error(new Date() + ': ' + err)
-		res.status(500).json({ message: err });
-		return;
-            } else {
-		res.status(200).json({ success: true, data: resData, stats: JSON.parse(resStats) });
-		return;
-            }
-	});
+	// Process results for display.
+	processOutput(res, refPath, resPath, resData);
     });    
 });
 
 // This method finds restriction enzyme offsets based on user inputs and fasta files in a directory.
 router.post('/findREOffsets', (req, res) => {
+    const reqIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     res.set('Content-Type', 'application/json');
 
     const { serverId, fastaREStr } = req.body;
@@ -835,7 +836,7 @@ runAnalysis = async function(req, res) {
     });
 
     // Write params to console for debug purposes.
-    console.error(new Date() + ': ' + cmdArgs.join(' '));
+    console.error(new Date() + ': processData cmdArgs: ' + cmdArgs.join(' '));
     
     // Make sure fasta sequence names match file names.
     //console.error("Processing renamed files...");
@@ -901,6 +902,27 @@ checkOutput = async function(res, refServerId, resServerId) {
     const refPath = '/tmp/' + refServerId + '/';
     const resPath = '/tmp/' + resServerId + '/';
 
+    // Check for error output first.
+    /*
+    fs.stat(resPath + 'pipelineProcess.err', (err, stats) => {
+	if (err) {
+	    // This should not happen, as pipelineProcess.err should always be created.
+	    // Therefore, we will always return an error because something clearly went
+	    // wrong, even if we can't easily tell what!
+	    res.status(500).json({ message: err });
+            return;
+        } else {
+	    // If pipelineProcess.err has non-zero size, there was an error.
+	    // Handle it appropriately...
+	    //if () {
+	    console.error(stats);
+		processOutput(res, refPath, resPath);
+		return;
+	    //}
+	}
+    });
+    */
+
     // Check for the final BAM alignment. If this is present, the analysis
     // completed successfully and we can process and return results.
     fs.access(resPath + 'filtered_alignment.bam', fs.constants.F_OK, (err) => {
@@ -918,7 +940,8 @@ checkOutput = async function(res, refServerId, resServerId) {
 }
 
 // Process results for a completed job.
-processOutput = async function(res, refPath, resPath) {
+processOutput = async function(res, refPath, resPath, resData) {
+    console.error(new Date() + ': ' + 'processOutput refPath: ' + refPath+ ' resPath: ' + resPath + ' resData: ' + resData);
     let resStats = {};
     try {
         resStats = await runProcessResults(refPath, resPath);
@@ -928,7 +951,11 @@ processOutput = async function(res, refPath, resPath) {
 	res.status(400).json({ message: err });
 	return;
     }
-    res.status(200).json({ pipelineStatus: "completed", stats: JSON.parse(resStats) });
+    res.set('Content-Type', 'application/json');
+    res.status(200).json({ success: true,
+			   pipelineStatus: "completed",
+			   stats: JSON.parse(resStats),
+			   data: resData });
     return;
 }
 
@@ -939,10 +966,10 @@ processError = async function(res, resPath) {
             res.status(500).json({ success: false, error: err });
             return;
         }
+	res.set('Content-Type', 'application/json');
         res.status(500).json({ pipelineStatus: "error", message: data });
         return;
-    });
-    
+    });    
 }
 
 runCheckForFast5 = function(serverId, fileName) {
