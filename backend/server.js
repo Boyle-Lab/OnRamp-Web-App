@@ -4,6 +4,7 @@ const logger = require("morgan");
 const fileUpload = require("express-fileupload");
 const cors = require('cors')
 const fs = require('fs-extra');
+const fsPromises = require('node:fs/promises');
 const path = require('path');
 const compression = require('compression');
 const {PythonShell} = require('python-shell');
@@ -309,14 +310,16 @@ router.post('/checkDownloadPrepJob', (req, res) => {
         // Resolve the request accordingly.
 	res.set('Content-Type', 'application/json');
         res.status(200).json({ pipelineStatus: "running" });
+	return;
     } catch(err) {
         // Process is not running. See if we have results or an error.
-        checkDownloadFile(res, serverId, fileName);
+        checkDownloadFile(reqIp, res, serverId, fileName);
+	return;
     }
 });
 
 // This function checks to make sure a download file is present when/where it's expected.
-checkDownloadFile = async function(res, serverId, fileName) {
+checkDownloadFile = async function(reqIp, res, serverId, fileName) {
     // Get location of data on the server.
     const resPath = '/tmp/' + serverId + '/';
 
@@ -326,7 +329,7 @@ checkDownloadFile = async function(res, serverId, fileName) {
         if (err) {
             // No tarball found. There was an error.
             // Process any stored error output and return it along with the json 
-            processError(res, resPath);
+            processError(reqIp, res, resPath);
             return;
         } else {
             // All is well! Process the output and return results.
@@ -601,14 +604,7 @@ catFastaFiles = function(_refFiles, refPath, outPath) {
 }
 
 runPlasmidSeq = function(cmdArgs) {
-    // Run the bulkPlasmidSeq pipeline with given options.
-    let options = {
-        mode: 'text',
-        pythonPath: '/usr/local/miniconda/envs/medaka/bin/python3',
-        pythonOptions: ['-u'],
-        args: cmdArgs
-    }
-    
+    // Run the bulkPlasmidSeq pipeline with given cmdArgs.
     return new Promise((resolve, reject) => {
 	exec('./runPipelineBackground.sh ' + cmdArgs.join(' '), (error, stdout, stderr) => {
             if (error) {
@@ -905,26 +901,33 @@ checkOutput = async function(reqIp, res, refServerId, resServerId) {
     const refPath = '/tmp/' + refServerId + '/';
     const resPath = '/tmp/' + resServerId + '/';
 
-    // Check for error output first.
-    /*
-    fs.stat(resPath + 'pipelineProcess.err', (err, stats) => {
-	if (err) {
-	    // This should not happen, as pipelineProcess.err should always be created.
-	    // Therefore, we will always return an error because something clearly went
-	    // wrong, even if we can't easily tell what!
-	    res.status(500).json({ message: err });
-            return;
-        } else {
-	    // If pipelineProcess.err has non-zero size, there was an error.
-	    // Handle it appropriately...
-	    //if () {
-	    console.error(stats);
-		processOutput(reqIp, res, refPath, resPath);
-		return;
-	    //}
-	}
-    });
-    */
+    // Check for error output.
+    // TO-DO: Check for error content that would obviate the specific check for
+    // filtered_alignment.bam.
+    let data = undefined;  // parseErrors will return false if this stays undefined.
+    try {
+	data = await fsPromises.readFile(resPath + 'pipelineProcess.err', "utf8");
+    } catch (err) {
+	// The file could not be read for some reason. This could
+        // mean it's absent or empty. Empty is fine. Absent is not
+        // fine, since the file should always be created.
+	fs.access(resPath + 'pipelineProcess.err', fs.constants.F_OK, (err) => {
+	    if (err) {
+		// File is not found/not readable
+                res.set('Content-Type', 'application/json');
+                res.status(500).json({ message: err });
+                return;
+	    }
+	    // File was there but empty. Do nothing.
+	});
+    }
+    // We need to look at the file content to determine if any actual
+    // errors were encountered (since some processes write progress
+    // messages to stderr).
+    const errorExists = await parseErrors(reqIp, res, data);
+    if (errorExists) {
+	return;
+    }
 
     // Check for the final BAM alignment. If this is present, the analysis
     // completed successfully and we can process and return results.
@@ -932,7 +935,7 @@ checkOutput = async function(reqIp, res, refServerId, resServerId) {
 	if (err) {
 	    // No BAM found. There was an error.
 	    // Process any stored error output and return it along with the json
-	    processError(res, resPath);
+	    processError(reqIp, res, resPath);
 	    return;
 	} else {
 	    // All is well! Process the output and return results.
@@ -962,18 +965,77 @@ processOutput = async function(reqIp, res, refPath, resPath, resData) {
     return;
 }
 
-// Look in results directory to see what error data we can find.
-processError = async function(res, resPath) {
+// Parse error data to determine if/where error(s) occurred in the
+// analytical pipeline.
+parseErrors = function(reqIp, res, data) {
+    // Just return false if no data were sent.
+    if (typeof(data) === 'undefined') {
+	return false;
+    }
     
+    // Regular expressions used to recognize pipeline steps.
+    const needle_re = /Needleman\-Wunsch/;
+
+    // Regular expressions used to recognize error output.
+    const processKilled_re = /[Kk][Ii][Ll]+[Ee][Dd]/;
+    const processTerminated_re = /[Tt][Ee][Rr][Mm][Ii][Nn][Aa][Tt][Ee][Dd]/;
+    const error_re = /[Ee][Rr]+[Oo][Rr]/;
+
+    // We will build a string to hold error messages.
+    let err = undefined;
+
+    // Step through lines of the stderr output looking for steps
+    // and errors
+    // TO-DO: Maybe just put a job ID in the error data file to use in log messages
+    let step = undefined;
+    data.split('\n').forEach(function (line) {
+        //console.error(line);
+	// See if this line indicates we've started a new step.
+        if (needle_re.test(line)) {
+            step = "needle";
+        }
+
+	// See if this line contains error content.
+        if (processKilled_re.test(line) || processTerminated_re.test(line)) {
+	    // Line content indicates a process was killed.
+	    console.error(new Date() + ' (' + reqIp + ') killErrorFound (' + step + '): ' + line);
+            if (step == "needle") {
+		err = err + "\n" + "Pairwise alignment step failed. (job killed -- max memory exceeded)";
+            }
+        } else if (error_re.test(line)) {
+	    // Line content indicates an error was thrown.
+	    console.error(new Date() + ' (' + reqIp + ') ErrorFound (' + step + '): ' + line);
+	    err = err + "\n" + line;
+	}	
+    });
+
+    if (err) {
+	processError(reqIp, res, undefined, err);
+	return true;
+    }
+    return false;
+}
+
+// Look in results directory to see what error data we can find.
+processError = async function(reqIp, res, resPath, error) {
+    // If error content is provided, just return the error.
+    if (error) {
+	res.set('Content-Type', 'application/json');
+        res.status(500).json({ pipelineStatus: "error", message: error });
+        return;
+    }
+    // If no error content provided, go get it.
     fs.readFile(resPath + 'pipelineProcess.err', 'utf8', (err, data) => {
         if (err) {
+	    res.set('Content-Type', 'application/json');
             res.status(500).json({ success: false, error: err });
             return;
         }
-	res.set('Content-Type', 'application/json');
-        res.status(500).json({ pipelineStatus: "error", message: data });
+	const errorExists = parseErrors(undefined, res, data);
+	// We store errorExists to be thorough, but don't actually need to
+	// test its value because only errors should bring us this far!
         return;
-    });    
+    });
 }
 
 runCheckForFast5 = function(serverId, fileName) {
