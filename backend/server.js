@@ -432,7 +432,8 @@ router.post('/processCachedData', (req, res) => {
 			};
 	
 	// Process results for display.
-	processOutput(reqIp, res, refPath, resPath, resData);
+	//processOutput(reqIp, res, refPath, resPath, resData);
+	checkOutput(reqIp, res, refServerId, resServerId, resData);
     });    
 });
 
@@ -896,7 +897,7 @@ runAnalysis = async function(req, res) {
 }
 
 // Check an outpath for results/errors and return processed data or error message.
-checkOutput = async function(reqIp, res, refServerId, resServerId) {
+checkOutput = async function(reqIp, res, refServerId, resServerId, resData) {
     // Get location of data on the server.
     const refPath = '/tmp/' + refServerId + '/';
     const resPath = '/tmp/' + resServerId + '/';
@@ -939,7 +940,7 @@ checkOutput = async function(reqIp, res, refServerId, resServerId) {
 	    return;
 	} else {
 	    // All is well! Process the output and return results.
-	    processOutput(reqIp, res, refPath, resPath);
+	    processOutput(reqIp, res, refPath, resPath, resData);
 	    return;
 	}
     });
