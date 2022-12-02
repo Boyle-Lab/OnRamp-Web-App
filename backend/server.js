@@ -432,7 +432,7 @@ router.post('/processCachedData', (req, res) => {
 			};
 	
 	// Process results for display.
-	processOutput(reqIp, res, refPath, resPath, resData);
+	checkOutput(reqIp, res, refServerId, resServerId, resData);
     });    
 });
 
@@ -896,7 +896,7 @@ runAnalysis = async function(req, res) {
 }
 
 // Check an outpath for results/errors and return processed data or error message.
-checkOutput = async function(reqIp, res, refServerId, resServerId) {
+checkOutput = async function(reqIp, res, refServerId, resServerId, resData) {
     // Get location of data on the server.
     const refPath = '/tmp/' + refServerId + '/';
     const resPath = '/tmp/' + resServerId + '/';
@@ -928,6 +928,8 @@ checkOutput = async function(reqIp, res, refServerId, resServerId) {
     if (errorExists) {
 	return;
     }
+    processOutput(reqIp, res, refPath, resPath, resData);
+    return;
 
     // Check for the final BAM alignment. If this is present, the analysis
     // completed successfully and we can process and return results.
@@ -939,7 +941,7 @@ checkOutput = async function(reqIp, res, refServerId, resServerId) {
 	    return;
 	} else {
 	    // All is well! Process the output and return results.
-	    processOutput(reqIp, res, refPath, resPath);
+	    processOutput(reqIp, res, refPath, resPath, resData);
 	    return;
 	}
     });
@@ -972,9 +974,13 @@ parseErrors = function(reqIp, res, data) {
     if (typeof(data) === 'undefined') {
 	return false;
     }
+
+    // Regular expression to identify the output directory name
+    const resServerId_re = /Output directory:\s+\/tmp\/(\d+)\//;
     
     // Regular expressions used to recognize pipeline steps.
     const needle_re = /Needleman\-Wunsch/;
+    const medaka_re = /medaka/;
 
     // Regular expressions used to recognize error output.
     const processKilled_re = /[Kk][Ii][Ll]+[Ee][Dd]/;
@@ -985,27 +991,39 @@ parseErrors = function(reqIp, res, data) {
     let err = undefined;
 
     // Step through lines of the stderr output looking for steps
-    // and errors
-    // TO-DO: Maybe just put a job ID in the error data file to use in log messages
+    // and errors    
+    // TO-DO:
+    // 1) Parse and capture entire traceback blocks
     let step = undefined;
+    let resServerId = undefined;
     data.split('\n').forEach(function (line) {
         //console.error(line);
+	// See if we have the output directory (from medaka output)
+	if (resServerId_re.test(line)) {
+	    let matches = resServerId_re.exec(line);
+	    resServerId = matches[1];
+	}
+	
 	// See if this line indicates we've started a new step.
         if (needle_re.test(line)) {
             step = "needle";
-        }
+        } else if (medaka_re.test(line)) {
+	    step = "medaka";
+	}
 
 	// See if this line contains error content.
         if (processKilled_re.test(line) || processTerminated_re.test(line)) {
 	    // Line content indicates a process was killed.
-	    console.error(new Date() + ' (' + reqIp + ') killErrorFound (' + step + '): ' + line);
+	    console.error(new Date() + ' (' + reqIp + ') (resServerId: ' + resServerId + ') killErrorFound (' + step + '): ' + line);
             if (step == "needle") {
-		err = err + "\n" + "Pairwise alignment step failed. (job killed -- max memory exceeded)";
-            }
+		err = append_err(err, "Pairwise alignment step failed. (job killed -- max memory exceeded)");
+            } else {
+		err = append_err(err, "Job failed. (" + step + ") (job killed -- max memory likely exceeded)");
+	    }
         } else if (error_re.test(line)) {
 	    // Line content indicates an error was thrown.
-	    console.error(new Date() + ' (' + reqIp + ') ErrorFound (' + step + '): ' + line);
-	    err = err + "\n" + line;
+	    console.error(new Date() + ' (' + reqIp + ') (resServerId: ' + resServerId + ') ErrorFound (' + step + '): ' + line);
+	    err = append_err(err, line);
 	}	
     });
 
@@ -1014,6 +1032,17 @@ parseErrors = function(reqIp, res, data) {
 	return true;
     }
     return false;
+}
+
+// Helper function to build error strings.
+append_err = function(err, line) {
+    let ret = undefined;
+    if (err) {
+        ret = err + "\n" + line;
+    } else {
+        ret = line;
+    }
+    return ret;
 }
 
 // Look in results directory to see what error data we can find.
