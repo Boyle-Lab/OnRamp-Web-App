@@ -1,12 +1,15 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+
 import { withStyles } from '@material-ui/core/styles';
-
-
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 
 /*
 This code is part of the bulk_plasmid_seq_web distribution
@@ -63,13 +66,33 @@ function ErrorContent(props) {
 	        <Grid item xs={12} className={classes.centerligned}>
 	            <Typography container="div" align="center" className={classes.bold}>
 	                The analysis pipeline encountered an error.<br/>
-	                See the information below for more details: 
+	                The actual error message was:
 	            </Typography>
 	          <Divider />
 	        </Grid>
-                <Divider />
+	    
 	        <Grid item xs={12} className={classes.centerAligned}>
-	            <span className='infoDialog' dangerouslySetInnerHTML={{ __html: error, }}></span>	
+	            <Typography container="div" align="center">
+	                <span className='infoDialog' dangerouslySetInnerHTML={{ __html: error, }}></span>
+	            </Typography>
+	            <Divider />
+                </Grid>
+	    
+	        <Grid item xs={12} className={classes.centerAligned}>
+	            <Typography container="div" align="center" className={classes.bold}>
+                        Reasons for this error may include:
+	            </Typography>
+	        </Grid>
+	        <Grid item xs={12} className={classes.leftAligned}>
+	            <Typography container="div" align="left">
+                        <span className='bold'>1)</span> The read file is not a valid fastq file.<br/>
+	                <span className='bold'>2)</span> Your data include an unusually-long reference (greater than ~10kb). A cosmid/fosmid, perhaps?<br/>
+	                <span className='bold'>3)</span> There is a problem with one or more of the reference fasta files:<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className='bold'>a)</span> The file contains multiple sequence records.<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className='bold'>b)</span> The fasta sequence name and file name do not match.<br/>
+                        <span className='bold'>4)</span> No reads aligned to one or more reference files. (Did you upload the wrong read file and/or reference(s)?)<br/>
+                        <span className='bold'>5)</span> Too many (>40) plasmids in the pool.<br/>
+                    </Typography>
                 </Grid>
 	    </Grid>
 	</Paper>

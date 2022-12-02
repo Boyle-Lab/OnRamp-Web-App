@@ -25,34 +25,32 @@ function Copyright() {
   );
 }
 
-/*const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ({
     root: {
 	display: 'flex',
 	flexDirection: 'column',
 	minHeight: '75vh',
     },
     footer: {
-	//position: 'absolute',
+	position: 'absolute',
 	padding: theme.spacing(3, 2),
 	marginTop: 'auto',
 	backgroundColor: '#414042',
-	//left: 0,
-	//bottom: 0,
+	left: 0,
+	bottom: 0,
 	width: '100%',
 	color: '#FFFFFF',
 	boxShadow: '0 -4px 5px 0 rgba(0, 0, 0, 0.25)',
-	flexShrink: 0,
-	textAlign: 'center'
     },
-}));*/
+}));
 
 export default function StickyFooter() {
-  //const classes = useStyles();
+  const classes = useStyles();
 
   return (
-    <div>
+    <div className={classes.root}>
 	  <CssBaseline />
-	  <footer className={'footer'}>
+	  <footer className={classes.footer}>
 	  <Grid container spacing={2} alignItems='center'>
 	  <Grid item xs={1}>
 	  <Tooltip title="Oxford Nanopore based Rapid Analysis of Mutliplexed Plasmids.">
