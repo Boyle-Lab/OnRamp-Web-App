@@ -60,7 +60,6 @@ router.post('/upload', (req, res) => {
     // Sometimes an empty reqest comes in (i.e., req.files is undefined).
     // Not sure why this happens, but it will crash the server if we do
     // not handle it.
-    let filesList = undefined;
     try {
 	Object.keys(req.files);
     } catch(err) {
@@ -242,10 +241,21 @@ prepareResults = async function(req, res) {
     console.error(new Date() + ' (' + reqIp + '): ' + 'prepareResults ' + serverId + ' ' + scope + ' ' + sessionName);
     const resultsPath = '/tmp/' + serverId;
 
+    // The following array will eventually be replaced by a file
+    // list given in the request body. This will allow users to select
+    // only the files they want to download. For now, we will just hard-
+    // code the list of files to include in the download. This is mainly
+    // to avoid including various versions of files that were uploaded by
+    // the user.
+    let fileList = ["filtered_alignment.bam*", "consensus_sequences", "combined_ref_seqs.fasta", "rotated_reference.fasta", "consensus_probs.hdf", "restriction_enzyme_cut_sites.yaml", "run_params.json", "pipelineProcess.err", "medaka_log.txt"];
+    if (scope == "consensus") {
+	fileList = ["consensus_sequences", "restriction_enzyme_cut_sites.yaml", "run_params.json", "pipelineProcess.err", "medaka_log.txt"];
+    }
+
     // Must put the tarball some place else during creation.
     const resServerId = Math.floor(1000000000 + Math.random() * 9000000000)
     const destPath = '/tmp/' + resServerId + '/';
-    fs.mkdir(destPath);
+    fs.mkdir(destPath);    
     
     // Tar up the results for download.
     let now = new Date();
@@ -259,11 +269,12 @@ prepareResults = async function(req, res) {
 	  + now.getMinutes() + '-'
 	  + now.getSeconds()
 	  + '.tar.gz';
-    let cmdArgs = destPath + outFile + ' ' + resultsPath + ' "\*"';
-    if (scope == 'consensus') {
-	cmdArgs = destPath + outFile + ' ' + resultsPath + '/consensus_sequences' + ' "\*"';
-    }
+    // Build the args string for the external script.
+    let cmdArgs = destPath + outFile + ' ' + resultsPath;
+    // Add the files, separated by spaces.
+    cmdArgs = cmdArgs + ' ' + fileList.join(' ');
     cmdArgs = cmdArgs + ' ' + destPath
+    console.error("prepareResults: " + cmdArgs);
     try {
 	let pid_line = await runPrepareDownload(cmdArgs, destPath);
 	res.set('Content-Type', 'application/json');

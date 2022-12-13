@@ -105,13 +105,11 @@ class Downloader extends Component {
                     .catch(error => {
                         console.log(error);
                         clearInterval(iv);
-			/*
-			// Should really get this fully-implemented here!
+ 			// Should really get this fully-implemented here!
                         this.setState({
                             processingErr: error.response.data.message,
                             showErrorDialog: true
                         });
-			*/
                     });
             }
         }, 5000);

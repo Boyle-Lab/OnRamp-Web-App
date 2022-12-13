@@ -161,6 +161,7 @@ if __name__ == "__main__":
                 if len(line) == 1:
                     continue
                 fields = re.split("[\s()/]+", line)
+                #sys.stderr.write("%s\n" % (fields))
                 if re.search('^# 1:', line):
                     res["pairwise_algn_stats"]["seq1_name"] = fields[-2]
                     res["pairwise_algn_seq"] = res["pairwise_algn_seq"] + 'Seq 1: ' + fields[-2] + ' (reference)\n'
