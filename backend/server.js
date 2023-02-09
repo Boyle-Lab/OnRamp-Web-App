@@ -297,10 +297,10 @@ prepareResults = async function(req, res) {
 runPrepareDownload = function(cmdArgs) {
     //console.error(cmdArgs);
     return new Promise((resolve, reject) => {
-        exec('./runPrepareDownload.sh ' + cmdArgs, (error, stdout, stderr) => {
-            if (error) {
-                console.error(new Date() + 'runPrepareDownload: ' + error);
-                reject(error);
+        exec('./runPrepareDownload.sh ' + cmdArgs, (err, stdout, stderr) => {
+            if (err) {
+                console.error(new Date() + 'runPrepareDownload: ' + err);
+                reject(err);
             } else {
                 resolve(stdout);
             }
@@ -555,10 +555,10 @@ handleGzipped = async function (files, path) {
 	});
     } else {
 	return new Promise((resolve, reject) => {
-	    exec(_cmdArgs.join(' '), (error, stdout, stderr) => {
-		if (error) {
+	    exec(_cmdArgs.join(' '), (err, stdout, stderr) => {
+		if (err) {
 		    console.error(new Date() + ': ' + err);
-		    reject(error);
+		    reject(err);
 		} else {
 		    resolve(_outfiles);
 		}
@@ -603,10 +603,10 @@ catFastaFiles = function(_refFiles, refPath, outPath) {
     filesToCat.push(outPath + 'combined_ref_seqs.fasta');
     // Combine files with cat.
     return new Promise((resolve, reject) => {
-	exec(filesToCat.join(' '), (error, stdout, stderr) => {
-            if (error) {
-		console.error(new Date() + ': ' + error);
-		reject(error);
+	exec(filesToCat.join(' '), (err, stdout, stderr) => {
+            if (err) {
+		console.error(new Date() + ': ' + err);
+		reject(err);
             } else {
 		resolve();
 	    }
@@ -617,10 +617,10 @@ catFastaFiles = function(_refFiles, refPath, outPath) {
 runPlasmidSeq = function(cmdArgs) {
     // Run the bulkPlasmidSeq pipeline with given cmdArgs.
     return new Promise((resolve, reject) => {
-	exec('./runPipelineBackground.sh ' + cmdArgs.join(' '), (error, stdout, stderr) => {
-            if (error) {
-		console.error(new Date() + ': ' + error);
-		reject(error);
+	exec('./runPipelineBackground.sh ' + cmdArgs.join(' '), (err, stdout, stderr) => {
+            if (err) {
+		console.error(new Date() + ': ' + err);
+		reject(err);
 	    } else {
 		resolve(stdout);
 	    }
@@ -637,7 +637,7 @@ runProcessResults = function(refPath, outPath) {
         args: cmdArgs
     }
 
-    //console.error('processResults.py ' + cmdArgs.join(' '));
+    console.error('processResults.py ' + cmdArgs.join(' '));
     return new Promise((resolve, reject) => {
 	PythonShell.run('processResults.py', options, function (err, resStats) {
             if (err) {
@@ -926,7 +926,7 @@ checkOutput = async function(reqIp, res, refServerId, resServerId, resData) {
 	    if (err) {
 		// File is not found/not readable
                 res.set('Content-Type', 'application/json');
-                res.status(500).json({ message: err });
+                res.status(500).json({ message: 'pipelineProcess.err does not exist or could not be read.' });
                 return;
 	    }
 	    // File was there but empty. Do nothing.
@@ -970,7 +970,7 @@ processOutput = async function(reqIp, res, refPath, resPath, resData) {
 	res.status(400).json({ message: err });
 	return;
     }
-    res.set('Content-Type', 'application/json');
+    //res.set('Content-Type', 'application/json');
     res.status(200).json({ success: true,
 			   pipelineStatus: "completed",
 			   stats: JSON.parse(resStats),
@@ -1057,11 +1057,11 @@ append_err = function(err, line) {
 }
 
 // Look in results directory to see what error data we can find.
-processError = async function(reqIp, res, resPath, error) {
+processError = async function(reqIp, res, resPath, err) {
     // If error content is provided, just return the error.
-    if (error) {
+    if (err) {
 	res.set('Content-Type', 'application/json');
-        res.status(500).json({ pipelineStatus: "error", message: error });
+        res.status(500).json({ pipelineStatus: "error", message: err });
         return;
     }
     // If no error content provided, go get it.
@@ -1083,14 +1083,14 @@ runCheckForFast5 = function(serverId, fileName) {
     //console.error(readPath);
     let readPath = '/tmp/' + serverId + '/' + fileName;
     return new Promise((resolve, reject) => {
-        exec('./checkForFast5.sh ' + readPath, (error, stdout, stderr) => {
+        exec('./checkForFast5.sh ' + readPath, (err, stdout, stderr) => {
 	    // Note we are calling an error a success here, since it means
 	    // h5dump could not read the file, so we know it is not .fast5
 	    // TO-DO: Maybe would be better to have the script exit 0 when
 	    // file is not fast5, so we can use standard expectations for
 	    // error vs. success
-            if (error) {
-		//console.error(new Date() + ': ' + error);
+            if (err) {
+		//console.error(new Date() + ': ' + err);
                 resolve();
             } else {
 		let err = 'ERROR: Fast5 format detected! ' + fileName + ' appears to be in fast5 format. Please perform basecalling on this file and resubmit in fastq format.';
