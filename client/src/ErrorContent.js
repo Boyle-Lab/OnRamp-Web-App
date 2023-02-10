@@ -85,13 +85,14 @@ function ErrorContent(props) {
 	        </Grid>
 	        <Grid item xs={12} className={classes.leftAligned}>
 	            <Typography container="div" align="left">
-                        <span className='bold'>1)</span> The read file is not a valid fastq file.<br/>
-	                <span className='bold'>2)</span> Your data include an unusually-long reference (greater than ~10kb). A cosmid/fosmid, perhaps?<br/>
-	                <span className='bold'>3)</span> There is a problem with one or more of the reference fasta files:<br/>
+                        <span className='bold'>1)</span> One or more file names contain white space and/or illegal characters: &#34; &#39; &#36; &#92; &#47; &#35; &#61; &#91; &#93; &#40; &#41; &#123; &#125; &#126; &#33; &#62; &#60; &#124; &#59; &#42; &#63; &#38; <br/>
+                        <span className='bold'>2)</span> The read file is not a valid fastq file.<br/>
+	                <span className='bold'>3)</span> Your data include an unusually-long reference (greater than ~10kb). A cosmid/fosmid, perhaps?<br/>
+	                <span className='bold'>4)</span> There is a problem with one or more of the reference fasta files:<br/>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className='bold'>a)</span> The file contains multiple sequence records.<br/>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className='bold'>b)</span> The fasta sequence name and file name do not match.<br/>
-                        <span className='bold'>4)</span> No reads aligned to one or more reference files. (Did you upload the wrong read file and/or reference(s)?)<br/>
-                        <span className='bold'>5)</span> Too many (>40) plasmids in the pool.<br/>
+                        <span className='bold'>5)</span> No reads aligned to one or more reference files. (Did you upload the wrong read file and/or reference(s)?)<br/>
+                        <span className='bold'>6)</span> Too many (>40) plasmids in the pool.<br/>
                     </Typography>
                 </Grid>
 	    </Grid>
