@@ -59,7 +59,7 @@ class App extends Component {
 	    resData: null,
 	    sessionName: null,
 	    runParams: null,
-	    useCookies: true,
+	    useCookies: undefined,
 	    useCached: 0,
 	    showCachedDialog: false,
 	    showAcceptCookiesDialog: false,
@@ -71,11 +71,27 @@ class App extends Component {
     }
 
     componentDidMount() {
-	const cookies =  _cookies.getAll();
-	if (Object.keys(cookies).length == 0) {
+	const useCookieTracker = _cookies.get('_onramp_cookies')
+	if (useCookieTracker === undefined) {
 	    this.setState({ 'showAcceptCookiesDialog': true });
 	} else {
-	    this.setState({ 'enableSessionsButton': true });
+	    if (useCookieTracker.value) {
+		const cookies =  _cookies.getAll();
+		// ignore cookies set by Google Analytics	    
+		let ncookies = 0;
+		const gaRe = /^_ga/;
+		Object.keys(cookies).forEach( (key, index) => {
+		    if (gaRe.test(key) || key === '_onramp_cookies') {
+			//console.log(key);
+		    } else {
+			ncookies++;
+		    }
+		});
+		if (ncookies > 0) {
+		    this.setState({ 'enableSessionsButton': true });
+		}
+	    }
+	    //this.setState({ 'enableSessionsButton': true });
 	}
 	//console.log(host, apiHost);
     }
@@ -130,6 +146,7 @@ class App extends Component {
     handleCookiesClick = (data) => {
         this._updateStateSettings(data);
         this.resetCookies();
+	_cookies.set('_onramp_cookies', '{"value":"' + data["useCookies"] + '"}', { 'maxAge': 63072000 });
     }
 
     // Handle responses regarding cached data.
