@@ -61,19 +61,24 @@ class CachedSessionDialog extends React.Component {
 		<Paper className={classes.root}>
 		{this.props.cookies ?
 		 (
-		     Object.keys(this.props.cookies).map((key, index) => (
-			 <div key={index.toString()}>
-			     <ListItem button onClick={() => this.handleShowResClick(key)} key={index.toString()}>
-			     <ListItemAvatar>
-			     <Avatar>
-			     <CollectionsIcon />
-			     </Avatar>
-			     </ListItemAvatar>
-			     <ListItemText primary={this.props.cookies[key].name} secondary={this.props.cookies[key].date} />
-			     </ListItem>
-			     <Divider/>
-			 </div>
-		     ))
+		     Object.keys(this.props.cookies).map((key, index) => {
+			 const gaRe = /^_ga/;
+			 if (!gaRe.test(key) && key !== '_onramp_cookies') {
+			     return(
+			         <div key={index.toString()}>
+			             <ListItem button onClick={() => this.handleShowResClick(key)} key={index.toString()}>
+			             <ListItemAvatar>
+			             <Avatar>
+			             <CollectionsIcon />
+			             </Avatar>
+			             </ListItemAvatar>
+			             <ListItemText primary={this.props.cookies[key].name} secondary={this.props.cookies[key].date} />
+			             </ListItem>
+			             <Divider/>
+				 </div>
+			     );
+			 }
+		     })
 		 ) : (<div/>)
 		}
 	        </Paper>
