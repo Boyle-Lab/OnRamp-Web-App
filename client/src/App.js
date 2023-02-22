@@ -118,35 +118,20 @@ class App extends Component {
     // Set cookies.
     setCookie = (data) => {
 	if (this.state.useCookies) {
-	    if (document.hasStorageAccess == null) {
-		_setCookie(data);
-	    } else {
-		document.hasStorageAccess().then((hasAccess) => {
-		    if (hasAccess) {
-			_setCookie(data);
-		    } else {
-			console.log("No first-party storage access granted");
-		    }
-		});
-	    }
+	    const session_key = Math.floor(1000000000 + Math.random() * 9000000000);
+	    let cookie_str = "{";
+	    Object.keys(data).forEach( (key, index) => {
+		cookie_str = cookie_str + '"' +  key + '":"' + data[key] + '"';
+		if (index !== Object.keys(data).length-1) {
+		    cookie_str = cookie_str + ',';
+		}
+	    });
+	    cookie_str = cookie_str + '}';
+	     _cookies.set(session_key, cookie_str, { 'maxAge': 86400 });
+	    //const cookies = _cookies.getAll();
+	    //console.log(cookies);
+	    this.setState({ enableSessionsButton: true });
 	}
-    }
-
-    // Mechanics of setCookie method.
-    _setCoookie = (data) => {
-	const session_key = Math.floor(1000000000 + Math.random() * 9000000000);
-                let cookie_str = "{";
-                Object.keys(data).forEach( (key, index) => {
-                    cookie_str = cookie_str + '"' +  key + '":"' + data[key] + '"';
-                    if (index !== Object.keys(data).length-1) {
-                        cookie_str = cookie_str + ',';
-                    }
-                });
-                cookie_str = cookie_str + '}';
-                _cookies.set(session_key, cookie_str, { 'maxAge': 86400 });
-                //const cookies = _cookies.getAll();
-                //console.log(cookies);
-                this.setState({ enableSessionsButton: true });
     }
 
     // Reset cookies.
