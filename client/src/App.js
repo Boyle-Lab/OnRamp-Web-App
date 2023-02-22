@@ -71,11 +71,14 @@ class App extends Component {
     }
 
     componentDidMount() {
-	const useCookieTracker = _cookies.get('_onramp_cookies')
-	if (useCookieTracker === undefined) {
+	const useCookies = _cookies.get('_onramp_cookies')
+	if (useCookies === undefined) {
 	    this.setState({ 'showAcceptCookiesDialog': true });
 	} else {
-	    if (useCookieTracker.value) {
+	    if (useCookies.value === true) {
+		if (this.state.useCookies !== true) {
+		    this.setState({ useCookies: true });
+		}
 		const cookies =  _cookies.getAll();
 		// ignore cookies set by Google Analytics	    
 		let ncookies = 0;
@@ -89,6 +92,11 @@ class App extends Component {
 		});
 		if (ncookies > 0) {
 		    this.setState({ 'enableSessionsButton': true });
+		}
+	    } else {
+		// User denied cookies.
+		if (this.state.useCookies === undefined) {
+                    this.setState({ 'useCookies': false });
 		}
 	    }
 	    //this.setState({ 'enableSessionsButton': true });
@@ -165,7 +173,7 @@ class App extends Component {
     handleCookiesClick = (data) => {
         this._updateStateSettings(data);
         this.resetCookies();
-	_cookies.set('_onramp_cookies', '{"value":"' + data["useCookies"] + '"}', { 'maxAge': 63072000 });
+	_cookies.set('_onramp_cookies', '{"value":' + data["useCookies"] + '}', { 'maxAge': 63072000 });
     }
 
     // Handle responses regarding cached data.
