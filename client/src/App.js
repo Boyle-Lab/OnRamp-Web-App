@@ -118,12 +118,9 @@ class App extends Component {
     // Set cookies.
     setCookie = (data) => {
 	if (this.state.useCookies) {
-	    _setCookie(data);
-	    /*
-	    if (document.hasStorageAccess === null) {
+	    if (document.hasStorageAccess == null) {
 		_setCookie(data);
 	    } else {
-		console.log("hasStorageAccess");
 		document.hasStorageAccess().then((hasAccess) => {
 		    if (hasAccess) {
 			_setCookie(data);
@@ -132,7 +129,6 @@ class App extends Component {
 		    }
 		});
 	    }
-	    */
 	}
     }
 
