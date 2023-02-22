@@ -59,7 +59,7 @@ class App extends Component {
 	    resData: null,
 	    sessionName: null,
 	    runParams: null,
-	    useCookies: undefined,
+	    useCookies: true,
 	    useCached: 0,
 	    showCachedDialog: false,
 	    showAcceptCookiesDialog: false,
@@ -71,35 +71,11 @@ class App extends Component {
     }
 
     componentDidMount() {
-	const useCookies = _cookies.get('_onramp_cookies')
-	if (useCookies === undefined) {
+	const cookies =  _cookies.getAll();
+	if (Object.keys(cookies).length == 0) {
 	    this.setState({ 'showAcceptCookiesDialog': true });
 	} else {
-	    if (useCookies.value === true) {
-		if (this.state.useCookies !== true) {
-		    this.setState({ useCookies: true });
-		}
-		const cookies =  _cookies.getAll();
-		// ignore cookies set by Google Analytics	    
-		let ncookies = 0;
-		const gaRe = /^_ga/;
-		Object.keys(cookies).forEach( (key, index) => {
-		    if (gaRe.test(key) || key === '_onramp_cookies') {
-			//console.log(key);
-		    } else {
-			ncookies++;
-		    }
-		});
-		if (ncookies > 0) {
-		    this.setState({ 'enableSessionsButton': true });
-		}
-	    } else {
-		// User denied cookies.
-		if (this.state.useCookies === undefined) {
-                    this.setState({ 'useCookies': false });
-		}
-	    }
-	    //this.setState({ 'enableSessionsButton': true });
+	    this.setState({ 'enableSessionsButton': true });
 	}
 	//console.log(host, apiHost);
     }
@@ -126,39 +102,20 @@ class App extends Component {
     // Set cookies.
     setCookie = (data) => {
 	if (this.state.useCookies) {
-	    _setCookie(data);
-	    /*
-	    if (document.hasStorageAccess === null) {
-		_setCookie(data);
-	    } else {
-		console.log("hasStorageAccess");
-		document.hasStorageAccess().then((hasAccess) => {
-		    if (hasAccess) {
-			_setCookie(data);
-		    } else {
-			console.log("No first-party storage access granted");
-		    }
-		});
-	    }
-	    */
+	    const session_key = Math.floor(1000000000 + Math.random() * 9000000000);
+	    let cookie_str = "{";
+	    Object.keys(data).forEach( (key, index) => {
+		cookie_str = cookie_str + '"' +  key + '":"' + data[key] + '"';
+		if (index !== Object.keys(data).length-1) {
+		    cookie_str = cookie_str + ',';
+		}
+	    });
+	    cookie_str = cookie_str + '}';
+	     _cookies.set(session_key, cookie_str, { 'maxAge': 86400 });
+	    //const cookies = _cookies.getAll();
+	    //console.log(cookies);
+	    this.setState({ enableSessionsButton: true });
 	}
-    }
-
-    // Mechanics of setCookie method.
-    _setCoookie = (data) => {
-	const session_key = Math.floor(1000000000 + Math.random() * 9000000000);
-                let cookie_str = "{";
-                Object.keys(data).forEach( (key, index) => {
-                    cookie_str = cookie_str + '"' +  key + '":"' + data[key] + '"';
-                    if (index !== Object.keys(data).length-1) {
-                        cookie_str = cookie_str + ',';
-                    }
-                });
-                cookie_str = cookie_str + '}';
-                _cookies.set(session_key, cookie_str, { 'maxAge': 86400 });
-                //const cookies = _cookies.getAll();
-                //console.log(cookies);
-                this.setState({ enableSessionsButton: true });
     }
 
     // Reset cookies.
@@ -173,7 +130,6 @@ class App extends Component {
     handleCookiesClick = (data) => {
         this._updateStateSettings(data);
         this.resetCookies();
-	_cookies.set('_onramp_cookies', '{"value":' + data["useCookies"] + '}', { 'maxAge': 63072000 });
     }
 
     // Handle responses regarding cached data.
