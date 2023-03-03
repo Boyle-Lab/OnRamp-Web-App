@@ -120,14 +120,14 @@ class Tutorial_Params extends Component {
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>Continue to the next step of the tutorial...</span><br/>
-		            <Link onClick={ () => this.setState({'showPage': 'tutorial_submit'}) } className={classes.icon}>Submit your Run</Link><br/>
+		            <Link onClick={ () => this.props.updateParentState({'showPage': 'tutorial_submit'}) } className={classes.icon}>Submit your Run</Link><br/>
                         </Typography>
                     </Grid>
 		</Grid>
 		<GenericDialog
                     name={'Under Construction!'}
                     open={this.state.showConstructionAlert}
-                    onClose={ () => this.props.updateParentState({"showConstructionAlert": false}) }
+                    onClose={ () => this.setState({"showConstructionAlert": false}) }
                     content=<Typography>Coming Soon; Thank you for your interest!</Typography>
                 />
 	    </div>
