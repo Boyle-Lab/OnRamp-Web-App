@@ -44,7 +44,7 @@ RUN cd /home/node && git clone https://github.com/Boyle-Lab/bulk_plasmid_seq_web
 
 # Copy example data archives and decompress into the /tmp folder
 COPY example_data/*.tar.gz /tmp/
-RUN cd /tmp && tar -xzf example_results.tar.gz && mkdir -pv /tmp/example_data && mv example_data.tar.gz example_data/
+RUN cd /tmp && tar -xzf --no-same-permissions --no-same-owner example_results.tar.gz && mkdir -pv /tmp/example_data && mv example_data.tar.gz example_data/
 RUN cd /tmp && ls -alth
 
 # Copy server health check script to /usr/local/bin
