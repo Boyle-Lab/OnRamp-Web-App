@@ -120,7 +120,7 @@ class Tutorial_Params extends Component {
 
                         <Typography align="left" variant="h6">
                             <span className='bold'>Continue to the next step of the tutorial...</span><br/>
-		            <Link onClick={ () => this.setState({'showConstructionAlert': true}) } className={classes.icon}>Submit your Run</Link><br/>
+		            <Link onClick={ () => this.setState({'showPAge': 'tutorial_submit'}) } className={classes.icon}>Submit your Run</Link><br/>
                         </Typography>
                     </Grid>
 		</Grid>
