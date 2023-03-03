@@ -120,7 +120,12 @@ backend/medakaModels.json
 # Directory used to monitor dev run resource usage, etc.
 run_stats
 
-example_data/*.orig.*
+# Uncompressed example data don't need to be versioned.
+example_data/example_results
+example_data/example_references
 
 # The general public doesn't need to see our to-do list! :-)
 TO-DO.txt
+
+# Files in the diagnostics folder (used for debugging issues that come up in the logs)
+diagnostics
