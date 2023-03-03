@@ -28,3 +28,4 @@ conda activate medaka
 cd /home/node/bulk_plasmid_seq_web/backend && pm2 start server.js --log /var/log/bulk_plasmid_seq_web.log --time
 cd /home/node/bulk_plasmid_seq_web/client && pm2 start "npm start"
 pm2 save
+cat  # Need a persistent process here to keep the container alive
