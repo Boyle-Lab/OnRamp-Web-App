@@ -129,3 +129,6 @@ TO-DO.txt
 
 # Files in the diagnostics folder (used for debugging issues that come up in the logs)
 diagnostics
+
+# Archive for manuscript.
+manuscript_release_archive
