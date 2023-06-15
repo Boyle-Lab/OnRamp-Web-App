@@ -1035,7 +1035,11 @@ parseErrors = function(reqIp, res, data) {
 	    // Line content indicates an error was thrown.
 	    console.error(new Date() + ' (' + reqIp + ') (resServerId: ' + resServerId + ') ErrorFound (' + step + '): ' + line);
 	    err = append_err(err, line);
-	}	
+	} else if (line === 'No reads were assigned to any plasmid!') {
+	    // Exit was normal, but no reads were assigned to any plasmids.
+	    console.error(new Date() + ' (' + reqIp + ') (resServerId: ' + resServerId + ') ErrorFound (' + step + '): ' + line);
+	    err = append_err(err, "Job Failed: No reads were assigned to any plasmid. Did you supply the correct reference(s) and fastq file(s)?");
+	}
     });
 
     if (err) {
