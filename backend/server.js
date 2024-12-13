@@ -259,8 +259,9 @@ prepareResults = async function(req, res) {
     
     // Tar up the results for download.
     let now = new Date();
+    santizedSessionName = sessionName.replaceAll(" ", "_") // No spaces allowed in file name!
     const outFile = 'OnRamp-Results-for_'
-	  + sessionName + '_'
+	  + sanitizedSessionName + '_'
 	  + days[now.getDay()] + '_'
 	  + now.getMonth() + '-'
 	  + now.getDate() + '-'
